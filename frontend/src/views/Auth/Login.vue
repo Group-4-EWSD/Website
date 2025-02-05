@@ -1,77 +1,88 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useForm, Field, ErrorMessage } from "vee-validate";
-import * as yup from "yup";
+import { ref } from 'vue'
+import { useForm, Field, ErrorMessage, Form } from 'vee-validate'
+import * as yup from 'yup'
+import FormElement from '@/components/shared/FormElement.vue'
+import Button from '@/components/ui/button/Button.vue'
+import SideImage from '@/assets/login-side-image.webp'
 
-const loading = ref(false);
+const loading = ref(false)
 
 const schema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
-});
+  email: yup.string().email('Invalid email').required('Please enter your email'),
+  password: yup
+    .string()
+    .required('Please enter your password')
+    .min(8, 'Password must be at least 8 characters.'),
+})
 
-interface loginForm{
-    email: string,
-    password: string
+interface loginForm {
+  email: string
+  password: string
 }
 
 const { handleSubmit, errors } = useForm<loginForm>({
   validationSchema: schema,
-});
+})
 
-const onSubmit = async (values: loginForm) => {
-  loading.value = true;
+const onSubmit = handleSubmit(async (values: loginForm) => {
+  loading.value = true
   try {
-    console.log("Login data:", values); 
+    console.log('Login data:', values)
   } catch (error) {
-    console.error("Login failed:", error);
+    console.error('Login failed:', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+})
+
+// const onSubmit = async (values: loginForm) => {
+//   console.log('Login data:', values)
+//   // validate();
+//   // if (errors.value) return;
+//   loading.value = true
+//   try {
+//     console.log('Login data:', values)
+//   } catch (error) {
+//     console.error('Login failed:', error)
+//   } finally {
+//     loading.value = false
+//   }
+// }
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md px-4">
-      <div class="shadow-lg p-6 bg-white rounded-2xl">
-        <h1 class="text-center text-2xl mb-4">Login</h1>
-        <form @submit="handleSubmit(onSubmit)" class="space-y-4">
-          <div class="space-y-2">
-            <label for="email" class="block font-medium">Email</label>
-            <Field
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              class="w-full p-2 border rounded"
-            />
-            <ErrorMessage name="email" class="text-sm text-red-500" />
-          </div>
-          <div class="space-y-2">
-            <label for="password" class="block font-medium">Password</label>
-            <Field
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              class="w-full p-2 border rounded"
-            />
-            <ErrorMessage name="password" class="text-sm text-red-500" />
-          </div>
-          <button
-            type="submit"
-            class="w-full py-2 bg-gray-700 text-white rounded"
-            :disabled="loading"
-          >
-            {{ loading ? "Loading..." : "Login" }}
-          </button>
+  <div class="grid grid-cols-1 md:grid-cols-2 h-screen">
+    <div class="w-full h-full hidden md:block">
+      <img :src="SideImage" alt="Aurora University" class="object-cover h-full w-full" />
+    </div>
+    <div class="flex items-center justify-center">
+      <div class="w-full max-w-lg px-4 flex flex-col gap-4">
+        <h1 class="text-3xl">Login</h1>
+        <form @submit="onSubmit" class="space-y-4">
+          <FormElement
+            name="email"
+            label="Email"
+            id="email"
+            placeholder="Enter your email"
+            :errors="errors"
+          />
+          <FormElement
+            name="password"
+            label="Password"
+            id="password"
+            placeholder="Enter your password"
+            :errors="errors"
+          />
+
+          <Button type="submit" :disabled="loading" class="w-full">
+            {{ loading ? 'Loading...' : 'Login' }}
+          </Button>
         </form>
+        <p>
+          Forgot password? <router-link to="/auth/forgot-password" class="text-blue-700">Reset password</router-link>
+        </p>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

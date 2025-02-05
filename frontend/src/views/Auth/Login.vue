@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useForm, Field, ErrorMessage, Form } from 'vee-validate'
+import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import FormElement from '@/components/shared/FormElement.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -35,20 +35,6 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
     loading.value = false
   }
 })
-
-// const onSubmit = async (values: loginForm) => {
-//   console.log('Login data:', values)
-//   // validate();
-//   // if (errors.value) return;
-//   loading.value = true
-//   try {
-//     console.log('Login data:', values)
-//   } catch (error) {
-//     console.error('Login failed:', error)
-//   } finally {
-//     loading.value = false
-//   }
-// }
 </script>
 
 <template>

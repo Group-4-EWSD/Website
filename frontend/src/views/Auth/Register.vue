@@ -3,7 +3,7 @@ import { useForm, Field } from "vee-validate";
 import * as yup from "yup";
 import { useRouter } from "vue-router";
 import { register } from "@/api/auth";
-import type { Credentials, RegisterData } from "@/types/auth";
+import type { RegisterData } from "@/types/auth";
 import { ref } from "vue";
 
 const router = useRouter();

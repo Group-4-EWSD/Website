@@ -1,4 +1,5 @@
 import axios from "axios";
+
 import type { Credentials, RegisterData } from "@/types/auth";
   
 const API_URL = "https://ewsd-project.vercel.app/v1"; 

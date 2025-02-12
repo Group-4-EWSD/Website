@@ -11,4 +11,9 @@ class Faculty extends Model
         'facultyName',
         'facultyDescription'
     ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class, 'facultyId', 'id');
+    }
 }

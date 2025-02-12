@@ -2,15 +2,18 @@
 import { useForm } from 'vee-validate'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
 import { useCookies } from 'vue3-cookies'
 import * as yup from 'yup'
 
+import { login } from '@/api/auth'
 import Logo from '@/assets/logo.png'
 import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
 import FormElement from '@/components/shared/FormElement.vue'
 import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import type { Credentials } from '@/types/auth'
 
 const router = useRouter()
 const loading = ref(false)
@@ -34,20 +37,22 @@ const { handleSubmit, errors } = useForm<loginForm>({
 
 const onSubmit = handleSubmit(async (values: loginForm) => {
   loading.value = true
-  try {
-    console.log('Login data:', values)
-    const { cookies } = useCookies()
-    const token = cookies.set('token', 'token1234')
 
-    // go to home
-    if (token) {
-      router.replace('/')
-    }
-  } catch (error) {
-    console.error('Login failed:', error)
-  } finally {
-    loading.value = false
-  }
+  login(values as Credentials)
+    .then((response) => {
+      if (!response.data) {
+        toast.error('Invalid credentials')
+      } else {
+        const { cookies } = useCookies()
+        cookies.set('token', response.data.token)
+        router.push('/')
+      }
+      loading.value = false
+    })
+    .catch((error) => {
+      loading.value = false
+      toast.error(`An error occurred: ${error.message}`)
+    })
 })
 </script>
 
@@ -63,7 +68,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
           <Label form="email">Email</Label>
         </template>
         <template #field>
-          <Input name="email" id="email" placeholder="Enter your email" :errors="errors"/>
+          <Input name="email" id="email" placeholder="Enter your email" :errors="errors" />
         </template>
       </FormElement>
       <FormElement>
@@ -71,17 +76,23 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
           <Label form="password">Password</Label>
         </template>
         <template #field>
-          <Input name="password" id="password" placeholder="Enter your password" type="password" :errors="errors"/>
+          <Input
+            name="password"
+            id="password"
+            placeholder="Enter your password"
+            type="password"
+            :errors="errors"
+          />
         </template>
       </FormElement>
 
-      <Button type="submit" :disabled="loading" class="w-full">
-        {{ loading ? 'Loading...' : 'Login' }}
+      <Button type="submit" :disabled="loading" :processing="loading" class="w-full">
+        {{ loading ? 'Logging in...' : 'Login' }}
       </Button>
     </form>
     <div class="flex justify-between text-sm">
-      <router-link to="/auth/forgot-password" class="text-blue-700">Forgot password?</router-link>
-      <router-link to="/auth/register" class="text-blue-700">Register</router-link>
+      <router-link to="/auth/forgot-password" class="text-primary">Forgot password?</router-link>
+      <router-link to="/auth/register" class="text-primary">Register</router-link>
     </div>
   </AuthBaseLayout>
 </template>

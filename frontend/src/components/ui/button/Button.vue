@@ -9,7 +9,8 @@ import { type ButtonVariants, buttonVariants } from '.'
 interface Props extends PrimitiveProps {
   variant?: ButtonVariants['variant']
   size?: ButtonVariants['size']
-  class?: HTMLAttributes['class']
+  class?: HTMLAttributes['class'],
+  processing?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +24,6 @@ const props = withDefaults(defineProps<Props>(), {
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"
   >
-    <slot />
+  <v-icon v-if="processing" name="fa-spinner" class="animate-spin" /> <slot />
   </Primitive>
 </template>

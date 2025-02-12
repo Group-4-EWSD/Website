@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Button from '@/components/ui/button/Button.vue'
+import { Toaster } from 'vue-sonner'
 </script>
 
 <template>
-  <div>
-    <router-view></router-view>
-  </div>
+  <!-- <router-view class="bg-[#F1F0E8]"></router-view> -->
+   <router-view></router-view>
+  <Toaster richColors position="top-right" />
 </template>

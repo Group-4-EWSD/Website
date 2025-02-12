@@ -26,4 +26,16 @@ class UserRepository extends BaseRepository
         return $this->model()::where('email', $email)->first(); // laravel eloquent
         // return DB::raw("SELECT * FROM users WHERE email = $email LIMIT 1 "); // raw query 
     }
+
+    public function getUserById($id)
+    {
+        return User::findOrFail($id);
+    }
+
+    public function updateUser($id, array $data)
+    {
+        $user = User::findOrFail($id);
+        $user->update($data);
+        return $user;
+    }
 }

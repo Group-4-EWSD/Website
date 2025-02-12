@@ -35,4 +35,14 @@ class UserService
             'user' => $user
         ];
     }
+
+    public function getUserProfile($id)
+    {
+        return $this->userRepository->getUserById($id);
+    }
+
+    public function updateUserProfile($id, array $data)
+    {
+        return $this->userRepository->updateUser($id, $data);
+    }
 }

@@ -3,20 +3,26 @@ import { ref } from 'vue'
 import { Search } from 'lucide-vue-next'
 import Input from '../input/Input.vue'
 import Button from '../button/Button.vue'
+
+const searchQuery = ref('')
 </script>
 
 <template>
-  <nav class="flex justify-between items-center p-4 bg-gray-900 text-white">
-    <div class="flex items-center space-x-4">
-      <div class="text-xl font-bold">University logo or image</div>
+  <nav class="flex justify-between items-center bg-primary text-white">
+    <div class="flex items-center">
+      <img
+        src="@/assets/nav-logo.png"
+        alt="University magazine logo"
+        class="h-14 w-auto max-h-full object-contain pl-6"
+      />
     </div>
     <div class="hidden sm:flex flex-1 justify-center">
-      <div class="w-1/2 relative">
+      <div class="w-1/2 relative my-4">
         <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
         <Input v-model="searchQuery" placeholder="Search..." class="pl-10" />
       </div>
     </div>
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-4 pr-6">
       <Button class="p-0 w-6 h-6">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +31,7 @@ import Button from '../button/Button.vue'
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          class="size-6 text-white"
         >
           <path
             stroke-linecap="round"
@@ -42,7 +48,7 @@ import Button from '../button/Button.vue'
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          class="size-6 text-white"
         >
           <path
             stroke-linecap="round"

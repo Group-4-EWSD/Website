@@ -11,7 +11,7 @@ const publicRoutes = [
     name: 'home',
     component: HomeView,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
     },
   },
 ]

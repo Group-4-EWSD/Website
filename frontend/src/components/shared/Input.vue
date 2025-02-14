@@ -3,6 +3,7 @@ import { ErrorMessage, Field } from 'vee-validate'
 import { ref, useAttrs } from 'vue'
 
 import { cn } from '@/lib/utils'
+import { Eye, EyeOff } from 'lucide-vue-next'
 
 interface Props {
   type?: string
@@ -44,10 +45,10 @@ const type = ref(props.type)
         @click="() => (type = type === 'password' ? 'text' : 'password')"
       >
         <span v-if="type === 'password'">
-          <v-icon name="fa-regular-eye-slash" />
+          <EyeOff class="h-5 w-5" />
         </span>
         <span v-else>
-          <v-icon name="fa-regular-eye" />
+          <Eye class="h-5 w-5"/>
         </span>
       </button>
     </div>

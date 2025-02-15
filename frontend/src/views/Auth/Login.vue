@@ -91,8 +91,8 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       </Button>
     </form>
     <div class="flex justify-between text-sm">
-      <router-link to="/auth/forgot-password" class="text-primary">Forgot password?</router-link>
-      <router-link to="/auth/register" class="text-primary">Register</router-link>
+      <router-link to="/auth/forgot-password" class="text-primary hover:underline">Forgot password?</router-link>
+      <router-link to="/auth/register" class="text-primary hover:underline">Register</router-link>
     </div>
   </AuthBaseLayout>
 </template>

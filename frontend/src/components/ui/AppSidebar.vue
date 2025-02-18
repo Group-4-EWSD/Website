@@ -1,4 +1,6 @@
-<script setup>
+<script setup lang="ts">
+import { FileText, Home, Inbox, LogOut, Settings } from 'lucide-vue-next'
+
 import {
   Sidebar,
   SidebarContent,
@@ -6,8 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+
 import Separator from './separator/Separator.vue'
-import { Home, Settings, FileText, LogOut, Inbox } from 'lucide-vue-next'
 
 const items = [
   {

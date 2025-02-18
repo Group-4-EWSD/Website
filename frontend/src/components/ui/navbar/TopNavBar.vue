@@ -1,6 +1,7 @@
-<script setup>
+<script setup lang="ts">
+import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
-import { Search, X, BellDot } from 'lucide-vue-next'
+
 import Input from '../input/Input.vue'
 
 const searchQuery = ref('')
@@ -21,7 +22,7 @@ const toggleSearch = () => {
       />
     </div>
 
-    <div class="sm:flex flex-1 sm:justify-center">
+    <div class="flex flex-1 justify-center">
       <div class="hidden sm:flex w-1/2 relative sm:my-4">
         <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
         <Input v-model="searchQuery" placeholder="Search..." class="pl-10" />
@@ -37,7 +38,7 @@ const toggleSearch = () => {
 
       <div
         v-else
-        class="absolute left-0 w-[90vw] flex items-center bg-white border rounded-lg px-3 py-1 shadow-md"
+        class="absolute top-3 sm:left-0 w-[45vw] sm:w-[90vw] flex items-center bg-white border rounded-lg px-3 py-1 shadow-md"
       >
         <Search class="text-black w-5 h-5" />
         <Input
@@ -45,7 +46,7 @@ const toggleSearch = () => {
           placeholder="Search..."
           class="flex-1 pl-2 outline-none border-none"
         />
-        <button @click="toggleSearch" class="ml-2 text-gray-500 hover:text-gray-700">
+        <button @click="toggleSearch" class="ml-2 text-gray-700">
           <X class="w-5 h-5" />
         </button>
       </div>

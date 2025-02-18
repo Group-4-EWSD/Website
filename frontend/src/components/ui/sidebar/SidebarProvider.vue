@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils'
 import { useEventListener, useMediaQuery, useVModel } from '@vueuse/core'
 import { TooltipProvider } from 'radix-vue'
 import { computed, type HTMLAttributes, type Ref, ref } from 'vue'
+
+import { cn } from '@/lib/utils'
+
 import {
   provideSidebarContext,
   SIDEBAR_COOKIE_MAX_AGE,
@@ -28,7 +30,7 @@ const emits = defineEmits<{
   'update:open': [open: boolean]
 }>()
 
-const isMobile = useMediaQuery('(max-width: 768px)')
+const isMobile = useMediaQuery('(max-width: 440px)')
 const openMobile = ref(false)
 
 const open = useVModel(props, 'open', emits, {

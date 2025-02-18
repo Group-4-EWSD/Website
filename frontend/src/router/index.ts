@@ -1,3 +1,4 @@
+import MyArticles from '@/views/Student/MyArticles.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
 
@@ -8,8 +9,16 @@ const Register = () => import('@/views/Auth/Register.vue')
 const publicRoutes = [
   {
     path: '/',
-    name: 'home',
+    name: 'Home',
     component: HomeView,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/my-articles',
+    name: 'My Articles',
+    component: MyArticles,
     meta: {
       // requiresAuth: true,
     },

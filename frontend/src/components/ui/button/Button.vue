@@ -5,11 +5,13 @@ import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
 
 import { type ButtonVariants, buttonVariants } from '.'
+import { Loader } from 'lucide-vue-next'
 
 interface Props extends PrimitiveProps {
   variant?: ButtonVariants['variant']
   size?: ButtonVariants['size']
   class?: HTMLAttributes['class']
+  processing?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +25,6 @@ const props = withDefaults(defineProps<Props>(), {
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"
   >
-    <slot />
+    <Loader v-if="processing" name="fa-spinner" class="animate-spin h-5 w-5" /> <slot />
   </Primitive>
 </template>

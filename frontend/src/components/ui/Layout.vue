@@ -16,7 +16,7 @@ import SidebarTrigger from './sidebar/SidebarTrigger.vue'
           class="sm:hidden absolute top-[1.3rem] left-[1.25rem] z-50 p-2 bg-primary rounded-md text-white w-8 h-8"
         />
       </SidebarProvider>
-      <main class="flex-1 md:ml-60 lg:ml-[230px] p-6 overflow-y-auto">
+      <main class="flex-1 p-6 overflow-y-auto mx-auto lg:max-w-[1500px]">
         <slot />
       </main>
     </div>

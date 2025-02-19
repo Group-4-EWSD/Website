@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AppSidebar from './AppSidebar.vue'
-import TopNavbar from './navbar/TopNavbar.vue'
-import SidebarProvider from './sidebar/SidebarProvider.vue'
-import SidebarTrigger from './sidebar/SidebarTrigger.vue'
+import AppSidebar from '@/components/ui/AppSidebar.vue'
+import TopNavbar from '@/components/ui/navbar/TopNavBar.vue'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+
 </script>
 
 <template>

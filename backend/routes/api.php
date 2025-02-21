@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
@@ -24,27 +25,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Articles routes
     Route::prefix('articles')->group(function () {
         // Normal Routes
-        Route::get('/', [ArticleController::class, 'index']); // Get all articles
-        Route::post('/', [ArticleController::class, 'store']); // Create a new article
-        // Route::get('/last', [ArticleController::class, 'last']); // Get the latest article
-        Route::get('/{id}', [ArticleController::class, 'show']); // Get a single article by ID
-        Route::patch('/{id}', [ArticleController::class, 'update']); // Update an article by ID
-        Route::delete('/{id}', [ArticleController::class, 'destroy']); // Delete an article by ID
-        // File Operations
-        Route::post('/{id}/upload-delete-files', [ArticleController::class, 'manageFiles']); // Upload/Delete files
-        Route::get('/{id}/download-zip', [ArticleController::class, 'downloadZip']); // Download article as ZIP
+        Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
+        Route::get('/', [ActivityController::class, 'articlePageInitial']);
+        Route::post('/like', [ActivityController::class, 'articleLike']);
+        Route::post('/comment', [ActivityController::class, 'articleComment']);
     });
 
     // Category routes
     Route::prefix('categories')->group(function () {
-        Route::get('/', [CategoryController::class, 'index']); // Get all categories
-        Route::post('/', [CategoryController::class, 'store']); // Create a category
     });
 
 
     // User routes
     Route::prefix('user')->group(function () {
-        Route::get('/profile', [UserController::class, 'show']);
-        Route::patch('/profile', [UserController::class, 'update']);
     });
 });

@@ -13,29 +13,11 @@ class ArticleService
         $this->articleRepository = $articleRepository;
     }
 
-    public function getAllArticles()
+    public function getHomePageData($request)
     {
-        return $this->articleRepository->getAll();
-    }
-
-    public function getArticleById($id)
-    {
-        return $this->articleRepository->getById($id);
-    }
-
-    public function createArticle(array $data)
-    {
-        // Example: Add additional validation or preprocessing
-        return $this->articleRepository->create($data);
-    }
-
-    public function updateArticle($id, array $data)
-    {
-        return $this->articleRepository->update($id, $data);
-    }
-
-    public function deleteArticle($id)
-    {
-        return $this->articleRepository->delete($id);
+        return [
+            'countData' => $this->articleRepository->getCountData(),
+            'allArticles' => $this->articleRepository->getAllArticles($request)
+        ];
     }
 }

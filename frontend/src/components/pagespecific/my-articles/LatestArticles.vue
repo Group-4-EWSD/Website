@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import { PencilIcon } from 'lucide-vue-next'
+
+import { Card } from '@/components/ui/card'
 import {
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
+  TableHead,
   TableHeader,
+  TableRow,
 } from '@/components/ui/table'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Edit, PencilIcon } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -34,7 +34,7 @@ import { Edit, PencilIcon } from 'lucide-vue-next'
           <TableCell> 0 </TableCell>
           <TableCell>
             <div class="flex gap-2">
-              <PencilIcon class="h-4 w-4"/>
+              <PencilIcon class="h-4 w-4" />
             </div>
           </TableCell>
         </TableRow>

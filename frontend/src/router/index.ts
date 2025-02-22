@@ -1,6 +1,7 @@
-import MyArticles from '@/views/Student/MyArticles.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
+
+import MyArticles from '@/views/Student/MyArticles.vue'
 
 const HomeView = () => import('@/views/HomeView.vue')
 const Login = () => import('@/views/Auth/Login.vue')

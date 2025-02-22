@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { Loader } from 'lucide-vue-next'
 import { Primitive, type PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
 
 import { cn } from '@/lib/utils'
 
 import { type ButtonVariants, buttonVariants } from '.'
-import { Loader } from 'lucide-vue-next'
 
 interface Props extends PrimitiveProps {
   variant?: ButtonVariants['variant']

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { ref } from 'vue'
+// import { ref } from 'vue'
 
 import DropZone from '@/components/shared/DropZone.vue'
 import FormElement from '@/components/shared/FormElement.vue'
@@ -39,7 +39,9 @@ const { handleSubmit, errors } = useForm<UploadArticleSchema>({
   // validationSchema: schema,
 })
 
-const onSubmit = handleSubmit(async (values: UploadArticleSchema) => {})
+const onSubmit = handleSubmit(async (values: UploadArticleSchema) => {
+  console.log(values)
+})
 </script>
 
 <template>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Button } from '@/components/ui/button';
 import { FileText, Image as ImageIcon } from 'lucide-vue-next';
+import { ref } from 'vue';
+
+import { Button } from '@/components/ui/button';
 
 const files = ref<File[]>([]);
 const isDragging = ref(false);

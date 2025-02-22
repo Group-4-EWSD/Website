@@ -2,15 +2,9 @@
 import Layout from '@/components/ui/Layout.vue'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Calendar, Edit } from 'lucide-vue-next'
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHeader,
-} from '@/components/ui/table'
+import { Calendar } from 'lucide-vue-next'
+import LatestArticles from '@/components/pagespecific/my-articles/LatestArticles.vue'
+
 
 const preUploadDate = new Intl.DateTimeFormat('en', {
   day: 'numeric',
@@ -56,34 +50,7 @@ const actualDeadlineDate = new Intl.DateTimeFormat('en', {
 
       <div class="flex flex-col gap-3">
         <h3 class="font-semibold uppercase">Latest articles</h3>
-        <Card class="p-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead> Tile </TableHead>
-                <TableHead> Submission Date </TableHead>
-                <TableHead> Status </TableHead>
-                <TableHead> Category </TableHead>
-                <TableHead> Comments </TableHead>
-                <TableHead> Actions </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell> Article 3 </TableCell>
-                <TableCell> 12/12/2021 </TableCell>
-                <TableCell> Pending </TableCell>
-                <TableCell> Science </TableCell>
-                <TableCell> 0 </TableCell>
-                <TableCell>
-                  <Button class="uppercase" size="icon">
-                    <Edit />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Card>
+        <LatestArticles />
       </div>
 
       <div class="flex flex-col gap-3">

@@ -23,14 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [UserController::class, 'dashboard']);
     
-    // Articles routes
-    Route::prefix('articles')->group(function () {
-        // Normal Routes
-        Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
-        Route::get('/', [ActivityController::class, 'articlePageInitial']);
-        Route::post('/like', [ActivityController::class, 'articleLike']);
-        Route::post('/comment', [ActivityController::class, 'articleComment']);
-    });
+    
 
     // Category routes
     Route::prefix('categories')->group(function () {
@@ -41,7 +34,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('user')->group(function () {
     });
 });
-
+// Articles routes
+Route::prefix('articles')->group(function () {
+    // Normal Routes
+    Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
+    Route::get('/', [ActivityController::class, 'articlePageInitial']);
+    Route::post('/like', [ActivityController::class, 'articleLike']);
+    Route::post('/comment', [ActivityController::class, 'articleComment']);
+    
+    Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
+});
 Route::post('upload', [FileController::class, 'upload']);
 Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route

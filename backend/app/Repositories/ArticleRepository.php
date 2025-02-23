@@ -5,11 +5,39 @@ namespace App\Repositories;
 use App\Models\Article;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 //use Your Model
 
 class ArticleRepository
 {
+    public function createArticle($articleId, $userId, $request)
+    {
+        DB::table('articles')->insert([
+            'article_id' => $articleId,
+            'article_title' => $request->article_title,
+            'article_description' => $request->article_description,
+            'article_status' => $request->article_status,
+            'user_id' => $userId,
+            'approver_id' => $request->approver_id ?? null,
+            'article_type_id' => $request->article_type_id,
+            'delete_flag' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function createArticleDetail($articleId, $filePath, $fileName, $fileType)
+    {
+        DB::table('article_details')->insert([
+            'article_detail_id' => Str::random(10),
+            'article_id' => $articleId,
+            'file_path' => $filePath,
+            'file_name' => $fileName,
+            'file_type' => $fileType,
+        ]);
+    }
+
     public function getCountData(){
         $userId = Auth::id();
         return DB::table('articles')

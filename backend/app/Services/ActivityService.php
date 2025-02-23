@@ -17,7 +17,6 @@ class ActivityService
         if(count($this->activityRepository->getUserArticlePair($request)) > 0){
             $this->activityRepository->increaseViewCount($request);
         }
-        $activityDetail = $this->activityRepository->getArticleDetail($request);
 
         return [
             'articleDetail' => $this->activityRepository->getArticleDetail($request)

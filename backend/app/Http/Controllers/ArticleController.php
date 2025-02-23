@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\ArticleService;
+use App\Services\FileService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 /**
  * @OA\Tag(
  *     name="Articles",
@@ -14,10 +17,12 @@ class ArticleController extends Controller
 {
 
     protected $articleService;
+    protected $fileService;
 
-    public function __construct(ArticleService $articleService)
+    public function __construct(ArticleService $articleService, FileService $fileService)
     {
         $this->articleService = $articleService;
+        $this->fileService = $fileService;
     }
 
     /**
@@ -38,5 +43,17 @@ class ArticleController extends Controller
     {
         $homePageData = $this->articleService->getHomePageData($request);
         return response()->json($homePageData);
+    }
+
+    public function createArticle(Request $request)
+    {
+        $userId = Auth::id();
+        $result = $this->articleService->createArticle($userId, $request);
+
+        if ($result['success']) {
+            return response()->json(['message' => 'Article created successfully'], 201);
+        } else {
+            return response()->json(['error' => $result['message']], 500);
+        }
     }
 }

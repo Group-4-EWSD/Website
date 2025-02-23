@@ -1,10 +1,9 @@
-import MyArticles from '@/views/Student/MyArticles.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
-
-const Home = () => import('@/views/Student/Home.vue')
-const Login = () => import('@/views/Auth/Login.vue')
-const Register = () => import('@/views/Auth/Register.vue')
+import MyArticles from '@/views/Student/MyArticles.vue'
+import Home from '@/views/Student/Home.vue'
+import Login from '@/views/Auth/Login.vue'
+import Register from '@/views/Auth/Register.vue'
 
 const publicRoutes = [
   {

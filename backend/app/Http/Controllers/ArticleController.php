@@ -45,7 +45,7 @@ class ArticleController extends Controller
         return response()->json($homePageData);
     }
 
-    public function createArticle(Request $request)
+    public function articleCreate(Request $request)
     {
         $userId = Auth::id();
         $result = $this->articleService->createArticle($userId, $request);
@@ -55,5 +55,9 @@ class ArticleController extends Controller
         } else {
             return response()->json(['error' => $result['message']], 500);
         }
+    }
+    public function draftArticleList(){
+        $articles = $this->articleService->draftArticleList();
+        return response()->json($articles);
     }
 }

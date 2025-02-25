@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('academic_years', function (Blueprint $table) {
-            $table->string('academic_year_id', 10)->primary();
-            $table->string('academic_year', 20);
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->uuid('notification_id')->primary();
+            $table->uuid('user_id');
+            $table->text('message');
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('academic_years');
+        Schema::dropIfExists('notifications');
     }
 };

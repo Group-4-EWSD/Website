@@ -62,4 +62,8 @@ class ArticleService
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
+
+    public function draftArticleList(){
+        $this->articleRepository->draftArticleList();
+    }
 }

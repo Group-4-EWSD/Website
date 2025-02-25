@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
@@ -35,13 +36,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 });
 // Articles routes
-Route::prefix('articles')->group(function () {
+Route::prefix('/articles')->group(function () {
     // Normal Routes
     Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
-    Route::get('/', [ActivityController::class, 'articlePageInitial']);
-    Route::post('/like', [ActivityController::class, 'articleLike']);
-    Route::post('/comment', [ActivityController::class, 'articleComment']);
-    
+    Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
+    Route::post('/like', [ActionController::class, 'articleLike']);
+    Route::post('/comment', [ActionController::class, 'articleComment']);
+    Route::post('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
     Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
 });
 Route::post('upload', [FileController::class, 'upload']);

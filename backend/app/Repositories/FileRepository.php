@@ -69,4 +69,35 @@ class FileRepository
 
         return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
+
+    public function readFileContents($s3Path)
+    {
+        $result = $this->s3Client->getObject([
+            'Bucket' => 'ewsdcloud',
+            'Key' => $s3Path,
+        ]);
+
+        $fileContent = $result['Body']->getContents();
+        $tempPath = storage_path('app/temp_' . time() . '.docx');
+        file_put_contents($tempPath, $fileContent);
+
+        // Read DOCX contents
+        $phpWord = IOFactory::load($tempPath);
+        $text = '';
+        foreach ($phpWord->getSections() as $section) {
+            foreach ($section->getElements() as $element) {
+                if ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
+                    foreach ($element->getElements() as $textElement) {
+                        if ($textElement instanceof \PhpOffice\PhpWord\Element\Text) {
+                            $text .= $textElement->getText() . ' ';
+                        }
+                    }
+                }
+            }
+        }
+
+        unlink($tempPath); // Delete temp file
+
+        return trim($text);
+    }
 }

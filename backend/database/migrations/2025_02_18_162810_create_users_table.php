@@ -17,13 +17,14 @@ return new class extends Migration
             $table->string('nickname', 100)->nullable();
             $table->string('user_email', 255)->unique();
             $table->string('user_password', 255);
-            $table->string('user_type_id', 10);
-            $table->string('faculty_id', 10)->nullable();
+            $table->uuid('user_type_id');
+            $table->uuid('faculty_id')->nullable();
             $table->tinyInteger('gender');
             $table->string('user_photo_path', 255)->nullable();
             $table->boolean('delete_flag')->default(false);
             $table->timestamps();
             $table->foreign('user_type_id')->references('user_type_id')->on('user_types');
+            $table->foreign('faculty_id')->references('faculty_id')->on('faculties');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

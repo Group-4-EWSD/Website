@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('activities', function (Blueprint $table) {
-            $table->bigIncrements('activity_id');
-            $table->string('article_id', 10);
-            $table->string('user_id', 10);
-            $table->integer('react')->default(0);
+            $table->uuid('activity_id')->primary();
+            $table->uuid('article_id');
+            $table->uuid('user_id', 10);
+            $table->integer('status')->default(0);
+            $table->timestamps();
             $table->foreign('article_id')->references('article_id')->on('articles');
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 

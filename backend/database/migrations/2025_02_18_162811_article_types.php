@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('article_types', function (Blueprint $table) {
-            $table->string('article_type_id', 10)->primary();
+            $table->uuid('article_type_id')->primary();
             $table->string('article_type_name', 100);
             $table->text('remark')->nullable();
             $table->boolean('delete_flag')->default(false);

@@ -15,27 +15,29 @@ class ActionService
         $this->actionRepository = $actionRepository;
     }
 
-    public function getArticleData($articleId){
-        if(count($this->actionRepository->getUserArticlePair($articleId)) == 0){
+    public function getArticleData($articleId)
+    {
+        if (count($this->actionRepository->getUserArticlePair($articleId)) == 0) {
             $this->actionRepository->increaseViewCount($articleId);
         }
-        
+
         $articleFiles = $this->actionRepository->getArticleDetailFiles($articleId);
         $fileService = app(FileService::class);
         $contentList = [];
         $articlePhotos = [];
+
         foreach ($articleFiles as $file) {
-            if (pathinfo($file, PATHINFO_EXTENSION) === 'docx') {
-                $contentList[$file] = $fileService->readFileContents($file);
-            } elseif ($file->file_type == 'PHOTO') {
+            $fullFileName = $file->file_name . '.' . $file->file_type; // Combine name and type
+            if ($file->file_type === 'docx') {
+                $contentList[$fullFileName] = $fileService->readFileContents($fullFileName);
+            } elseif (in_array($file->file_type, ['png', 'jpg', 'jpeg', 'gif', 'webp'])) {
                 $articlePhotos[] = $file->file_path;
             }
         }
-        dd($contentList);
 
         return [
             'articleDetail' => $this->actionRepository->getArticleDetail($articleId),
-            'articleContent' => $articleContent,
+            'articleContent' => $contentList,
             'articlePhotos' => $articlePhotos,
             'commentList' => $this->actionRepository->getCommentList($articleId)
         ];

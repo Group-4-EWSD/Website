@@ -6,6 +6,36 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/articles/{articleId}": {
+            "get": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Get article data",
+                "operationId": "58c431ecffe8c6c55ee8bcd171db5534",
+                "parameters": [
+                    {
+                        "name": "articleId",
+                        "in": "path",
+                        "description": "ID of the article",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "6d7b4943-854c-4cb0-a0e3-97022110f228"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Article not found"
+                    }
+                }
+            }
+        },
         "/api/articles": {
             "get": {
                 "tags": [
@@ -53,12 +83,73 @@
                     }
                 }
             }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User login",
+                "operationId": "abc53c091ac89d7a2af0892997d1ee08",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User's email address",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "email",
+                            "example": "alice@example.com"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "User's password",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password",
+                            "example": "password123"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Articles",
             "description": "API Endpoints for Articles"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
         }
     ]
 }

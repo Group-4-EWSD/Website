@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Aws\S3\S3Client;
+use PhpOffice\PhpWord\IOFactory;
 use ZipArchive;
 
 class FileRepository

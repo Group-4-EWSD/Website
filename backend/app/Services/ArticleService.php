@@ -32,7 +32,7 @@ class ArticleService
 
         try {
             // Generate unique IDs
-            $articleId = Str::random(10);
+            $articleId = Str::uuid();
 
             // Save article
             $this->articleRepository->createArticle($articleId, $userId, $request);

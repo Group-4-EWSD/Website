@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_types', function (Blueprint $table) {
-            $table->uuid('user_type_id')->primary();
-            $table->string('user_type_name', 100);
+        Schema::create('academic_years', function (Blueprint $table) {
+            $table->uuid('academic_year_id')->primary();
+            $table->string('academic_year', 20);
         });
     }
 
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_types');
+        Schema::dropIfExists('academic_years');
     }
 };

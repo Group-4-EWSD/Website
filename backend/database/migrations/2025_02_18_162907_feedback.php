@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('article_details', function (Blueprint $table) {
-            $table->uuid('article_detail_id')->primary();
+        Schema::create('feedbacks', function (Blueprint $table) {
+            $table->uuid('feedback_id')->primary();
             $table->uuid('article_id');
-            $table->string('file_path', 255);
-            $table->string('file_name', 255);
-            $table->string('file_type', 50);
+            $table->uuid('user_id');
+            $table->text('message');
+            $table->boolean('delete_flag')->default(false);
+            $table->timestamps();
             $table->foreign('article_id')->references('article_id')->on('articles');
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('article_details');
+        Schema::dropIfExists('feedbacks');
     }
 };

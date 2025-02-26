@@ -37,4 +37,10 @@ class FileService
         $s3Path = 'documents/' . $fileName;
         return $this->fileRepository->downloadAsZip($s3Path, $fileName);
     }
+
+    public function readFileContents($fileName)
+    {
+        $s3Path = 'documents/' . $fileName;
+        return $this->fileRepository->readFileContents($s3Path);
+    }
 }

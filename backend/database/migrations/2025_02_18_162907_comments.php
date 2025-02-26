@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->bigIncrements('message_id');
-            $table->unsignedBigInteger('activity_id');
+        Schema::create('comments', function (Blueprint $table) {
+            $table->uuid('comment_id')->primary();
+            $table->uuid('article_id');
+            $table->uuid('user_id');
             $table->text('message');
-            $table->tinyInteger('message_type');
             $table->boolean('delete_flag')->default(false);
             $table->timestamps();
-            $table->foreign('activity_id')->references('activity_id')->on('activities');
+            $table->foreign('article_id')->references('article_id')->on('articles');
+            $table->foreign('user_id')->references('user_id')->on('users');
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('comments');
     }
 };

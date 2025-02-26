@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('terms_conditions', function (Blueprint $table) {
-            $table->string('term_condition_id', 10)->primary();
+            $table->uuid('term_condition_id')->primary();
             $table->text('term_condition');
         });
     }

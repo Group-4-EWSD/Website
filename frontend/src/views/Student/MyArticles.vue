@@ -33,7 +33,9 @@ const actualDeadlineDate = new Intl.DateTimeFormat('en', {
           <h2 class="font-semibold uppercase">Upload Articles</h2>
           <div class="grid md:grid-cols-2 grid-cols-1 gap-3">
             <UploadArticle />
-            <Button variant="secondary" class="uppercase w-full">View draft</Button>
+            <RouterLink to="/student/my-articles/draft">
+              <Button variant="secondary" class="uppercase w-full">View draft</Button>
+            </RouterLink>
           </div>
         </Card>
         <Card class="p-5 flex flex-row gap-5 items-center">

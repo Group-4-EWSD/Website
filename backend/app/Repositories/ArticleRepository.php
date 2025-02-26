@@ -62,7 +62,7 @@ class ArticleRepository
                 'art.updated_at',
                 DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path")
             ])
-            ->join('users as u', 'u.user_id', '=', 'art.user_id')
+            ->join('users as u', 'u.id', '=', 'art.user_id')
             ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');        
 
         // Apply search filter if `articleTitle` exists in the request

@@ -28,7 +28,7 @@ class actionRepository extends BaseRepository
 
     public function getUserArticlePair($articleId){
         $pair = $this->model()::where('article_id', $articleId)
-            ->where('user_id', 'U0003')
+            ->where('user_id', Auth::id())
             ->select('action_id', 'react')
             ->get();
         return $pair;
@@ -46,7 +46,7 @@ class actionRepository extends BaseRepository
                 DB::raw("(SELECT status FROM activities WHERE article_id = '$articleId' ORDER BY created_at DESC LIMIT 1) AS article_status"),
                 DB::raw("(SELECT COUNT(*) FROM actions WHERE article_id = '$articleId') AS view_count"),
                 DB::raw("(SELECT COUNT(*) FROM actions WHERE article_id = '$articleId' AND react = 1) AS like_count"),
-                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions WHERE article_id = '$articleId' AND react = 1 AND user_id = 'U0003')) AS current_user_react"),
+                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions WHERE article_id = '$articleId' AND react = 1 AND user_id = Auth::id())) AS current_user_react"),
                 DB::raw("(SELECT COUNT(*) FROM comments WHERE article_id = '$articleId') AS comment_count")
             ])
             ->leftJoin('users', 'users.user_id', '=', 'articles.user_id')
@@ -81,14 +81,14 @@ class actionRepository extends BaseRepository
         $this->model()::create([
             'action_id' => Str::uuid(),
             'article_id' => $articleId,
-            'user_id' => 'U0003', // Get authenticated user's ID
+            'user_id' => Auth::id(), // Get authenticated user's ID
             'react' => 0
         ]);
     }
 
     public function makeAction($request){
         $this->model()::where('article_id', $request->articleId)
-                ->where('user_id', 'U0003')  // Get authenticated user's ID
+                ->where('user_id', Auth::id())  // Get authenticated user's ID
                 ->update(['react' => 1]);
     }
 
@@ -96,7 +96,7 @@ class actionRepository extends BaseRepository
         Comment::create([
             'comment_id' => Str::uuid(),
             'article_id' => $request->articleId,
-            'user_id' => 'U0003', // Get authenticated user's ID
+            'user_id' => Auth::id(), // Get authenticated user's ID
             'message' => $request->message,
             'delete_flag' => 0,
             'created_at' => now(),

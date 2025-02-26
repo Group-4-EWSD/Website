@@ -20,6 +20,7 @@ class ActionController extends Controller
      *     path="/api/articles/{articleId}",
      *     summary="Get article data",
      *     tags={"Articles"},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="articleId",
      *         in="path",
@@ -40,6 +41,7 @@ class ActionController extends Controller
      *     path="/like",
      *     summary="Like an article",
      *     tags={"Articles"},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -61,6 +63,7 @@ class ActionController extends Controller
      *     path="/comment",
      *     summary="Comment on an article",
      *     tags={"Articles"},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(

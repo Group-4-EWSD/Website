@@ -27,7 +27,7 @@ class UserController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/login",
+     *     path="/api/login",
      *     summary="User login",
      *     tags={"Authentication"},
      *     @OA\Parameter(

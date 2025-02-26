@@ -1,8 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "EWSD API",
-        "description": "API Documentation for EWSD Project",
+        "title": "API Documentation",
         "version": "1.0.0"
     },
     "paths": {
@@ -33,7 +32,101 @@
                     "404": {
                         "description": "Article not found"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/like": {
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Like an article",
+                "operationId": "0239871e759b197662acb0088f59a6b1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "articleId"
+                                ],
+                                "properties": {
+                                    "articleId": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "6d7b4943-854c-4cb0-a0e3-97022110f228"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Article liked successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/comment": {
+            "post": {
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Comment on an article",
+                "operationId": "1a1583408e85549cf34b78d198ab5bd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "articleId",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "articleId": {
+                                        "type": "string",
+                                        "format": "uuid",
+                                        "example": "6d7b4943-854c-4cb0-a0e3-97022110f228"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "This is a great article!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment added successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/articles": {
@@ -78,19 +171,27 @@
                     "200": {
                         "description": "List of Articles"
                     },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/login": {
+        "/api/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "User login",
-                "operationId": "abc53c091ac89d7a2af0892997d1ee08",
+                "operationId": "0fc9610184083ac6dddab2c63139225a",
                 "parameters": [
                     {
                         "name": "email",
@@ -139,6 +240,17 @@
                         "description": "Invalid credentials"
                     }
                 }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "JWT Authorization",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },

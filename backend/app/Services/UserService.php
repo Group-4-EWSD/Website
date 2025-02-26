@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class UserService
 {
@@ -18,16 +19,13 @@ class UserService
     public function login($credentials)
     {
         $user = $this->userRepository->findByEmail($credentials['email']);
-
-        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        if (!$user || !Hash::check($credentials['password'], $user->user_password)) {
             return [
                 'status' => 401,
                 'message' => 'Invalid email or password'
             ];
         }
-
         $token = $user->createToken('authToken')->plainTextToken;
-
         return [
             'status' => 200,
             'message' => 'Login successful',

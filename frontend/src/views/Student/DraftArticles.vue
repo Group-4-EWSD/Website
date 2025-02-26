@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Layout from '@/components/ui/Layout.vue'
-import { DeleteIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
+import { PencilIcon, TrashIcon } from 'lucide-vue-next'
 
 import { Card } from '@/components/ui/card'
 import {
@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 
 const sampleData = [
   {
@@ -57,8 +58,12 @@ const sampleData = [
             <TableCell> {{ article.lastEditedDate }} </TableCell>
             <TableCell>
               <div class="flex gap-3">
-                <PencilIcon class="h-4 w-4 cursor-pointer"/>
-                <TrashIcon class="h-4 w-4 text-destructive cursor-pointer" />
+                <TooltipWrapper text="Edit">
+                  <PencilIcon class="h-4 w-4 cursor-pointer" />
+                </TooltipWrapper>
+                <TooltipWrapper text="Delete">
+                  <TrashIcon class="h-4 w-4 text-destructive cursor-pointer" />
+                </TooltipWrapper>
               </div>
             </TableCell>
           </TableRow>

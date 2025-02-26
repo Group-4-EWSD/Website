@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-// import { ref } from 'vue'
-
+import { ref } from 'vue'
 import DropZone from '@/components/shared/DropZone.vue'
 import FormElement from '@/components/shared/FormElement.vue'
 import Input from '@/components/shared/Input.vue'
@@ -17,16 +16,6 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 
-// const loading = ref(false)
-
-// const schema = yup.object({
-//   email: yup.string().email('Invalid email').required('Please enter your email'),
-//   password: yup
-//     .string()
-//     .required('Please enter your password')
-//     .min(8, 'Password must be at least 8 characters.'),
-// })
-
 interface UploadArticleSchema {
   title: string
   description: string
@@ -35,25 +24,106 @@ interface UploadArticleSchema {
   files: File[]
 }
 
-const { handleSubmit, errors } = useForm<UploadArticleSchema>({
-  // validationSchema: schema,
+// Create a ref to control the dialog open state
+const isOpen = ref(false)
+const isLoading = ref(false)
+
+const { handleSubmit, errors, values, setValues } = useForm<UploadArticleSchema>({
+  initialValues: {
+    title: '',
+    description: '',
+    category: '',
+    type: '',
+    files: []
+  }
 })
 
-const onSubmit = handleSubmit(async (values: UploadArticleSchema) => {
-  console.log(values)
+// Function to submit the article
+const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
+  try {
+    isLoading.value = true
+    console.log('Submitting article:', formValues)
+    
+    // Here you would typically make an API call to submit the article
+    // Example:
+    // await articleApi.submitArticle(formValues)
+    
+    // Simulate API call with timeout
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Close the dialog after successful submission
+    isOpen.value = false
+    
+    // Reset form after submission
+    resetForm()
+    
+    // You might want to show a success notification here
+  } catch (error) {
+    console.error('Error submitting article:', error)
+    // Handle error (show error notification, etc.)
+  } finally {
+    isLoading.value = false
+  }
 })
+
+// Function to save article as draft
+const saveAsDraft = async () => {
+  try {
+    isLoading.value = true
+    const formValues = values
+    
+    console.log('Saving article as draft:', formValues)
+    
+    // Here you would typically make an API call to save the draft
+    // Example:
+    // await articleApi.saveAsDraft(formValues)
+    
+    // Simulate API call with timeout
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Close the dialog after saving
+    isOpen.value = false
+    
+    // Reset form after saving
+    resetForm()
+    
+    // You might want to show a success notification here
+  } catch (error) {
+    console.error('Error saving draft:', error)
+    // Handle error (show error notification, etc.)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Function to close the modal
+const closeModal = () => {
+  isOpen.value = false
+  resetForm()
+}
+
+// Function to reset the form
+const resetForm = () => {
+  setValues({
+    title: '',
+    description: '',
+    category: '',
+    type: '',
+    files: []
+  })
+}
 </script>
 
 <template>
-  <Dialog>
+  <Dialog v-model:open="isOpen">
     <DialogTrigger as-child>
-      <Button class="uppercase w-full">Upload</Button>
+      <Button class="uppercase w-full" @click="isOpen = true">Upload</Button>
     </DialogTrigger>
     <DialogContent class="sm:max-w-[700px]">
       <DialogHeader>
         <DialogTitle class="uppercase">Upload your article</DialogTitle>
       </DialogHeader>
-      <form @submit="onSubmit" class="space-y-4 pt-5">
+      <form @submit.prevent="onSubmit" class="space-y-4 pt-5">
         <FormElement :errors="errors" layout="row">
           <template #label>
             <Label form="title">Title</Label>
@@ -111,14 +181,16 @@ const onSubmit = handleSubmit(async (values: UploadArticleSchema) => {
             </Select>
           </template>
         </FormElement>
-
         <DropZone />
       </form>
-
       <DialogFooter>
-        <Button type="submit" variant="ghost"> Cancel </Button>
-        <Button type="submit" variant="outline"> Save as draft </Button>
-        <Button type="submit"> Submit </Button>
+        <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading">Cancel</Button>
+        <Button type="button" variant="outline" @click="saveAsDraft" :processing="isLoading">
+          {{ isLoading ? 'Saving...' : 'Save as draft' }}
+        </Button>
+        <Button type="submit" @click="onSubmit" :processing="isLoading">
+          {{ isLoading ? 'Submitting...' : 'Submit' }}
+        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

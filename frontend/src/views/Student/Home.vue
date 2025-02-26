@@ -81,7 +81,7 @@ const articles = [
 
 <template>
   <Layout>
-    <h2 class="text-2xl font-bold mb-4 uppercase">Dashboard</h2>
+    <h2 class="text-xl font-bold mb-4 uppercase">Dashboard</h2>
 
     <div class="flex flex-col gap-5">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

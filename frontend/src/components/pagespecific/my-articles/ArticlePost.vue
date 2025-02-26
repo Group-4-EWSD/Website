@@ -1,0 +1,51 @@
+<script setup lang="ts">
+import { defineProps } from 'vue'
+import { Card } from '@/components/ui/card'
+import { HeartIcon, EyeIcon } from 'lucide-vue-next'
+
+interface Article {
+  title: string
+  date: string
+  totalLikes: number
+  totalViews: number
+  status: string
+  description: string
+}
+
+// define props
+const props = defineProps<{
+  article: Article
+}>()
+
+const article = props.article
+</script>
+
+<template>
+  <Card :key="article.title" class="p-4 flex flex-col gap-4">
+    <div class="flex justify-between items-top">
+      <div class="flex flex-col gap-2">
+        <h3 class="font-semibold">{{ article.title }}</h3>
+        <p class="text-sm">{{ article.date }}</p>
+      </div>
+      <div class="flex flex-row gap-3 h-fit">
+        <div class="flex gap-2 items-center">
+          <HeartIcon class="h-4 w-4" />
+          <p class="text-sm">{{ article.totalLikes }}</p>
+        </div>
+        <div class="flex gap-2 items-center">
+          <EyeIcon class="h-4 w-4" />
+          <p class="text-sm">{{ article.totalViews }}</p>
+        </div>
+        <div class="text-sm w-fit p-1 px-2 bg-secondary text-white rounded-md">
+          {{ article.status }}
+        </div>
+      </div>
+    </div>
+    
+    <p class="text-sm">{{ article.description }}</p>
+
+    
+    
+
+  </Card>
+</template>

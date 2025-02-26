@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
 
-const HomeView = () => import('@/views/HomeView.vue')
+const Home = () => import('@/views/Student/Home.vue')
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
@@ -11,7 +11,7 @@ const publicRoutes = [
   {
     path: '/',
     name: 'Home',
-    component: HomeView,
+    component: Home,
     meta: {
       // requiresAuth: true,
     },

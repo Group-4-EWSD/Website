@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
 import { PencilIcon, TrashIcon } from 'lucide-vue-next'
 
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Card } from '@/components/ui/card'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Table,
   TableBody,
@@ -11,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 
 const sampleData = [
   {
@@ -51,7 +51,7 @@ const sampleData = [
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="article in sampleData">
+          <TableRow v-for="article in sampleData" :key="article.title">
             <TableCell> {{ article.title }} </TableCell>
             <TableCell> {{ article.description }} </TableCell>
             <TableCell> {{ article.category }} </TableCell>

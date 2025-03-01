@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
+import { FilterX, Grip, MessageCircleMore, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+
 import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Table,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
-  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
-import { ThumbsUp, Grip, MessageCircleMore, SlidersHorizontal, FilterX } from 'lucide-vue-next'
+
 
 const articles = [
   {

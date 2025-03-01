@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 // props
 // const props = defineProps({

@@ -4,8 +4,9 @@ import MyArticles from '@/views/Student/MyArticles.vue'
 import Home from '@/views/Student/Home.vue'
 import Login from '@/views/Auth/Login.vue'
 import Register from '@/views/Auth/Register.vue'
+import ArticleDetails from '@/views/Student/ArticleDetails.vue'
 
-const publicRoutes = [
+const studentRoutes = [
   {
     path: '/',
     name: 'Home',
@@ -18,6 +19,14 @@ const publicRoutes = [
     path: '/student/my-articles',
     name: 'My Articles',
     component: MyArticles,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/articles/:id',
+    name: 'ArticleDetails',
+    component: ArticleDetails,
     meta: {
       // requiresAuth: true,
     },
@@ -35,7 +44,7 @@ const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...publicRoutes, ...authRoutes, wildcardRoute],
+  routes: [...studentRoutes, ...authRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {

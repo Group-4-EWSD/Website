@@ -10,7 +10,7 @@ import {
   TableCell,
   TableHeader,
 } from '@/components/ui/table'
-import { ThumbsUp, Grip, MessageCircleMore, SlidersHorizontal, FilterX } from 'lucide-vue-next'
+import { ThumbsUp, Eye, SlidersHorizontal, FilterX } from 'lucide-vue-next'
 
 const articles = [
   {
@@ -33,7 +33,7 @@ const articles = [
   },
   {
     id: 3,
-    title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+    title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
     description:
       'The rise of artificial intelligence has sparked numerous debates across various fields...',
     author: 'Swe Thu Htet',
@@ -42,7 +42,7 @@ const articles = [
   },
   {
     id: 4,
-    title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+    title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
     description:
       'The rise of artificial intelligence has sparked numerous debates across various fields...',
     author: 'Swe Thu Htet',
@@ -51,7 +51,7 @@ const articles = [
   },
   {
     id: 5,
-    title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+    title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
     description:
       'The rise of artificial intelligence has sparked numerous debates across various fields...',
     author: 'Swe Thu Htet',
@@ -60,7 +60,7 @@ const articles = [
   },
   {
     id: 6,
-    title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+    title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
     description:
       'The rise of artificial intelligence has sparked numerous debates across various fields...',
     author: 'Swe Thu Htet',
@@ -92,7 +92,7 @@ const articles = [
           </CardHeader>
           <CardContent>
             <p class="text-4xl font-bold text-blue-500 py-2">
-              45 <span class="text-primary"> Likes</span>
+              45 <span class="text-primary text-3xl"> Likes</span>
             </p>
             <p class="text-sm text-muted-foreground">Up to 10% from Last Week</p>
           </CardContent>
@@ -100,7 +100,6 @@ const articles = [
         <Card class="p-4">
           <CardHeader class="flex items-center justify-between">
             <CardTitle class="text-lg uppercase">Uploaded Articles</CardTitle>
-            <component :is="Grip" />
           </CardHeader>
           <CardContent>
             <p class="text-4xl font-bold py-2">21</p>
@@ -110,7 +109,7 @@ const articles = [
         <Card class="p-4">
           <CardHeader class="flex items-center justify-between">
             <CardTitle class="text-lg uppercase">Total Views</CardTitle>
-            <component :is="MessageCircleMore" />
+            <component :is="Eye" />
           </CardHeader>
           <CardContent>
             <p class="text-4xl font-bold py-2">35</p>
@@ -119,7 +118,8 @@ const articles = [
         </Card>
       </div>
 
-      <div class="flex flex-col gap-3">
+      <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
+        <!-- <div class="flex flex-col gap-3"> -->
         <div class="flex justify-between items-center pb-2">
           <h3 class="font-semibold uppercase">AURORA's magazine articles</h3>
           <div class="flex gap-3 text-gray-600">
@@ -127,8 +127,7 @@ const articles = [
             <FilterX class="w-5 h-5 cursor-pointer hover:text-black" />
           </div>
         </div>
-
-        <Card class="p-4">
+        <div class="max-h-[275px] overflow-y-auto">
           <Table class="w-full">
             <TableBody>
               <TableRow
@@ -143,7 +142,10 @@ const articles = [
                       class="w-10 h-10 rounded-full border border-white hidden sm:flex"
                     />
                     <div class="flex-1">
-                      <a href="#" class="text-blue-600 font-semibold hover:underline py-1">
+                      <a
+                        :href="`/articles/${article.id}`"
+                        class="text-blue-600 font-semibold hover:underline py-1"
+                      >
                         {{ article.title }}
                       </a>
                       <p class="text-sm text-gray-500 py-1">
@@ -157,7 +159,7 @@ const articles = [
               </TableRow>
             </TableBody>
           </Table>
-        </Card>
+        </div>
       </div>
     </div>
   </Layout>

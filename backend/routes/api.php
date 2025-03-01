@@ -46,3 +46,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('upload', [FileController::class, 'upload']);
 Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
+Route::post('/list-file', [FileController::class, 'listFiles']); // New route

@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Route::get('/getUserList', [UserController::class, 'index']);
+Route::post('/userLogin', [UserController::class, 'login']);
 
 Route::middleware([RedirectIfAuthenticated::class])->group(function () {
     Route::post('/login', [UserController::class, 'login']);

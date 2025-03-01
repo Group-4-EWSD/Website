@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
+import { FilterX, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+
 import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHeader,
-} from '@/components/ui/table'
-import { ThumbsUp, Eye, SlidersHorizontal, FilterX } from 'lucide-vue-next'
+import Layout from '@/components/ui/Layout.vue'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 const articles = [
   {
@@ -81,7 +74,7 @@ const articles = [
 
 <template>
   <Layout>
-    <h2 class="text-2xl font-bold mb-4 uppercase">Dashboard</h2>
+    <h2 class="text-xl font-bold mb-4 uppercase">Dashboard</h2>
 
     <div class="flex flex-col gap-5">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

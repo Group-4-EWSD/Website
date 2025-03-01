@@ -1,13 +1,12 @@
 <script setup lang="ts">
-
 import { CalendarDays } from 'lucide-vue-next'
 
+import ArticlePost from '@/components/pagespecific/my-articles/ArticlePost.vue'
 import LatestArticles from '@/components/pagespecific/my-articles/LatestArticles.vue'
 import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.vue'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
-
 
 const preUploadDate = new Intl.DateTimeFormat('en', {
   day: 'numeric',
@@ -21,6 +20,38 @@ const actualDeadlineDate = new Intl.DateTimeFormat('en', {
   year: 'numeric',
 }).format(new Date())
 
+const sampleArticles = [
+  {
+    title: 'Article 1',
+    description:
+      'loren ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+    category: 'Category 1',
+    totalLikes: 10,
+    totalViews: 100,
+    date: '12/12/2025',
+    status: 'Approved',
+  },
+  {
+    title: 'Article 2',
+    description:
+      'loren ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+    category: 'Category 2',
+    totalLikes: 20,
+    totalViews: 200,
+    date: '12/12/2025',
+    status: 'Pending',
+  },
+  {
+    title: 'Article 3',
+    description:
+      'loren ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+    category: 'Category 3',
+    totalLikes: 30,
+    totalViews: 300,
+    date: '12/12/2025',
+    status: 'Rejected',
+  },
+]
 </script>
 
 <template>
@@ -33,7 +64,9 @@ const actualDeadlineDate = new Intl.DateTimeFormat('en', {
           <h2 class="font-semibold uppercase">Upload Articles</h2>
           <div class="grid md:grid-cols-2 grid-cols-1 gap-3">
             <UploadArticle />
-            <Button variant="secondary" class="uppercase w-full">View draft</Button>
+            <RouterLink to="/student/my-articles/draft">
+              <Button variant="secondary" class="uppercase w-full">View draft</Button>
+            </RouterLink>
           </div>
         </Card>
         <Card class="p-5 flex flex-row gap-5 items-center">
@@ -59,6 +92,7 @@ const actualDeadlineDate = new Intl.DateTimeFormat('en', {
 
       <div class="flex flex-col gap-3">
         <h3 class="font-semibold uppercase">My Articles</h3>
+        <ArticlePost v-for="article in sampleArticles" :key="article.title" :article="article" />
       </div>
     </div>
   </Layout>

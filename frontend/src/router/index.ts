@@ -1,16 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
-import MyArticles from '@/views/Student/MyArticles.vue'
-import Home from '@/views/Student/Home.vue'
-import Login from '@/views/Auth/Login.vue'
-import Register from '@/views/Auth/Register.vue'
 import ArticleDetails from '@/views/Student/ArticleDetails.vue'
 
-const studentRoutes = [
+const StudentHome = () => import('@/views/Student/Home.vue')
+const Login = () => import('@/views/Auth/Login.vue')
+const Register = () => import('@/views/Auth/Register.vue')
+const MyArticles = () => import('@/views/Student/MyArticles.vue')
+const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
+const Settings = () => import('@/views/Settings.vue')
+
+const publicRoutes = [
   {
-    path: '/',
+    path: '/student/home',
     name: 'Home',
-    component: Home,
+    component: StudentHome,
     meta: {
       // requiresAuth: true,
     },
@@ -27,6 +30,22 @@ const studentRoutes = [
     path: '/articles/:id',
     name: 'ArticleDetails',
     component: ArticleDetails,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/my-articles/draft',
+    name: 'Draft Articles',
+    component: DraftArticles,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/settings',
+    name: 'Settings',
+    component: Settings,
     meta: {
       // requiresAuth: true,
     },

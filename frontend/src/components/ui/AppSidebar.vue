@@ -14,7 +14,7 @@ import Separator from './separator/Separator.vue'
 const items = [
   {
     title: 'Home',
-    url: '/',
+    url: '/student/home',
     icon: Home,
   },
   {
@@ -24,12 +24,12 @@ const items = [
   },
   {
     title: 'Inbox',
-    url: '#',
+    url: '/student/inbox',
     icon: Inbox,
   },
   {
     title: 'Settings',
-    url: '#',
+    url: '/student/settings',
     icon: Settings,
   },
   {
@@ -45,10 +45,12 @@ const items = [
       <SidebarMenu class="flex flex-col h-full">
         <SidebarMenuItem v-for="item in items.slice(0, -1)" :key="item.title">
           <SidebarMenuButton as-child>
-            <a :href="item.url" class="p-6">
+            
+            <RouterLink :to="item.url" class="p-6" active-class="bg-primary text-white rounded-lg">
               <component :is="item.icon" />
               <span>{{ item.title }}</span>
-            </a>
+            </RouterLink>
+
           </SidebarMenuButton>
         </SidebarMenuItem>
 

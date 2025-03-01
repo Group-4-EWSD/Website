@@ -46,10 +46,10 @@ class actionRepository extends BaseRepository
                 DB::raw("(SELECT status FROM activities WHERE article_id = '$articleId' ORDER BY created_at DESC LIMIT 1) AS article_status"),
                 DB::raw("(SELECT COUNT(*) FROM actions WHERE article_id = '$articleId') AS view_count"),
                 DB::raw("(SELECT COUNT(*) FROM actions WHERE article_id = '$articleId' AND react = 1) AS like_count"),
-                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions WHERE article_id = '$articleId' AND react = 1 AND user_id = Auth::id())) AS current_user_react"),
+                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions WHERE article_id = '$articleId' AND react = 1 AND user_id = '$userId')) AS current_user_react"),
                 DB::raw("(SELECT COUNT(*) FROM comments WHERE article_id = '$articleId') AS comment_count")
             ])
-            ->leftJoin('users', 'users.user_id', '=', 'articles.user_id')
+            ->leftJoin('users', 'users.id', '=', 'articles.user_id')
             ->where('articles.article_id', '=', $articleId)
             ->first();
         return $article;
@@ -63,7 +63,7 @@ class actionRepository extends BaseRepository
     public function getCommentList($articleId){
         // SELECT c.message, c.created_at, c.user_id, u.user_photo_path, u.gender, u.user_name FROM comments c JOIN users u ON u.user_id = c.user_id;
         $comments = DB::table('comments as c')
-                ->join('users as u', 'u.user_id', '=', 'c.user_id')
+                ->join('users as u', 'u.id', '=', 'c.user_id')
                 ->select([
                     'c.message',
                     'c.created_at',

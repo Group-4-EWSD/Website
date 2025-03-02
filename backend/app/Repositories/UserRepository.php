@@ -38,4 +38,10 @@ class UserRepository extends BaseRepository
         $user->update($data);
         return $user;
     }
+
+    public function getTermsCondition()
+    {
+        $termsConditions = DB::table("terms_conditions")->get();
+        return $termsConditions;
+    }
 }

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
 import ArticleDetails from '@/views/Student/ArticleDetails.vue'
+import Notification from '@/views/Student/Notification.vue'
 
 const StudentHome = () => import('@/views/Student/Home.vue')
 const Login = () => import('@/views/Auth/Login.vue')
@@ -9,10 +10,10 @@ const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 const Settings = () => import('@/views/Settings.vue')
 
-const publicRoutes = [
+const studentRoutes = [
   {
     path: '/student/home',
-    name: 'Home',
+    name: 'Student Home',
     component: StudentHome,
     meta: {
       // requiresAuth: true,
@@ -28,7 +29,7 @@ const publicRoutes = [
   },
   {
     path: '/articles/:id',
-    name: 'ArticleDetails',
+    name: 'Article Details',
     component: ArticleDetails,
     meta: {
       // requiresAuth: true,
@@ -38,6 +39,14 @@ const publicRoutes = [
     path: '/student/my-articles/draft',
     name: 'Draft Articles',
     component: DraftArticles,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/notifications',
+    name: 'Student Notifications',
+    component: Notification,
     meta: {
       // requiresAuth: true,
     },

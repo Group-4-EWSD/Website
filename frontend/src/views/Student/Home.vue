@@ -1,9 +1,34 @@
 <script setup lang="ts">
-import { FilterX, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 
-import { Card } from '@/components/ui/card'
+import { ref } from 'vue'
 import Layout from '@/components/ui/Layout.vue'
+import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
+import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
+
+const sortOption = ref<string>('')
+
+const sortOptions = ref([
+  { value: 'newest', label: 'Newest First' },
+  { value: 'oldest', label: 'Oldest First' },
+  { value: 'name-asc', label: 'Name (A → Z)' },
+  { value: 'name-desc', label: 'Name (Z → A)' },
+])
+
+const sortBy = (option: string) => {
+  sortOption.value = option
+  console.log('Sorting by:', option)
+  // Implement sorting logic in your computed properties or API call
+}
 
 const articles = [
   {
@@ -76,55 +101,77 @@ const articles = [
   <Layout>
     <h2 class="text-xl font-bold mb-4 uppercase">Dashboard</h2>
 
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-3">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card class="p-4">
-          <CardHeader class="flex items-center justify-between">
-            <CardTitle class="text-lg uppercase">Total Likes</CardTitle>
+          <div class="flex items-center justify-between p-0">
+            <h2 class="text-lg uppercase">Total Likes</h2>
             <component :is="ThumbsUp" />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div>
             <p class="text-4xl font-bold text-blue-500 py-2">
               45 <span class="text-primary text-3xl"> Likes</span>
             </p>
             <p class="text-sm text-muted-foreground">Up to 10% from Last Week</p>
-          </CardContent>
+          </div>
         </Card>
         <Card class="p-4">
-          <CardHeader class="flex items-center justify-between">
-            <CardTitle class="text-lg uppercase">Uploaded Articles</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg uppercase">Uploaded Articles</h2>
+          </div>
+          <div>
             <p class="text-4xl font-bold py-2">21</p>
             <p class="text-sm text-muted-foreground">Articles for this year</p>
-          </CardContent>
+          </div>
         </Card>
         <Card class="p-4">
-          <CardHeader class="flex items-center justify-between">
-            <CardTitle class="text-lg uppercase">Total Views</CardTitle>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg uppercase">Total Views</h2>
             <component :is="Eye" />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div>
             <p class="text-4xl font-bold py-2">35</p>
             <p class="text-sm text-muted-foreground">75% total numbers of views</p>
-          </CardContent>
+          </div>
         </Card>
       </div>
 
+      <div class="flex justify-between items-center pb-2 relative">
+        <h3 class="font-semibold uppercase">AURORA's magazine articles</h3>
+        <div class="flex gap-3 text-gray-600 pr-[10px] relative">
+          <!-- Filter -->
+          <FilterModal />
+
+          <!-- Sorting -->
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <SlidersHorizontal
+                class="w-5 h-5 cursor-pointer hover:text-black transition-all"
+                aria-label="Sort items"
+              />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" class="w-48 z-50">
+              <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                v-for="option in sortOptions"
+                :key="option.value"
+                @click="sortBy(option.value)"
+              >
+                {{ option.label }}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
         <!-- <div class="flex flex-col gap-3"> -->
-        <div class="flex justify-between items-center pb-2">
-          <h3 class="font-semibold uppercase">AURORA's magazine articles</h3>
-          <div class="flex gap-3 text-gray-600">
-            <SlidersHorizontal class="w-5 h-5 cursor-pointer hover:text-black" />
-            <FilterX class="w-5 h-5 cursor-pointer hover:text-black" />
-          </div>
-        </div>
-        <div class="max-h-[275px] overflow-y-auto">
+        <div class="max-h-[400px] overflow-y-auto">
           <Table class="w-full">
             <TableBody>
               <TableRow
-                v-for="article in articles"
+                v-for="article in articles.slice(0, 6)"
                 :key="article.id"
                 class="border-b hover:bg-gray-50 transition-all"
               >

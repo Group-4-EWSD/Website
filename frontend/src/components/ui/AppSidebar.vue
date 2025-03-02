@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, Home, Inbox, LogOut, Settings } from 'lucide-vue-next'
+import { FileText, Home, Bell, LogOut, Settings } from 'lucide-vue-next'
 
 import {
   Sidebar,
@@ -23,9 +23,9 @@ const items = [
     icon: FileText,
   },
   {
-    title: 'Inbox',
-    url: '/student/inbox',
-    icon: Inbox,
+    title: 'Notifications',
+    url: '/student/notifications',
+    icon: Bell,
   },
   {
     title: 'Settings',
@@ -45,12 +45,10 @@ const items = [
       <SidebarMenu class="flex flex-col h-full">
         <SidebarMenuItem v-for="item in items.slice(0, -1)" :key="item.title">
           <SidebarMenuButton as-child>
-            
             <RouterLink :to="item.url" class="p-6" active-class="bg-primary text-white rounded-lg">
               <component :is="item.icon" />
               <span>{{ item.title }}</span>
             </RouterLink>
-
           </SidebarMenuButton>
         </SidebarMenuItem>
 

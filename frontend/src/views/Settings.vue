@@ -35,60 +35,63 @@ const getAvatarFallBack = (name: string): string => {
 </script>
 <template>
   <Layout>
-    <div class="flex flex-col h-full gap-4">
-      <h2 class="text-lg md:text-xl font-bold uppercase">Settings</h2>
-      <Card>
-        <CardContent class="py-6">
-          <h2 class="md:text-lg font-semibold mb-4">Profile</h2>
-          <div class="flex flex-row items-center gap-6">
-            <Avatar size="medium">
-              <AvatarImage :src="user.photoUrl ?? ''" alt="@unovue" />
-              <AvatarFallback class="text-white">{{ getAvatarFallBack(user.name) }}</AvatarFallback>
-            </Avatar>
-            <div class="flex flex-row flex-wrap gap-2">
-              <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white"
-                >Remove</Button
-              >
-              <Button variant="secondary">Change</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent class="py-6">
-          <div class="flex items-center justify-between">
-            <h2 class="md:text-lg font-semibold mb-4">Personal Information</h2>
-
-            <EditInformationDialog
-              :isOpen="showEditDialog"
-              :initialData="user"
-              @update:isOpen="showEditDialog = $event"
-            >
-              <template #trigger>
-                <Button variant="secondary" class="hidden md:flex">
-                  <PencilIcon class="w-4 h-4" />Edit</Button
+    <div class="mb-4">
+      <div class="flex flex-col h-full gap-4">
+        <h2 class="text-lg md:text-xl font-bold uppercase">Settings</h2>
+        <Card>
+          <CardContent class="py-6">
+            <h2 class="md:text-lg font-semibold mb-4">Profile</h2>
+            <div class="flex flex-row items-center gap-6">
+              <Avatar size="medium">
+                <AvatarImage :src="user.photoUrl ?? ''" alt="@unovue" />
+                <AvatarFallback class="text-white">{{
+                  getAvatarFallBack(user.name)
+                }}</AvatarFallback>
+              </Avatar>
+              <div class="flex flex-row flex-wrap gap-2">
+                <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white"
+                  >Remove</Button
                 >
-                <Button variant="ghost" class="p-0 m-0 hover:bg-0 md:hidden">
-                  <PencilIcon class="w-4 h-4" />
-                </Button>
-              </template>
-            </EditInformationDialog>
-          </div>
-          <div class="flex flex-col">
-            <SettingsRow label="Name" :value="user.name" />
-            <SettingsRow label="Nick Name" :value="user.nickName" />
-            <SettingsRow label="Email" :value="user.email" />
-            <SettingsRow label="Faculty" :value="user.faculty" />
-            <SettingsRow label="Date of Birth" :value="user.dateOfBirth" />
-            <SettingsRow label="Gender" :value="user.gender" />
-            <SettingsRow label="Phone Number" :value="user.phoneNumber" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                <Button variant="secondary">Change</Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent class="py-6">
+            <div class="flex items-center justify-between">
+              <h2 class="md:text-lg font-semibold mb-4">Personal Information</h2>
 
-    <!-- Edit Dialog -->
-    <!-- <Dialog :open="showDialog" @update:open="showDialog = $event">
+              <EditInformationDialog
+                :isOpen="showEditDialog"
+                :initialData="user"
+                @update:isOpen="showEditDialog = $event"
+              >
+                <template #trigger>
+                  <Button variant="secondary" class="hidden md:flex">
+                    <PencilIcon class="w-4 h-4" />Edit</Button
+                  >
+                  <Button variant="ghost" class="p-0 m-0 hover:bg-0 md:hidden">
+                    <PencilIcon class="w-4 h-4" />
+                  </Button>
+                </template>
+              </EditInformationDialog>
+            </div>
+            <div class="flex flex-col">
+              <SettingsRow label="Name" :value="user.name" />
+              <SettingsRow label="Nick Name" :value="user.nickName" />
+              <SettingsRow label="Email" :value="user.email" />
+              <SettingsRow label="Faculty" :value="user.faculty" />
+              <SettingsRow label="Date of Birth" :value="user.dateOfBirth" />
+              <SettingsRow label="Gender" :value="user.gender" />
+              <SettingsRow label="Phone Number" :value="user.phoneNumber" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Edit Dialog -->
+      <!-- <Dialog :open="showDialog" @update:open="showDialog = $event">
       <DialogContent class="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit {{ currentField }}</DialogTitle>
@@ -132,5 +135,6 @@ const getAvatarFallBack = (name: string): string => {
         </DialogFooter>
       </DialogContent>
     </Dialog> -->
+    </div>
   </Layout>
 </template>

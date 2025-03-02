@@ -6,6 +6,8 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\UserTypeController;
+use App\Http\Controllers\FacultyController;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,3 +48,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('upload', [FileController::class, 'upload']);
 Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
+Route::get('/usertype-dropdown', [UserTypeController::class, 'UserTypeDropdown']);
+Route::get('/faculty-dropdown', [FacultyController::class, 'FacultyDropdown']);

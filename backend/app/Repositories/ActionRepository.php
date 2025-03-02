@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
 /**
  * Class actionRepository.
  */
-class actionRepository extends BaseRepository
+class ActionRepository extends BaseRepository
 {
     /**
      * @return string

@@ -6,6 +6,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -32,18 +33,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
     });
-    
 
     // Category routes
-    Route::prefix('categories')->group(function () {
+    Route::prefix('/categories')->group(function () {
     });
-
 
     // User routes
-    Route::prefix('user')->group(function () {
+    Route::prefix('/user')->group(function () {
+    });
+    Route::get('/logout', [UserController::class, 'logout']);
+
+    // User routes
+    Route::prefix('/notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
     });
 });
+Route::get('/termsCondition', [UserController::class, 'termsCondition']);
 
+// Unnecessory, Just for testing
 Route::post('upload', [FileController::class, 'upload']);
 Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route

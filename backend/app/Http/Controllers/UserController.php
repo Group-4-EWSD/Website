@@ -72,6 +72,23 @@ class UserController extends Controller
         return response()->json($response, $response['status']);
     }
 
+    public function logout(Request $request)
+    {
+        $request->user()->tokens->each(function ($token) {
+            $token->delete();
+        });
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Logout successful'
+        ]);
+    }
+
+    public function termsCondition(){
+        return response()->json($this->userService->getTermsCondition());
+    }
+
+
     public function show()
     {
         $userId = Auth::id(); // Get logged-in user ID

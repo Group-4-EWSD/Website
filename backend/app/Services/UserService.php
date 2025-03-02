@@ -43,4 +43,9 @@ class UserService
     {
         return $this->userRepository->updateUser($id, $data);
     }
+
+    public function getTermsCondition()
+    {
+        return $this->userRepository->getTermsCondition();
+    }
 }

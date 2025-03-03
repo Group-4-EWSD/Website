@@ -30,9 +30,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
+        Route::post('/commentDelete', [ActionController::class, 'articleCommentDelete']);
         Route::post('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
+        Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
     });
+    Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 
     // Category routes
     Route::prefix('/categories')->group(function () {

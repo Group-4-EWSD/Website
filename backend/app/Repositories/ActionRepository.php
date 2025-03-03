@@ -77,6 +77,22 @@ class actionRepository extends BaseRepository
         return $comments;
     }
 
+    public function getFeedbackList($articleId){
+        $feedbacks = DB::table('feedbacks as f')
+                ->join('users as u', 'u.id', '=', 'f.user_id')
+                ->select([
+                    'f.message',
+                    'f.created_at',
+                    'f.user_id',
+                    'u.user_photo_path',
+                    'u.gender',
+                    'u.user_name'
+                ])
+                ->where('c.article_id', $articleId)
+                ->get();
+        return $feedbacks;
+    }
+
     public function increaseViewCount($articleId){
         $this->model()::create([
             'action_id' => Str::uuid(),
@@ -86,10 +102,17 @@ class actionRepository extends BaseRepository
         ]);
     }
 
-    public function makeAction($request){
+    public function currentReaction($request){
+        $reaction = $this->model()::where('article_id', $request->articleId)
+                ->where('user_id', Auth::id())->first()->reaction;
+        return $reaction;
+    }
+    public function makeAction($reaction, $request){
         $this->model()::where('article_id', $request->articleId)
                 ->where('user_id', Auth::id())  // Get authenticated user's ID
-                ->update(['react' => 1]);
+                ->update(['react' => $reaction]);
+        $reactionCount = $this->model()::where('article_id', $request->articleId)->count();
+        return $reactionCount;
     }
 
     public function createComment($request){
@@ -102,5 +125,15 @@ class actionRepository extends BaseRepository
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    public function deleteComment($commentId){
+        $deleted = Comment::where('comment_id', $commentId)->delete();
+        return $deleted > 0;
+    }
+
+    public function academicYearList(){
+        $academicYearList = DB::table("academic_years")->select('academic_year_id','academic_year')->get();
+        return $academicYearList;
     }
 }

@@ -41,7 +41,7 @@ class UserRepository extends BaseRepository
 
     public function getTermsCondition()
     {
-        $termsConditions = DB::table("terms_conditions")->get();
+        $termsConditions = DB::table("terms_conditions")->get()->toArray();
         return $termsConditions;
     }
 }

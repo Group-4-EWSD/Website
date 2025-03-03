@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Article;
+use App\Models\ArticleDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,9 +18,8 @@ class ArticleRepository
             'article_id' => $articleId,
             'article_title' => $request->article_title,
             'article_description' => $request->article_description,
-            'article_status' => $request->article_status,
             'user_id' => $userId,
-            'approver_id' => null,
+            'system_id' => $request->system_id,
             'article_type_id' => $request->article_type_id,
             'delete_flag' => false,
             'created_at' => now(),
@@ -38,6 +38,25 @@ class ArticleRepository
         ]);
     }
 
+    public function createActivity($articleId, $userId, $systemId, $request){
+        DB::table('activities')->insert([
+            'activity_id' => Str::uuid(),
+            'article_id' => $articleId,
+            'user_id' => $userId,
+            'status' => $request->status,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function getSystemId($userId){
+        $systemId = DB::table('system_data as sd')
+            ->join('user as u', 'u.faculy_id', '=', 'sd.faculy_id')
+            ->where('u.id', $userId)
+            ->pluck('sysetm_id');
+        return $systemId;
+    }
+
     public function getCountData(){
         $userId = Auth::id();
         return DB::table('articles')
@@ -49,7 +68,7 @@ class ArticleRepository
         ->first();
     }
 
-    public function getAllArticles($request)
+    public function getAllArticles($userId, $request)
     {
         $articles = DB::table('articles as art')
             ->select([
@@ -63,13 +82,22 @@ class ArticleRepository
                 DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path")
             ])
             ->join('users as u', 'u.id', '=', 'art.user_id')
+            ->join('system_data as sd', 'sd.system_id', '=', 'art.system_id')
+            ->join('academic_years as ay', 'ay.academicYearId', '=', 'sd.academicYearId')
             ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');        
 
         // Apply search filter if `articleTitle` exists in the request
+        if (!empty($request->academicYearId)) {
+            $articles->where('ay.academicYearId', '=', $request->academicYearId);
+        }
+
         if (!empty($request->articleTitle)) {
             $articles->where('art.article_title', 'LIKE', '%' . $request->articleTitle . '%');
         }
 
+        if (!empty($request->myArticles)) {
+            $articles->where('u.id','=',$userId);
+        }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([
             'art.article_id',
@@ -82,8 +110,27 @@ class ArticleRepository
             'art.updated_at'
         ]);
 
-        // Apply ORDER BY, LIMIT, and OFFSET before executing
-        $articles->orderByDesc('art.created_at');
+        // 1: create_at ASC, 2: created_at DESC, 3: title ASC, 4: title DESC
+        if (!empty($request->sorting)) {
+            switch ($request->sorting) {
+                case 1:
+                    $articles->orderBy('art.created_at', 'asc');
+                    break;
+                case 2:
+                    $articles->orderBy('art.created_at', 'desc');
+                    break;
+                case 3:
+                    $articles->orderBy('art.article_title', 'asc');
+                    break;
+                case 4:
+                    $articles->orderBy('art.article_title', 'desc');
+                    break;
+                default:
+                    $articles->orderBy('art.created_at', 'desc');
+            }
+        } else {
+            $articles->orderBy('art.created_at', 'desc');
+        }        
 
         // Apply LIMIT only if `displayNumber` is set
         if ($request->displayNumber > 0) {
@@ -95,7 +142,6 @@ class ArticleRepository
                 $articles->offset($offset);
             }
         }
-        $articles = $articles->get();
 
         return $articles;
     }
@@ -113,4 +159,20 @@ class ArticleRepository
                 ->get();
         return $articles;
     }
+
+    public function getDeadlines($facultyId){
+        $deadlines = DB::table('system_datas as sd')
+                ->select('sd.pre_submission_date', 'sd.actual_submission_date')
+                ->where('faculty_id', $facultyId)
+                ->get();
+        return $deadlines;
+    }
+
+    public function getFileList($articleId){
+        $files = ArticleDetail::where('article_id', $articleId)
+            ->pluck('file_path')
+            ->toArray();
+        return $files ?: []; // Ensures an empty array if no files found
+    }
+    
 }

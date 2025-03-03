@@ -8,6 +8,7 @@ use Aws\S3\S3Client;
 class ActionService
 {
     protected $actionRepository;
+    protected $notificationService;
     protected $s3Client;
 
     public function __construct(ActionRepository $actionRepository)
@@ -39,15 +40,26 @@ class ActionService
             'articleDetail' => $this->actionRepository->getArticleDetail($articleId),
             'articleContent' => $contentList,
             'articlePhotos' => $articlePhotos,
-            'commentList' => $this->actionRepository->getCommentList($articleId)
+            'commentList' => $this->actionRepository->getCommentList($articleId),
+            'feedbackList' => $this->actionRepository->getFeedbackList($articleId)
         ];
     }
 
     public function likeArticle($request){
-        $this->actionRepository->makeAction($request);
+        $currentReaction = $this->actionRepository->currentReaction($request);
+        $currentReaction = $currentReaction == 0 ? 1 : 0;
+        return $this->actionRepository->makeAction($currentReaction, $request);
     }
 
     public function commentArticle($request){
         $this->actionRepository->createComment($request);
+    }
+
+    public function commentDeleteArticle($request){
+        return $this->actionRepository->deleteComment($request);
+    }
+
+    public function academicYearList(){
+        return $this->actionRepository->academicYearList();
     }
 }

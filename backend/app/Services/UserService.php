@@ -46,6 +46,8 @@ class UserService
 
     public function getTermsCondition()
     {
-        return $this->userRepository->getTermsCondition();
+        $termsConditions = $this->userRepository->getTermsCondition();        
+        $termConditionsArray = array_map(fn($item) => $item->term_condition, $termsConditions);
+        return $termConditionsArray;
     }
 }

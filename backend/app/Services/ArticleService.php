@@ -41,6 +41,8 @@ class ArticleService
 
     public function createArticle($userId, $request)
     {
+        
+        $systemId = $this->articleRepository->getSystemId($userId, $request->status);
         DB::beginTransaction();
 
         try {
@@ -48,7 +50,7 @@ class ArticleService
             $articleId = Str::uuid();
 
             // Save article
-            $this->articleRepository->createArticle($articleId, $userId, $request);
+            $this->articleRepository->createArticle($articleId, $userId, $systemId, $request);
 
             // Process and save article details (file uploads)
             if ($request->has('article_details')) {
@@ -68,7 +70,6 @@ class ArticleService
                     }
                 }
             }
-            $systemId = $this->articleRepository->getSystemId($userId, $request->status);
             $this->articleRepository->createActivity($articleId, $userId, $systemId, $request);
 
             DB::commit();

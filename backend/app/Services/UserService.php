@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -26,6 +28,16 @@ class UserService
             ];
         }
         $token = $user->createToken('authToken')->plainTextToken;
+        // Insert into login history
+        DB::table('login_histories')->insert([
+            [
+                'id' => Str::uuid(),
+                'user_id' => $user->id, 
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->header('User-Agent'),
+                'logged_in_at' => now(),
+            ],
+        ]);
         return [
             'status' => 200,
             'message' => 'Login successful',

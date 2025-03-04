@@ -37,7 +37,7 @@ const notifications = [
         <div
           v-for="notification in notifications"
           :key="notification.id"
-          class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all"
+          class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all cursor-pointer"
         >
           <img
             src="@/assets/profile.png"

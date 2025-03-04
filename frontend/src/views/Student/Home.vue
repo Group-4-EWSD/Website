@@ -18,10 +18,10 @@ import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 const sortOption = ref<string>('')
 
 const sortOptions = ref([
-  { value: 'newest', label: 'Newest First' },
-  { value: 'oldest', label: 'Oldest First' },
-  { value: 'name-asc', label: 'Name (A → Z)' },
-  { value: 'name-desc', label: 'Name (Z → A)' },
+  { value: 'created asc', label: 'Newest First' },
+  { value: 'created desc', label: 'Oldest First' },
+  { value: 'title asc', label: 'Name (A → Z)' },
+  { value: 'title-desc', label: 'Name (Z → A)' },
 ])
 
 const sortBy = (option: string) => {

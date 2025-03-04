@@ -53,6 +53,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('/notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
     });
+
+    Route::post('/update-user-photo', [UserController::class, 'updateUserPhoto']);
+    Route::get('/get-user-photo', [UserController::class, 'getUserPhoto']);
+    Route::delete('/delete-user-photo', [UserController::class, 'deleteUserPhoto']);
+
 });
 Route::get('/termsCondition', [UserController::class, 'termsCondition']);
 

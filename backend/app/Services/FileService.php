@@ -19,12 +19,18 @@ class FileService
         $fileName = time() . '_' . $file->getClientOriginalName();
         $s3Path = 'documents/' . $fileName;
 
-        $this->fileRepository->uploadToS3($s3Path, $file->path());
+        $this->fileRepository->uploadToS3($s3Path, $file->getPathname());
 
         return [
             'message' => 'Uploaded',
-            'file_name' => $fileName
+            'file_name' => $fileName,
+            'file_path' => $s3Path // Add this
         ];
+    }
+
+    public function deleteFile(string $s3Path): void
+    {
+        $this->fileRepository->deleteFromS3($s3Path);
     }
 
     public function listFiles()

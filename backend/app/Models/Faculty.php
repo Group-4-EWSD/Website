@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Faculty extends Model
 {
     protected $fillable = [
-        'facultyId',
-        'facultyName',
-        'facultyDescription'
+        'faculty_id',
+        'faculty_name',
+        'faculty_description'
     ];
 
     public function users()
     {
-        return $this->hasMany(User::class, 'facultyId', 'id');
+        return $this->hasMany(User::class, 'faculty_id', 'faculty_id');
     }
 }

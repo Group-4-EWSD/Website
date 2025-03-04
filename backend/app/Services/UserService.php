@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
+use App\Services\FileService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -10,10 +11,12 @@ use Illuminate\Support\Facades\Log;
 class UserService
 {
     protected $userRepository;
+    protected $fileService;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, FileService $fileService)
     {
         $this->userRepository = $userRepository;
+        $this->fileService = $fileService;
     }
 
     public function login($credentials)
@@ -32,6 +35,50 @@ class UserService
             'token' => $token,
             'user' => $user
         ];
+    }
+
+    public function updateUserPhoto(string $id, $photo): string
+    {
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            throw new \Exception('User not found', 404);
+        }
+
+        if ($user->user_photo_path) {
+            $this->fileService->deleteFile($user->user_photo_path);
+        }
+
+        $photoPath = $this->fileService->uploadFile($photo, 'user_photos');
+
+        $this->userRepository->updatePhoto($id, $photoPath);
+
+        return $photoPath;
+    }
+
+    public function getUserPhoto(string $id): ?string
+    {
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            throw new \Exception('User not found', 404);
+        }
+
+        return $user->user_photo_path;
+    }
+
+    public function deleteUserPhoto(string $id): void
+    {
+        $user = $this->userRepository->findById($id);
+
+        if (!$user) {
+            throw new \Exception('User not found', 404);
+        }
+
+        if ($user->user_photo_path) {
+            $this->fileService->deleteFile($user->user_photo_path);
+            $this->userRepository->updatePhoto($id, null);
+        }
     }
 
     public function getUserProfile($id)

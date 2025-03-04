@@ -10,6 +10,9 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    // protected $primaryKey = 'id'; // Ensure Laravel knows the primary key
+    // public $incrementing = false; // Tell Laravel it's not auto-incrementing
+    // protected $keyType = 'string'; // Specify that it's a string
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -19,20 +22,16 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
-        'email',
-        'phone_number',
-        'address',
-        'city',
-        'state',
-        'postal_code',
-        'country',
-        'date_of_birth',
+        'id',
+        'user_name',
+        'nickname',
+        'user_email',
+        'user_password',
+        'user_type_id',
+        'faculty_id',
         'gender',
-        'password',
-        'loyalty_points',
-        'is_active',
+        'user_photo_path',
+        'delete_flag',
     ];
 
     /**
@@ -41,7 +40,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password',
+        'user_password',
         'remember_token',
     ];
 
@@ -54,17 +53,17 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'user_password' => 'hashed',
         ];
     }
 
     public function faculty()
     {
-        return $this->belongsTo(Faculty::class, 'facultyId', 'id');
+        return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
     }
     
     public function userType()
     {
-        return $this->hasMany(userType::class, 'user_type_id', 'user_type_id');
+        return $this->belongsTo(userType::class, 'user_type_id', 'user_type_id');
     }
 }

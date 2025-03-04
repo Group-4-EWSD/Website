@@ -8,6 +8,6 @@ class FacultyRepository
 {
     public function getFacultyDropdown()
     {
-        return Faculty::select('facultyId','facultyName');
+        return Faculty::select('faculty_id','faculty_name');
     }
 }

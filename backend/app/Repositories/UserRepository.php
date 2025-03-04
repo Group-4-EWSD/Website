@@ -32,6 +32,22 @@ class UserRepository extends BaseRepository
         return User::findOrFail($id);
     }
 
+    public function findById(string $id): ?User
+    {
+        return $this->model->find($id);
+    }
+
+    public function updatePhoto(string $id, ?string $photoPath): bool
+    {
+        $user = $this->findById($id);
+        if (!$user) {
+            return false;
+        }
+
+        $user->user_photo_path = $photoPath;
+        return $user->save();
+    }
+
     public function updateUser($id, array $data)
     {
         $user = User::findOrFail($id);

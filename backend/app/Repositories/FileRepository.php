@@ -33,6 +33,14 @@ class FileRepository
         ]);
     }
 
+    public function deleteFromS3($s3Path): void
+    {
+        $this->s3Client->deleteObject([
+            'Bucket' => 'ewsdcloud',
+            'Key' => $s3Path,
+        ]);
+    }
+
     public function listS3Files()
     {
         $result = $this->s3Client->listObjectsV2([

@@ -3,16 +3,19 @@ namespace App\Http\Controllers;
 
 use App\Models\User; 
 use App\Services\UserService;
+use App\Services\Fileservice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     protected $userService;
+    protected $fileService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UserService $userService, FileService $fileService)
     {
         $this->userService = $userService;
+        $this->fileService = $fileService;
     }
     /**
      * Get all users.
@@ -112,6 +115,42 @@ class UserController extends Controller
         return response()->json($this->userService->updateUserProfile($userId, $data));
     }
 
+    public function getUserPhoto(): JsonResponse
+    {
+        $userId = Auth::id();
+        $user = $this->userService->getUserProfile($userId);
+
+        return response()->json([
+            'message' => 'User profile retrieved successfully',
+            'user' => $user,
+        ], 200);
+    }
+
+    public function deleteUserPhoto(): JsonResponse
+    {
+        $userId = Auth::id();
+        $this->userService->deleteUserPhoto($userId);
+
+        return response()->json([
+            'message' => 'User photo deleted successfully',
+        ], 200);
+    }
+
+    public function updateUserPhoto(Request $request)
+    {
+        $userId = Auth::id();
+
+        $request->validate([
+            'user_photo' => 'required|image|mimes:jpeg,png,jpg', 
+        ]);
+
+        $photoPath = $this->userService->updateUserPhoto($userId, $request->file('user_photo'));
+
+        return response()->json([
+            'message' => 'User photo updated successfully',
+            'photo_path' => $photoPath,
+        ], 200);
+    }
 
     public function dashboard(){
 

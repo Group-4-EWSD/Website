@@ -27,6 +27,21 @@ class FileService
         ];
     }
 
+    public function uploadUserPhoto(UploadedFile $photo): string
+    {
+        $fileName = time() . '_' . $photo->getClientOriginalName();
+        $s3Path = 'user_profile/' . $fileName;
+
+        $this->fileRepository->uploadToS3($s3Path, $photo->path());
+
+        return $s3Path; 
+    }
+
+    public function deleteFile(string $s3Path): void
+    {
+        $this->fileRepository->deleteFromS3($s3Path);
+    }
+
     public function listFiles()
     {
         return $this->fileRepository->listS3Files();

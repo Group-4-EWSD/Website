@@ -60,3 +60,6 @@ Route::post('/list-file', [FileController::class, 'listFiles']); // New route
 Route::get('/test-list-files', [FileController::class, 'listFiles']); 
 Route::get('/usertype-dropdown', [UserTypeController::class, 'UserTypeDropdown']);
 Route::get('/faculty-dropdown', [FacultyController::class, 'FacultyDropdown']);
+Route::get('/get-student-photo', [UserController::class, 'getUserPhoto']);
+Route::delete('/delete-student-photo', [UserController::class, 'deleteUserPhoto']);
+Route::post('/update-student-photo', [UserController::class, 'updateUserPhoto']);

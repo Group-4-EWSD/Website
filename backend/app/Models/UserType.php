@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class UserType extends Model
 {
     protected $fillable = [
-        'userTypeId',
-        'userTypeName'
+        'user_type_id',
+        'user_type_name'
     ];
 
     public function users()
     {
-        return $this->belongsTo(User::class, 'userTypeId', 'userTypeId');
+        return $this->hasMany(User::class, 'user_type_id', 'user_type_id');
     }
 }

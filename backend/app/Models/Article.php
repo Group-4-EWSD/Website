@@ -15,14 +15,4 @@ class Article extends Model
         'approverId',
         'categoryId'
     ];
-    
-    public function catgory()
-    {
-        return $this->belongsTo(Category::class, 'categoryId', 'categoryId');
-    }
-
-    public function activity()
-    {
-        return $this->hasMany(Activity::class, 'articleId', 'articleId');
-    }
 }

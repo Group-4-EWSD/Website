@@ -15,7 +15,7 @@ class NotificationController extends Controller
     }
 
     public function index(){
-        $homePageData = $this->notificationService->getNotificationList();
-        return response()->json($homePageData);
+        $notificationData = $this->notificationService->getNotificationList();
+        return response()->json($notificationData);
     }
 }

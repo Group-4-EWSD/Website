@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Services\ActionService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class ActionController extends Controller
 {
     
     protected $actionService;
+    protected $notificationService;
 
-    public function __construct(ActionService $actionService)
+    public function __construct(ActionService $actionService, NotificationService $notificationService)
     {
         $this->actionService = $actionService;
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -54,8 +57,9 @@ class ActionController extends Controller
      * )
      */
     public function articleLike(Request $request){
-        $this->actionService->likeArticle($request);
-        return response()->json(['message' => 'Article liked successfully']);
+        $reactionCount = $this->actionService->likeArticle($request);
+        $this->notificationService->setNotification('1', $request->articleId);
+        return response()->json(['likeCount' => $reactionCount]);
     }
 
     /**
@@ -76,9 +80,23 @@ class ActionController extends Controller
      *     @OA\Response(response=400, description="Invalid request")
      * )
      */
-    public function articleComment(Request $request){
-        $this->actionService->commentArticle($request);
-        return response()->json(['message' => 'Comment added successfully']);
+    public function articleComment(Request $request) {
+        $success = $this->actionService->commentArticle($request);
+        $this->notificationService->setNotification('2', $request->articleId);
+        if ($success) {
+            return response()->json(['message' => 'Comment added successfully'], 201);
+        } else {
+            return response()->json(['message' => 'Failed to add comment'], 500);
+        }
     }
 
+    public function articleCommentDelete(Request $request){
+        $this->actionService->commentDeleteArticle($request);
+        return response()->json(['message' => 'Comment deleted successfully']);
+    }
+
+    public function academicYearList(){
+        $academicYearList = $this->actionService->academicYearList();
+        return response()->json($academicYearList);
+    }
 }

@@ -62,19 +62,34 @@ class actionRepository extends BaseRepository
 
     public function getCommentList($articleId){
         // SELECT c.message, c.created_at, c.user_id, u.user_photo_path, u.gender, u.user_name FROM comments c JOIN users u ON u.user_id = c.user_id;
-        $comments = DB::table('comments as c')
-                ->join('users as u', 'u.id', '=', 'c.user_id')
-                ->select([
-                    'c.message',
-                    'c.created_at',
-                    'c.user_id',
+        $comments = Comment::select([
+                    'comments.message',
+                    'comments.created_at',
+                    'comments.user_id',
                     'u.user_photo_path',
                     'u.gender',
                     'u.user_name'
                 ])
-                ->where('c.article_id', $articleId)
+                ->join('users as u', 'u.id', '=', 'comments.user_id')
+                ->where('comments.article_id', '=', $articleId)
                 ->get();
         return $comments;
+    }
+
+    public function getFeedbackList($articleId){
+        $feedbacks = DB::table('feedbacks as f')
+                ->join('users as u', 'u.id', '=', 'f.user_id')
+                ->select([
+                    'f.message',
+                    'f.created_at',
+                    'f.user_id',
+                    'u.user_photo_path',
+                    'u.gender',
+                    'u.user_name'
+                ])
+                ->where('f.article_id', $articleId)
+                ->get();
+        return $feedbacks;
     }
 
     public function increaseViewCount($articleId){
@@ -86,14 +101,21 @@ class actionRepository extends BaseRepository
         ]);
     }
 
-    public function makeAction($request){
+    public function currentReaction($request){
+        $reaction = $this->model()::where('article_id', $request->articleId)
+                ->where('user_id', Auth::id())->first()->react;
+        return $reaction;
+    }
+    public function makeAction($reaction, $request){
         $this->model()::where('article_id', $request->articleId)
                 ->where('user_id', Auth::id())  // Get authenticated user's ID
-                ->update(['react' => 1]);
+                ->update(['react' => $reaction]);
+        $reactionCount = $this->model()::where('article_id', $request->articleId)->count();
+        return $reactionCount;
     }
 
     public function createComment($request){
-        Comment::create([
+        return Comment::create([
             'comment_id' => Str::uuid(),
             'article_id' => $request->articleId,
             'user_id' => Auth::id(), // Get authenticated user's ID
@@ -102,5 +124,15 @@ class actionRepository extends BaseRepository
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    public function deleteComment($request){
+        $deleted = Comment::where('comment_id', $request->commentId)->delete();
+        return $deleted > 0;
+    }
+
+    public function academicYearList(){
+        $academicYearList = DB::table("academic_years")->select('academic_year_id','academic_year')->get();
+        return $academicYearList;
     }
 }

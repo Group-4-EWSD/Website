@@ -29,12 +29,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('/articles')->group(function () {
         // Normal Routes
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
+        Route::get('/myArticles', [ArticleController::class, 'myArticleInitial']); // Get all articles
+        Route::get('/draftList', [ArticleController::class, 'draftArticleList']); // draft article list
+        Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
         Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
-        Route::post('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
+        Route::delete('/commentDelete', [ActionController::class, 'articleCommentDelete']);
         Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
     });
+    Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 
     // Category routes
     Route::prefix('/categories')->group(function () {
@@ -43,7 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User routes
     Route::prefix('/user')->group(function () {
     });
-    Route::get('/logout', [UserController::class, 'logout']);
+    Route::post('/logout', [UserController::class, 'logout']);
 
     // User routes
     Route::prefix('/notifications')->group(function () {

@@ -60,10 +60,18 @@ class ArticleController extends Controller
      */
     public function homePageInitial(Request $request)
     {
-        $homePageData = $this->articleService->getHomePageData($request);
+        $userId = Auth::id();
+        $homePageData = $this->articleService->getHomePageData($userId, $request);
         return response()->json($homePageData);
     }
 
+    public function myArticleInitial(Request $request)
+    {
+        $userId = Auth::id();
+        $facultyId = Auth::user()->faculty_id;
+        $myArticleData = $this->articleService->getMyArticles($userId, $facultyId, $request);
+        return response()->json($myArticleData);
+    }
 
     public function articleCreate(Request $request)
     {
@@ -77,7 +85,17 @@ class ArticleController extends Controller
         }
     }
     public function draftArticleList(){
-        $articles = $this->articleService->draftArticleList();
+        $userId = Auth::id();
+        $articles = $this->articleService->draftArticleList($userId);
         return response()->json($articles);
+    }
+
+    public function articleDownload($articleId){
+        $articleFileList = $this->articleService->getFileList($articleId);
+        if (!empty($articleFileList)) {
+            for ($i=0; $i < $articleFileList; $i++) {
+                $this->fileService->downloadAsZip($articleFileList[$i]);
+            }
+        }
     }
 }

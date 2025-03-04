@@ -12,14 +12,14 @@ use Illuminate\Support\Str;
 
 class ArticleRepository
 {
-    public function createArticle($articleId, $userId, $request)
+    public function createArticle($articleId, $userId, $systemId, $request)
     {
         DB::table('articles')->insert([
             'article_id' => $articleId,
             'article_title' => $request->article_title,
             'article_description' => $request->article_description,
             'user_id' => $userId,
-            'system_id' => $request->system_id,
+            'system_id' => $systemId,
             'article_type_id' => $request->article_type_id,
             'delete_flag' => false,
             'created_at' => now(),
@@ -51,9 +51,9 @@ class ArticleRepository
 
     public function getSystemId($userId){
         $systemId = DB::table('system_datas as sd')
-            ->join('user as u', 'u.faculy_id', '=', 'sd.faculy_id')
+            ->join('users as u', 'u.faculty_id', '=', 'sd.faculty_id')
             ->where('u.id', $userId)
-            ->pluck('sysetm_id');
+            ->first()->system_id;
         return $systemId;
     }
 
@@ -71,20 +71,21 @@ class ArticleRepository
     public function getAllArticles($userId, $request)
     {
         $articles = DB::table('articles as art')
-            ->select([
-                'art.article_title',
-                'art.user_id',
-                'u.user_name',
-                'u.user_photo_path',
-                'u.gender',
-                'art.created_at',
-                'art.updated_at',
-                DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path")
-            ])
-            ->join('users as u', 'u.id', '=', 'art.user_id')
-            ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
-            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
-            ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');        
+                ->select([
+                    'art.article_title',
+                    'art.user_id',
+                    'u.user_name',
+                    'u.user_photo_path',
+                    'u.gender',
+                    'art.created_at',
+                    'art.updated_at',
+                    DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path"),
+                    DB::raw("(SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status")
+                ])
+                ->join('users as u', 'u.id', '=', 'art.user_id')
+                ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
+                ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+                ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');
 
         // Apply search filter if `articleTitle` exists in the request
         if (!empty($request->academicYearId)) {
@@ -97,6 +98,9 @@ class ArticleRepository
         
         if (!empty($request->myArticles)) {
             $articles->where('art.user_id','=',$userId);
+            $articles->havingRaw("status IN (1, 2, 3)");
+        } else {
+            $articles->havingRaw("status IN (2, 3)");
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([

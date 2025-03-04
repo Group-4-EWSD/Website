@@ -62,17 +62,16 @@ class actionRepository extends BaseRepository
 
     public function getCommentList($articleId){
         // SELECT c.message, c.created_at, c.user_id, u.user_photo_path, u.gender, u.user_name FROM comments c JOIN users u ON u.user_id = c.user_id;
-        $comments = DB::table('comments as c')
-                ->join('users as u', 'u.id', '=', 'c.user_id')
-                ->select([
-                    'c.message',
-                    'c.created_at',
-                    'c.user_id',
+        $comments = Comment::select([
+                    'comments.message',
+                    'comments.created_at',
+                    'comments.user_id',
                     'u.user_photo_path',
                     'u.gender',
                     'u.user_name'
                 ])
-                ->where('c.article_id', $articleId)
+                ->join('users as u', 'u.id', '=', 'comments.user_id')
+                ->where('comments.article_id', '=', $articleId)
                 ->get();
         return $comments;
     }
@@ -88,7 +87,7 @@ class actionRepository extends BaseRepository
                     'u.gender',
                     'u.user_name'
                 ])
-                ->where('c.article_id', $articleId)
+                ->where('f.article_id', $articleId)
                 ->get();
         return $feedbacks;
     }
@@ -104,7 +103,7 @@ class actionRepository extends BaseRepository
 
     public function currentReaction($request){
         $reaction = $this->model()::where('article_id', $request->articleId)
-                ->where('user_id', Auth::id())->first()->reaction;
+                ->where('user_id', Auth::id())->first()->react;
         return $reaction;
     }
     public function makeAction($reaction, $request){
@@ -116,7 +115,7 @@ class actionRepository extends BaseRepository
     }
 
     public function createComment($request){
-        Comment::create([
+        return Comment::create([
             'comment_id' => Str::uuid(),
             'article_id' => $request->articleId,
             'user_id' => Auth::id(), // Get authenticated user's ID
@@ -127,8 +126,8 @@ class actionRepository extends BaseRepository
         ]);
     }
 
-    public function deleteComment($commentId){
-        $deleted = Comment::where('comment_id', $commentId)->delete();
+    public function deleteComment($request){
+        $deleted = Comment::where('comment_id', $request->commentId)->delete();
         return $deleted > 0;
     }
 

@@ -17,8 +17,9 @@ class NotificationService
 
     public function getNotificationList()
     {
+        $notifications = $this->notificationRepository->getNotificationList();
         $this->notificationRepository->seenAllNotifications();
-        return $this->notificationRepository->getNotificationList();
+        return $notifications;
     }
 
     public function setNotification($type, $articleId)

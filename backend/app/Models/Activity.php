@@ -14,9 +14,4 @@ class Activity extends Model
         'created_at',
         'updated_at'
     ];
-
-    public function activity()
-    {
-        return $this->belongsTo(Article::class, 'articleId', 'articleId');
-    }
 }

@@ -26,7 +26,7 @@ class NotificationRepository extends BaseRepository
 
     public function getNotificationList()
     {
-        return $this->model()::where('id', Auth::id())->first();
+        return $this->model()::where('user_id', Auth::id())->get();
     }
 
     public function setNotification($type, $articleId)
@@ -36,9 +36,9 @@ class NotificationRepository extends BaseRepository
         $message = "";
 
         if($type == '1'){//Like
-            $message = $userName + " has reacted to your article " + $articleTitle;
+            $message = $userName . " has reacted to your article " . $articleTitle;
         }elseif ($type == '2') {//Comment
-            $message = $userName + " has commented to your article " + $articleTitle;
+            $message = $userName . " has commented to your article " . $articleTitle;
         }
         
         $this->model()::create([

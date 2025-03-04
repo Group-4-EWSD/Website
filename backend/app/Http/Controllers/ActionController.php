@@ -59,7 +59,7 @@ class ActionController extends Controller
     public function articleLike(Request $request){
         $reactionCount = $this->actionService->likeArticle($request);
         $this->notificationService->setNotification('1', $request->articleId);
-        return response()->json($reactionCount);
+        return response()->json(['likeCount' => $reactionCount]);
     }
 
     /**
@@ -92,7 +92,7 @@ class ActionController extends Controller
 
     public function articleCommentDelete(Request $request){
         $this->actionService->commentDeleteArticle($request);
-        return response()->json(['message' => 'Comment added successfully']);
+        return response()->json(['message' => 'Comment deleted successfully']);
     }
 
     public function academicYearList(){

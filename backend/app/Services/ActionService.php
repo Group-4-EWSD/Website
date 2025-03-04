@@ -52,7 +52,7 @@ class ActionService
     }
 
     public function commentArticle($request){
-        $this->actionRepository->createComment($request);
+        return $this->actionRepository->createComment($request);
     }
 
     public function commentDeleteArticle($request){

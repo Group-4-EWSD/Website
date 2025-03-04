@@ -10,6 +10,9 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    protected $primaryKey = 'id'; // Ensure Laravel knows the primary key
+    public $incrementing = false; // Tell Laravel it's not auto-incrementing
+    protected $keyType = 'string'; // Specify that it's a string
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 

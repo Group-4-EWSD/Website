@@ -32,8 +32,8 @@ class ArticleService
         $myArticles = $this->articleRepository->getAllArticles($userId, $request);
         $latestArticles = $myArticles->orderBy('created_at', 'desc')->take(3)->get();
         return [
-            'preUploadDeadline' => $deadlines['pre_submission_data'],
-            'actualUploadDeadline' => $deadlines['actual_submission_data'],
+            'preUploadDeadline' => $deadlines->pre_submission_date,
+            'actualUploadDeadline' => $deadlines->actual_submission_date,
             'latestArticles' => $latestArticles,
             'myArticles' => $myArticles->get()
         ];
@@ -80,8 +80,8 @@ class ArticleService
         }
     }
 
-    public function draftArticleList(){
-        $this->articleRepository->draftArticleList();
+    public function draftArticleList($userId){
+        return $this->articleRepository->draftArticleList($userId);
     }
 
     public function getFileList($articleId){

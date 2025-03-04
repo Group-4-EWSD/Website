@@ -50,7 +50,7 @@ class ArticleRepository
     }
 
     public function getSystemId($userId){
-        $systemId = DB::table('system_data as sd')
+        $systemId = DB::table('system_datas as sd')
             ->join('user as u', 'u.faculy_id', '=', 'sd.faculy_id')
             ->where('u.id', $userId)
             ->pluck('sysetm_id');
@@ -82,21 +82,21 @@ class ArticleRepository
                 DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path")
             ])
             ->join('users as u', 'u.id', '=', 'art.user_id')
-            ->join('system_data as sd', 'sd.system_id', '=', 'art.system_id')
-            ->join('academic_years as ay', 'ay.academicYearId', '=', 'sd.academicYearId')
+            ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
+            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
             ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');        
 
         // Apply search filter if `articleTitle` exists in the request
         if (!empty($request->academicYearId)) {
-            $articles->where('ay.academicYearId', '=', $request->academicYearId);
+            $articles->where('ay.academic_year_id', '=', $request->academicYearId);
         }
 
         if (!empty($request->articleTitle)) {
             $articles->where('art.article_title', 'LIKE', '%' . $request->articleTitle . '%');
         }
-
+        
         if (!empty($request->myArticles)) {
-            $articles->where('u.id','=',$userId);
+            $articles->where('art.user_id','=',$userId);
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([
@@ -113,16 +113,16 @@ class ArticleRepository
         // 1: create_at ASC, 2: created_at DESC, 3: title ASC, 4: title DESC
         if (!empty($request->sorting)) {
             switch ($request->sorting) {
-                case 1:
+                case '1':
                     $articles->orderBy('art.created_at', 'asc');
                     break;
-                case 2:
+                case '2':
                     $articles->orderBy('art.created_at', 'desc');
                     break;
-                case 3:
+                case '3':
                     $articles->orderBy('art.article_title', 'asc');
                     break;
-                case 4:
+                case '4':
                     $articles->orderBy('art.article_title', 'desc');
                     break;
                 default:
@@ -142,29 +142,31 @@ class ArticleRepository
                 $articles->offset($offset);
             }
         }
-
         return $articles;
     }
 
-    public function draftArticleList(){
+    public function draftArticleList($userId) {
+        $subQuery = DB::table('activities as act')
+            ->select('act.article_id', 'act.status', 'act.created_at')
+            ->whereRaw('act.created_at = (SELECT MAX(created_at) FROM activities WHERE article_id = act.article_id)')
+            ->where('act.status', 0); // Ensure only drafts (status = 0) are considered
+    
         $articles = DB::table('articles as a')
-                ->select('a.article_title', 'a.article_description')
-                ->join(
-                    DB::table('activities')
-                        ->selectRaw('MAX(created_at) as created_at, article_id, status')
-                        ->groupBy('article_id')
-                        ->where('status', 0), // Filter to only status = 0
-                    'a.article_id', '=', 'atv.article_id'
-                )
-                ->get();
+            ->select('a.article_title', 'a.article_description')
+            ->joinSub($subQuery, 'atv', function ($join) {
+                $join->on('a.article_id', '=', 'atv.article_id');
+            })
+            ->where('a.user_id', '=', $userId)
+            ->get();
+    
         return $articles;
-    }
+    }    
 
     public function getDeadlines($facultyId){
         $deadlines = DB::table('system_datas as sd')
                 ->select('sd.pre_submission_date', 'sd.actual_submission_date')
-                ->where('faculty_id', $facultyId)
-                ->get();
+                // ->where('faculty_id', $facultyId)
+                ->first();
         return $deadlines;
     }
 

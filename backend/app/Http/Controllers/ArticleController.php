@@ -85,14 +85,15 @@ class ArticleController extends Controller
         }
     }
     public function draftArticleList(){
-        $articles = $this->articleService->draftArticleList();
+        $userId = Auth::id();
+        $articles = $this->articleService->draftArticleList($userId);
         return response()->json($articles);
     }
 
     public function articleDownload($articleId){
         $articleFileList = $this->articleService->getFileList($articleId);
         if (!empty($articleFileList)) {
-            for ($i=0; $i < $articleFileList; $i++) { 
+            for ($i=0; $i < $articleFileList; $i++) {
                 $this->fileService->downloadAsZip($articleFileList[$i]);
             }
         }

@@ -37,6 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/comment', [ActionController::class, 'articleComment']);
         Route::delete('/commentDelete', [ActionController::class, 'articleCommentDelete']);
         Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
+        Route::patch('/changeStatus/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
     });
     Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 

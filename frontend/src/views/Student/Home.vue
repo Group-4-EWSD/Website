@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-
 import { ref } from 'vue'
-import Layout from '@/components/ui/Layout.vue'
+
+import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import { Card } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
+import Layout from '@/components/ui/Layout.vue'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 const sortOption = ref<string>('')
 

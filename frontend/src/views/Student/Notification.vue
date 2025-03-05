@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
+
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+
+import Layout from '@/components/ui/Layout.vue'
 
 dayjs.extend(relativeTime)
 
 const notifications = [
   {
     id: 1,
+    article_id: 1,
     name: 'Jean Philippe A.',
     role: 'Student - Art & Science',
     message:
@@ -17,6 +20,7 @@ const notifications = [
   },
   {
     id: 2,
+    article_id: 2,
     name: 'Emily Clark',
     role: 'Professor - Computer Science',
     message:
@@ -34,32 +38,35 @@ const notifications = [
 
       <!-- Notification Cards -->
       <div class="space-y-4">
-        <div
+        <RouterLink
           v-for="notification in notifications"
           :key="notification.id"
-          class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all cursor-pointer"
+          :to="`/articles/${notification.article_id}`"
+          class="block"
         >
-          <img
-            src="@/assets/profile.png"
-            alt="Profile Image"
-            class="w-12 h-12 rounded-full border mr-4"
-          />
+          <div class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all cursor-pointer">
+            <img
+              src="@/assets/profile.png"
+              alt="Profile Image"
+              class="w-12 h-12 rounded-full border mr-4"
+            />
 
-          <div class="flex-1 flex justify-between">
-            <!-- Left side -->
-            <div>
-              <div class="text-lg font-semibold text-gray-800">
-                From {{ notification.name }} ({{ notification.role }})
+            <div class="flex-1 flex justify-between">
+              <!-- Left side -->
+              <div>
+                <div class="text-lg font-semibold text-gray-800">
+                  From {{ notification.name }} ({{ notification.role }})
+                </div>
+                <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
               </div>
-              <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
-            </div>
 
-            <!-- Right side -->
-            <div class="text-xs text-gray-500 ml-4 flex-shrink-0">
-              {{ dayjs(notification.dateTime).fromNow() }}
+              <!-- Right side -->
+              <div class="text-xs text-gray-500 ml-4 flex-shrink-0">
+                {{ dayjs(notification.dateTime).fromNow() }}
+              </div>
             </div>
           </div>
-        </div>
+        </RouterLink>
       </div>
     </div>
   </Layout>

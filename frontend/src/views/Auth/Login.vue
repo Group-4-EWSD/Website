@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label'
 import type { Credentials } from '@/types/auth'
 
 const router = useRouter()
+const { cookies } = useCookies()
 const loading = ref(false)
 
 const schema = yup.object({
@@ -43,9 +44,31 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       if (!response.data) {
         toast.error('Invalid credentials')
       } else {
-        const { cookies } = useCookies()
         cookies.set('token', response.data.token)
-        router.push('/')
+        let userRole = response.data.user.role; 
+        userRole = 'student';
+
+        // Role-based redirection
+        switch (userRole) {
+          case 'student':
+            console.log('hit');
+            router.push('/student/home'); 
+            break;
+          case 'guest':
+            router.push('/guest/home');
+            break;
+          case 'coordinator':
+            router.push('/coordinator/dashboard');
+            break;
+          case 'admin':
+            router.push('/admin/dashboard');
+            break;
+          case 'manager':
+            router.push('/manager/dashboard');
+            break;
+          default:
+            router.push('/');
+        }
       }
       loading.value = false
     })

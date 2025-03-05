@@ -9,15 +9,15 @@ export const register = async (userData: RegisterData) => {
   return await api.post(`register`, userData)
 }
 
-// export const logout = async () => {
-//     const token = localStorage.getItem("token");
+export const logout = async () => {
+    const token = localStorage.getItem("token");
 
-//     await axios.post(
-//       `${API_URL}/logout`,
-//       {},
-//       {
-//         headers: { Authorization: `Bearer ${token}` },
-//       }
-//     );
-//     localStorage.removeItem("token");
-// };
+    await api.post(
+      `logout`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    localStorage.removeItem("token");
+};

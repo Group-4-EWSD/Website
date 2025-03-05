@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, Home, Bell, LogOut, Settings } from 'lucide-vue-next'
+import { Bell, FileText, Home, LogOut, Settings } from 'lucide-vue-next'
 
 import {
   Sidebar,
@@ -34,7 +34,7 @@ const items = [
   },
   {
     title: 'Log Out',
-    url: '#',
+    url: '/auth/logout',
     icon: LogOut,
   },
 ]

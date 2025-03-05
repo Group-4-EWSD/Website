@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { useCookies } from 'vue3-cookies'
 
-const BASE_URL = 'https://ewsd-project.vercel.app/v1/'
+// const BASE_URL = 'https://ewsd-project.vercel.app/v1/'
+const BASE_URL = 'http://127.0.0.1:8000/api/'
 
 // Create Axios instance
 const api = axios.create({

@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
-import ArticleDetails from '@/views/Student/ArticleDetails.vue'
-import Notification from '@/views/Student/Notification.vue'
 
-const StudentHome = () => import('@/views/Student/Home.vue')
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
+const StudentHome = () => import('@/views/Student/Home.vue')
+const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
+const Notification = () => import('@/views/Student/Notification.vue')
 const Settings = () => import('@/views/Settings.vue')
 
 const studentRoutes = [
@@ -65,6 +65,7 @@ const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
   { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
   { path: '/auth/register', name: 'register', component: Register },
+  { path: '/auth/logout', name: 'logout', component: Login },
 ]
 
 // Wildcard route to catch undefined paths and redirect to login

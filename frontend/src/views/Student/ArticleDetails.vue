@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { Download, Eye, Heart, Send } from 'lucide-vue-next'
 import { ref } from 'vue'
 
@@ -9,22 +11,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 // const route = useRoute()
 
 const activeTab = ref('comments')
-
 const newComment = ref('')
 
+dayjs.extend(relativeTime)
+
 const comments = ref([
-  { id: 1, name: 'Alice', text: 'This is a great post!' },
-  { id: 2, name: 'Bob', text: 'I totally agree with this.' },
+  { id: 1, name: 'Alice', text: 'This is a great post!', timestamp: '2025-03-01 14:30' },
+  { id: 2, name: 'Bob', text: 'I totally agree with this.', timestamp: '2025-03-05 21:30' },
 ])
 
 const feedbacks = ref([
-  { id: 1, name: 'Charlie', text: 'This article could be improved with more examples.' },
-  { id: 2, name: 'David', text: 'Great explanation, but I had some confusion with one part.' },
+  { id: 1, name: 'Charlie', text: 'This article could be improved with more examples.', timestamp: '2025-03-01 14:30' },
+  { id: 2, name: 'David', text: 'Great explanation, but I had some confusion with one part.', timestamp: '2025-03-05 21:30' },
 ])
 
 const addComment = () => {
   if (newComment.value.trim()) {
-    comments.value.push({ id: Date.now(), name: 'You', text: newComment.value })
+    comments.value.push({
+      id: Date.now(), name: 'You', text: newComment.value,
+      timestamp: dayjs().toISOString()
+    })
     newComment.value = ''
   }
 }
@@ -100,7 +106,10 @@ const article = {
             <div v-for="comment in comments" :key="comment.id" class="flex items-start gap-3 mb-4">
               <img src="@/assets/profile.png" alt="User Avatar" class="w-10 h-10 rounded-full" />
               <div class="flex-1">
-                <p class="font-semibold">{{ comment.name }}</p>
+                <div class="flex justify-between items-start">
+                  <p class="font-semibold">{{ comment.name }}</p>
+                  <p class="text-gray-700">{{ dayjs(comment.timestamp).fromNow() }}</p>
+                </div>
                 <p class="text-gray-700">{{ comment.text }}</p>
               </div>
             </div>
@@ -112,6 +121,7 @@ const article = {
                   v-model="newComment"
                   placeholder="Write a comment..."
                   class="flex-1 p-2 border rounded-md focus:outline-none focus:ring"
+                  @keydown.enter="addComment"
                 />
                 <Button @click="addComment" class="py-5"><Send class="w-5 h-5" /></Button>
               </div>
@@ -127,7 +137,10 @@ const article = {
             >
               <img src="@/assets/profile.png" alt="User Avatar" class="w-10 h-10 rounded-full" />
               <div class="flex-1">
-                <p class="font-semibold">{{ feedback.name }}</p>
+                <div class="flex justify-between items-start">
+                  <p class="font-semibold">{{ feedback.name }}</p>
+                  <p class="text-gray-700">{{ dayjs(feedback.timestamp).fromNow() }}</p>
+                </div>
                 <p class="text-gray-700">{{ feedback.text }}</p>
               </div>
             </div>

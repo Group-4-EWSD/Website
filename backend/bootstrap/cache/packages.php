@@ -1,4 +1,22 @@
 <?php return array (
+  'darkaonline/l5-swagger' => 
+  array (
+    'aliases' => 
+    array (
+      'L5Swagger' => 'L5Swagger\\L5SwaggerFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'L5Swagger\\L5SwaggerServiceProvider',
+    ),
+  ),
+  'jason-guru/laravel-make-repository' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'JasonGuru\\LaravelMakeRepository\\RepositoryServiceProvider',
+    ),
+  ),
   'laravel/pail' => 
   array (
     'providers' => 

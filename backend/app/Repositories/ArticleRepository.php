@@ -30,7 +30,7 @@ class ArticleRepository
     public function createArticleDetail($articleId, $filePath, $fileName, $fileType)
     {
         DB::table('article_details')->insert([
-            'article_detail_id' => Str::random(10),
+            'article_detail_id' => Str::uuid(),
             'article_id' => $articleId,
             'file_path' => $filePath,
             'file_name' => $fileName,
@@ -50,10 +50,15 @@ class ArticleRepository
     }
 
     public function getSystemId($userId){
-        $systemId = DB::table('system_datas as sd')
-            ->join('users as u', 'u.faculty_id', '=', 'sd.faculty_id')
-            ->where('u.id', $userId)
-            ->first()->system_id;
+        $systemId = DB::select("
+                    SELECT sd.*
+                    FROM system_datas AS sd
+                    JOIN academic_years AS ay ON ay.academic_year = CONCAT(YEAR(CURDATE()), '-', YEAR(CURDATE()) + 1)
+                    JOIN users AS u ON u.faculty_id = sd.faculty_id
+                    WHERE u.id = ?
+                    LIMIT 1
+                ", [$userId])[0]->system_id; // Use parameter binding to prevent SQL injection
+
         return $systemId;
     }
 
@@ -147,6 +152,17 @@ class ArticleRepository
             }
         }
         return $articles;
+    }
+
+    public function changeArticleStatus($userId, $articleId, $request){
+        DB::table('activities')->insert([
+            'activity_id' => Str::uuid(),
+            'article_id' => $articleId,
+            'user_id' => $userId,
+            'status' => $request->status,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     public function draftArticleList($userId) {

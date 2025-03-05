@@ -84,6 +84,18 @@ class ArticleController extends Controller
             return response()->json(['error' => $result['message']], 500);
         }
     }
+
+    public function articleChangeStatus($articleId, Request $request)
+    {
+        $userId = Auth::id();
+        $result = $this->articleService->changeArticleStatus($userId, $articleId, $request);
+        if ($result) {
+            return response()->json(['message' => 'Article status changed successfully'], 201);
+        } else {
+            return response()->json(['message' => 'Failed to change article status.'], 500);
+        }
+    }
+
     public function draftArticleList(){
         $userId = Auth::id();
         $articles = $this->articleService->draftArticleList($userId);

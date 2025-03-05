@@ -51,25 +51,35 @@ class ArticleService
 
             // Save article
             $this->articleRepository->createArticle($articleId, $userId, $systemId, $request);
-
             // Process and save article details (file uploads)
-            if ($request->has('article_details')) {
-                foreach ($request->article_details as $key => $detail) {
-                    if ($request->hasFile("article_details.$key.file")) {
-                        $file = $request->file("article_details.$key.file");
-                        // $fileName = time() . '_' . $file->getClientOriginalName();
-                        $fileName = time() . '_' . $request->article_title;
+            // dd($request);
+            if ($request->hasFile('article_details')) {
+                $uploadedFiles = []; // Array to store filenames
+            
+                foreach ($request->file('article_details') as $key => $file) {
+                    if ($file->isValid()) { 
+                        // Generate filename
+                        $fileName = time() . '_' . $request->article_title . '.' . $file->getClientOriginalExtension();
                         $s3Path = 'documents/' . $fileName;
+            
                         // Upload file to S3
-                        $this->fileRepository->uploadToS3($s3Path, $file->path());
-                        // $uploadResult = $this->fileRepository->uploadFile($file);
+                        $this->fileRepository->uploadToS3($s3Path, $file->getRealPath());
+            
+                        // File URL on S3
                         $filePath = 'https://ewsdcloud.s3.amazonaws.com/documents/' . $fileName;
-
+            
+                        // Save the filename used
+                        $uploadedFiles[] = $fileName;
+            
                         // Save article details
                         $this->articleRepository->createArticleDetail($articleId, $filePath, $fileName, $file->getClientOriginalExtension());
                     }
                 }
+            
+                // Debugging: Show all uploaded filenames
+                dd($uploadedFiles);
             }
+                       
             $this->articleRepository->createActivity($articleId, $userId, $systemId, $request);
 
             DB::commit();
@@ -79,6 +89,10 @@ class ArticleService
             DB::rollBack();
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
+
+    public function changeArticleStatus($userId, $articleId, $request){
+        return $this->articleRepository->changeArticleStatus($userId, $articleId, $request);
     }
 
     public function draftArticleList($userId){

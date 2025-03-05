@@ -1,15 +1,60 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
+import ArticleDetails from '@/views/Student/ArticleDetails.vue'
+import Notification from '@/views/Student/Notification.vue'
 
-const HomeView = () => import('@/views/HomeView.vue')
+const StudentHome = () => import('@/views/Student/Home.vue')
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
+const MyArticles = () => import('@/views/Student/MyArticles.vue')
+const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
+const Settings = () => import('@/views/Settings.vue')
 
-const publicRoutes = [
+const studentRoutes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView,
+    path: '/student/home',
+    name: 'Student Home',
+    component: StudentHome,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/my-articles',
+    name: 'My Articles',
+    component: MyArticles,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/articles/:id',
+    name: 'Article Details',
+    component: ArticleDetails,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/my-articles/draft',
+    name: 'Draft Articles',
+    component: DraftArticles,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/notifications',
+    name: 'Student Notifications',
+    component: Notification,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/student/settings',
+    name: 'Settings',
+    component: Settings,
     meta: {
       // requiresAuth: true,
     },
@@ -27,7 +72,7 @@ const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...publicRoutes, ...authRoutes, wildcardRoute],
+  routes: [...studentRoutes, ...authRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {

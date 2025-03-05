@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, Home, Inbox, LogOut, Settings } from 'lucide-vue-next'
+import { FileText, Home, Bell, LogOut, Settings } from 'lucide-vue-next'
 
 import {
   Sidebar,
@@ -14,22 +14,22 @@ import Separator from './separator/Separator.vue'
 const items = [
   {
     title: 'Home',
-    url: '#',
+    url: '/student/home',
     icon: Home,
   },
   {
     title: 'My Articles',
-    url: '#',
+    url: '/student/my-articles',
     icon: FileText,
   },
   {
-    title: 'Inbox',
-    url: '#',
-    icon: Inbox,
+    title: 'Notifications',
+    url: '/student/notifications',
+    icon: Bell,
   },
   {
     title: 'Settings',
-    url: '#',
+    url: '/student/settings',
     icon: Settings,
   },
   {
@@ -45,10 +45,10 @@ const items = [
       <SidebarMenu class="flex flex-col h-full">
         <SidebarMenuItem v-for="item in items.slice(0, -1)" :key="item.title">
           <SidebarMenuButton as-child>
-            <a :href="item.url">
+            <RouterLink :to="item.url" class="p-6" active-class="bg-primary text-white rounded-lg">
               <component :is="item.icon" />
               <span>{{ item.title }}</span>
-            </a>
+            </RouterLink>
           </SidebarMenuButton>
         </SidebarMenuItem>
 
@@ -56,7 +56,7 @@ const items = [
 
         <SidebarMenuItem :key="items[items.length - 1].title">
           <SidebarMenuButton as-child>
-            <a :href="items[items.length - 1].url">
+            <a :href="items[items.length - 1].url" class="p-6">
               <component :is="items[items.length - 1].icon" />
               <span>{{ items[items.length - 1].title }}</span>
             </a>

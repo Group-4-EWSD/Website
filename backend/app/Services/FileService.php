@@ -38,15 +38,19 @@ class FileService
         return $this->fileRepository->listS3Files();
     }
 
+    public function readFileContents($s3Path)
+    {
+        return $this->fileRepository->readFileContents($s3Path);
+    }
+
     public function downloadAsZip($fileName)
     {
         $s3Path = 'documents/' . $fileName;
         return $this->fileRepository->downloadAsZip($s3Path, $fileName);
     }
 
-    public function readFileContents($fileName)
+    public function downloadMultipleAsZip($files)
     {
-        $s3Path = 'documents/' . $fileName;
-        return $this->fileRepository->readFileContents($s3Path);
+        return $this->fileRepository->downloadMultipleAsZip($files);
     }
 }

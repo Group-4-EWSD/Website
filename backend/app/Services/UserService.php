@@ -78,7 +78,7 @@ class UserService
             $this->fileService->deleteFile($user->user_photo_path);
         }
 
-        $photoPath = $this->fileService->uploadFile($photo)['file_path']; 
+        $photoPath = $this->fileService->uploadFile($photo)['file_path'];
         $this->userRepository->updatePhoto($id, $photoPath);
 
         return $photoPath;

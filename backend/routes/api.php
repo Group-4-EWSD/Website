@@ -35,9 +35,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
-        Route::delete('/commentDelete', [ActionController::class, 'articleCommentDelete']);
-        Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
-        Route::patch('/changeStatus/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
+        Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
+        Route::post('/create', [ArticleController::class, 'articleCreateUpdate']); // create an article
+        Route::post('/update', [ArticleController::class, 'articleCreateUpdate']); // create an article
+        Route::post('/change-status/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
     });
     Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 

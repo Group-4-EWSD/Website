@@ -12,22 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('first_name', 100);
-            $table->string('last_name', 100);
-            $table->string('email', 255)->unique();
-            $table->string('phone_number', 15)->nullable();
-            $table->text('address')->nullable();
-            $table->string('city', 100)->nullable();
-            $table->string('state', 100)->nullable();
-            $table->string('postal_code', 20)->nullable();
-            $table->string('country', 100)->nullable();
-            $table->date('date_of_birth')->nullable();
-            $table->enum('gender', ['Male', 'Female', 'Other', 'Prefer not to say']);
-            $table->string('password');
-            $table->integer('loyalty_points')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->timestamps(0);  // This will create created_at and updated_at fields
+            $table->string('id', 10)->primary();
+            $table->string('user_name', 255);
+            $table->string('nickname', 100)->nullable();
+            $table->string('user_email', 255)->unique();
+            $table->string('user_password', 255);
+            $table->uuid('user_type_id');
+            $table->uuid('faculty_id')->nullable();
+            $table->tinyInteger('gender');
+            $table->string('user_photo_path', 255)->nullable();
+            $table->boolean('delete_flag')->default(false);
+            $table->timestamps();
+            $table->foreign('user_type_id')->references('user_type_id')->on('user_types');
+            $table->foreign('faculty_id')->references('faculty_id')->on('faculties');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -38,7 +35,7 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignId('id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');

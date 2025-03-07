@@ -60,4 +60,10 @@ class UserRepository extends BaseRepository
         $user->user_photo_path = $photoPath;
         return $user->save();
     }
+
+    public function getUserList(){
+        $userList = "
+            
+        ";
+    }
 }

@@ -117,4 +117,8 @@ class UserService
         }
         return $this->userRepository->updateUser($id, $data);
     }
+
+    public function getUserList(){
+        return $this->userRepository->getUserList();
+    }
 }

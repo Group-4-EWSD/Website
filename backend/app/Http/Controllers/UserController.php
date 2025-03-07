@@ -181,4 +181,8 @@ class UserController extends Controller
             'user' => $updatedUser
         ], 200);
     }
+
+    public function getUserList(){
+        return $updatedUser = $this->userService->getUserList();
+    }
 }

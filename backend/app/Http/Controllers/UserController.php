@@ -158,4 +158,27 @@ class UserController extends Controller
             'photo_path' => $photoPath,
         ], 200);
     }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $userId = Auth::id();
+
+        $data = $request->validate([
+            'user_name' => 'sometimes|string|max:255',
+            'nickname' => 'sometimes|string|max:255',
+            'user_password' => 'sometimes|string|min:8|confirmed',
+            'gender' => 'sometimes|in:male,female,other',
+        ]);
+
+        if (isset($data['user_password'])) {
+            $data['user_password'] = bcrypt($data['user_password']);
+        }
+
+        $updatedUser = $this->userService->updateUserProfile($userId, $data);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $updatedUser
+        ], 200);
+    }
 }

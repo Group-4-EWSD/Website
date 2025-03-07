@@ -54,10 +54,10 @@ class UserService
         return $this->userRepository->getUserById($id);
     }
 
-    public function updateUserProfile($id, array $data)
-    {
-        return $this->userRepository->updateUser($id, $data);
-    }
+    // public function updateUserProfile($id, array $data)
+    // {
+    //     return $this->userRepository->updateUser($id, $data);
+    // }
 
     public function getTermsCondition()
     {
@@ -107,5 +107,14 @@ class UserService
             $this->fileService->deleteFile($user->user_photo_path);
             $this->userRepository->updatePhoto($id, null);
         }
+    }
+
+    public function updateUserProfile($id, array $data)
+    {
+        $user = $this->userRepository->getUserById($id);
+        if (!$user) {
+            throw new \Exception('User not found', 404);
+        }
+        return $this->userRepository->updateUser($id, $data);
     }
 }

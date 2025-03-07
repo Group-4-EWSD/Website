@@ -26,13 +26,14 @@ class ActionService
         $fileService = app(FileService::class);
         $contentList = [];
         $articlePhotos = [];
-
         foreach ($articleFiles as $file) {
-            $fullFileName = $file->file_name . '.' . $file->file_type; // Combine name and type
+            $fullFileName = $file->file_name; // Combine name and type
             if ($file->file_type === 'docx') {
-                $contentList[$fullFileName] = $fileService->readFileContents($fullFileName);
+                $docPath = $file->file_path;
+                $contentList[$fullFileName] = $fileService->readFileContents($docPath);
             } elseif (in_array($file->file_type, ['png', 'jpg', 'jpeg', 'gif', 'webp'])) {
-                $articlePhotos[] = $file->file_path;
+                $photoPath = $file->file_path;
+                $articlePhotos[$fullFileName] = $photoPath ? "https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/{$photoPath}" : null;
             }
         }
 

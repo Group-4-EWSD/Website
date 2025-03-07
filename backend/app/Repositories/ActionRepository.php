@@ -66,7 +66,7 @@ class actionRepository extends BaseRepository
                     'comments.message',
                     'comments.created_at',
                     'comments.user_id',
-                    'u.user_photo_path',
+                    DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
                     'u.user_name'
                 ])
@@ -83,7 +83,7 @@ class actionRepository extends BaseRepository
                     'f.message',
                     'f.created_at',
                     'f.user_id',
-                    'u.user_photo_path',
+                    DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
                     'u.user_name'
                 ])

@@ -28,11 +28,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Articles routes
     Route::prefix('/articles')->group(function () {
         // Normal Routes
+        Route::get('/detail', [ActionController::class, 'articlePageInitial']);
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
-        Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
         Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
@@ -68,3 +68,4 @@ Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
 Route::post('/list-file', [FileController::class, 'listFiles']); // New route
 Route::get('/test-list-files', [FileController::class, 'listFiles']); 
+Route::get('/item-list', [ArticleController::class, 'getItemList']);

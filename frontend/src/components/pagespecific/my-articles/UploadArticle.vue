@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm } from 'vee-validate'
+import { ErrorMessage, useForm } from 'vee-validate'
 import { ref } from 'vue'
 
 import DropZone from '@/components/shared/DropZone.vue'
@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label'
 import { ArticleStatus, uploadArticle } from '@/api/article'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
+import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 
 interface UploadArticleSchema {
   title: string
@@ -34,70 +35,68 @@ interface UploadArticleSchema {
 const isOpen = ref(false)
 const isLoading = ref(false)
 
-const acceptedFileTypes = ['image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+const acceptedFileTypes = [
+  'image/jpeg',
+  'image/png',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
 
 const validationSchema = yup.object({
-    title: yup.string()
-      .required('Title is required')
-      .min(3, 'Title must be at least 3 characters')
-      .max(100, 'Title must be less than 100 characters'),
-    description: yup.string()
-      .required('Description is required')
-      .min(10, 'Description must be at least 10 characters')
-      .max(500, 'Description must be less than 500 characters'),
-    category: yup.string()
-      .required('Category is required')
-      .oneOf(['coffee', 'tea', 'coke'], 'Please select a valid category'),
-    type: yup.string()
-      .required('Type is required')
-      .oneOf(['docx', 'image'], 'Please select a valid type'),
-    files: yup.array()
-      .of(yup.mixed<File>())
-      .test('required', 'At least one file is required', (files) => files && files.length > 0)
-      .test('fileSize', 'File size is too large', (files) => {
-        if (!files) return true
-        return files.every(file => file && file.size <= 5 * 1024 * 1024) // 5MB limit
-      }),
-    agreeToterm: yup.boolean()
-      .required('You must agree to the terms')
-      .oneOf([true], 'You must agree to the terms')
+  title: yup
+    .string()
+    .required('Title is required')
+    .min(3, 'Title must be at least 3 characters')
+    .max(100, 'Title must be less than 100 characters'),
+  description: yup.string().max(500, 'Description must be less than 500 characters'),
+  category: yup.string().required('Category is required'),
+  agreeToterm: yup
+    .boolean()
+    .required('You must agree to the terms')
+    .oneOf([true], 'You must agree to the terms'),
+  files: yup
+    .array()
+    .of(yup.mixed<File>())
+    .test('required', 'At least one file is required', (files) => files && files.length > 0)
+    .test('fileSize', 'File size is too large', (files) => {
+      if (!files) return true
+      return files.every((file) => file && file.size <= 5 * 1024 * 1024) // 5MB limit
+    }),
 })
 
-
 const { handleSubmit, errors, values, setValues, resetForm } = useForm<UploadArticleSchema>({
+  validationSchema,
   initialValues: {
     title: '',
     description: '',
     category: '',
     agreeToterm: false,
-    files: []
+    files: [],
   },
 })
 
 const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
-
   if (isLoading.value) return
 
   try {
     isLoading.value = true
-    
+
     // Map form values to API data structure
     const articleData = {
       article_title: formValues.title,
       article_description: formValues.description,
       article_type_id: formValues.category,
       status: ArticleStatus.SUBMITTED,
-      article_details: formValues.files
+      article_details: formValues.files,
     }
-    
+
     // Submit the article using the API
     await uploadArticle(articleData)
 
     toast.success('Article submitted successfully')
-    
+
     // Close the dialog after successful submission
     isOpen.value = false
-    
+
     // Reset form
     resetForm()
   } catch (error) {
@@ -119,16 +118,16 @@ const saveAsDraft = async () => {
       article_description: values.description,
       article_type_id: values.category,
       status: ArticleStatus.DRAFT,
-      article_details: values.files
+      article_details: values.files,
     }
-    
+
     await uploadArticle(articleData)
 
     toast.success('Article saved as draft')
-    
+
     // Close the dialog after saving
     isOpen.value = false
-    
+
     // Reset form
     resetForm()
   } catch (error) {
@@ -149,7 +148,7 @@ const closeModal = () => {
 const handleFilesAdded = (files: File[]) => {
   setValues({
     ...values,
-    files
+    files,
   })
 }
 </script>
@@ -164,7 +163,7 @@ const handleFilesAdded = (files: File[]) => {
         <DialogTitle class="uppercase">Upload your article</DialogTitle>
       </DialogHeader>
       <form @submit.prevent="onSubmit" class="space-y-4 pt-5">
-        <FormElement :errors="errors" layout="row">
+        <FormElement layout="row">
           <template #label>
             <Label for="title">Title</Label>
           </template>
@@ -172,7 +171,7 @@ const handleFilesAdded = (files: File[]) => {
             <Input name="title" id="title" placeholder="Enter article title" :errors="errors" />
           </template>
         </FormElement>
-        <FormElement :errors="errors" layout="row">
+        <FormElement layout="row">
           <template #label>
             <Label for="description">Description</Label>
           </template>
@@ -187,7 +186,7 @@ const handleFilesAdded = (files: File[]) => {
             />
           </template>
         </FormElement>
-        <FormElement :errors="errors" layout="row">
+        <FormElement layout="row">
           <template #label>
             <Label for="category">Category</Label>
           </template>
@@ -204,31 +203,34 @@ const handleFilesAdded = (files: File[]) => {
             ></Select>
           </template>
         </FormElement>
-        <FormElement :errors="errors" layout="row">
+        <DropZone
+          @files-added="handleFilesAdded"
+          :acceptedTypes="acceptedFileTypes"
+          :value="values.files"
+          :errors="errors.files"
+        />
+
+        <FormElement :errors="errors">
           <template #label>
-            <Label for="type">Type</Label>
-          </template>
-          <template #field>
-            <Select
-              name="type"
-              id="type"
-              :errors="errors"
-              :options="[
-                { label: 'Docx', value: 'docx' },
-                { label: 'Image', value: 'image' },
-              ]"
-            >
-            </Select>
+            <div class="flex items-center gap-2">
+              <Checkbox name="agreeToterm" id="agreeToterm" />
+              <Label for="agreeToterm" class="text-sm cursor-pointer">
+                I agree to the terms and conditions
+              </Label>
+            </div>
+
+            <ErrorMessage
+              v-if="errors.agreeToterm"
+              :name="'agreeToterm'"
+              class="text-sm text-red-500"
+            />
           </template>
         </FormElement>
-        <DropZone 
-            @files-added="handleFilesAdded" 
-            :acceptedTypes="acceptedFileTypes" 
-            :value="values.files"
-          />
       </form>
       <DialogFooter>
-        <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading">Cancel</Button>
+        <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading"
+          >Cancel</Button
+        >
         <Button type="button" variant="outline" @click="saveAsDraft" :disabled="isLoading">
           {{ isLoading ? 'Saving...' : 'Save as draft' }}
         </Button>

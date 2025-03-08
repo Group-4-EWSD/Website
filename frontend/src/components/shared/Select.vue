@@ -16,7 +16,7 @@ interface Props {
   class?: string
   placeholder?: string
   options: { label: string; value: string }[]
-  errors?: Record<string, string | string[] | null>
+  errors?: Record<string, string | string[] | null | undefined>
 }
 
 const props = withDefaults(defineProps<Props>(), {

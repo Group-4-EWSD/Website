@@ -126,4 +126,10 @@ class ArticleController extends Controller
 
         return response()->json(['message' => 'No files found'], 404);
     }
+
+    public function getItemList(Request $request){
+        $item = $request->item;
+        $itemList = $this->articleService->getItemList($item);
+        return $itemList;
+    }
 }

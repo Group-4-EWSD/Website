@@ -94,9 +94,4 @@ class ActionController extends Controller
         $this->actionService->commentDeleteArticle($request);
         return response()->json(['message' => 'Comment deleted successfully']);
     }
-
-    public function academicYearList(){
-        $academicYearList = $this->actionService->academicYearList();
-        return response()->json($academicYearList);
-    }
 }

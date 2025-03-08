@@ -43,8 +43,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 
     // Category routes
-    Route::prefix('/categories')->group(function () {
-    });
+    Route::get('/itemList', [ArticleController::class, 'getItemList']);
 
     // User routes
     Route::prefix('/user')->group(function () {

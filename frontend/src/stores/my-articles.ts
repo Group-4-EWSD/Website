@@ -1,18 +1,21 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { getMyArticles } from '@/api/articles'
-import type { ArticleParams, Articles, CountData } from '@/types/article'
+import type { ArticleParams, Articles, CountData, MyArticlesResponse } from '@/types/article'
 
 export const useMyArticlesStore = defineStore('myArticles', () => {
   // State
   const articles = ref<Articles[]>([])
+  const latestArticles = ref<Articles[]>([])
+  const preUploadDeadline = ref('')
+  const actualUploadDeadline = ref('')
   const countData = ref<CountData | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const currentPage = ref(1)
   const pageSize = ref(10)
   const totalCount = ref(0)
-  const hasLoaded = ref(false) // New flag to track if data has been loaded
+  const hasLoaded = ref(false) // Flag to track if data has been loaded
   const filters = ref<Omit<ArticleParams, 'pageNumber' | 'displayNumber'>>({
     academicYearId: undefined,
     articleTitle: undefined,
@@ -45,17 +48,21 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
     error.value = null
     
     try {
-      const response = await getMyArticles({
+      const response: MyArticlesResponse = await getMyArticles({
         pageNumber: currentPage.value,
         displayNumber: pageSize.value,
         ...filters.value
       })
       
-      articles.value = response.allArticles || []
-      countData.value = response.countData || null
+      // Update state with the response data
+      articles.value = response.myArticles || []
+      latestArticles.value = response.latestArticles || []
+      preUploadDeadline.value = response.preUploadDeadline || ''
+      actualUploadDeadline.value = response.actualUploadDeadline || ''
       
-      // Fix the total count calculation
-      totalCount.value = response.countData?.currentYearArticleCount || articles.value.length
+      // Set total count based on the number of articles
+      // This might need adjustment if pagination is server-side
+      totalCount.value = articles.value.length
       
       // Mark as loaded
       hasLoaded.value = true
@@ -110,6 +117,9 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
   return {
     // State
     articles,
+    latestArticles,
+    preUploadDeadline,
+    actualUploadDeadline,
     countData,
     isLoading,
     error,
@@ -123,7 +133,7 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
     statusText,
     // Actions
     fetchArticles,
-    refreshArticles, // New explicit refresh method
+    refreshArticles,
     setPage,
     setPageSize,
     setFilters,

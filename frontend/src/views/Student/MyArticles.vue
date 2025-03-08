@@ -11,19 +11,6 @@ import { Pagination } from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMyArticlesStore } from '@/stores/my-articles'
 
-// Date formatting
-const preUploadDate = new Intl.DateTimeFormat('en', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-}).format(new Date())
-
-const actualDeadlineDate = new Intl.DateTimeFormat('en', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-}).format(new Date())
-
 const myArticlesStore = useMyArticlesStore()
 
 onMounted(() => {
@@ -59,27 +46,36 @@ const formatDate = (dateString: string): string => {
           <CalendarDays class="h-14 w-14 text-yellow-500" />
           <div class="flex flex-col gap-3">
             <h2 class="font-semibold">Pre Upload Deadline</h2>
-            <p>{{ preUploadDate }}</p>
+
+            <Skeleton v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="w-20 h-5" />
+            <p v-if="myArticlesStore.preUploadDeadline">{{ myArticlesStore.preUploadDeadline ? formatDate(myArticlesStore.preUploadDeadline) : '' }}</p>
           </div>
         </Card>
         <Card class="p-5 flex flex-row gap-5 items-center">
           <CalendarDays class="h-14 w-14 text-destructive" />
           <div class="flex flex-col gap-3">
             <h2 class="font-semibold">Actual Deadline</h2>
-            <p>{{ actualDeadlineDate }}</p>
+            <Skeleton v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="w-20 h-5" />
+            <p v-if="myArticlesStore.preUploadDeadline">{{ myArticlesStore.actualUploadDeadline ? formatDate(myArticlesStore.actualUploadDeadline) : '' }}</p>
           </div>
         </Card>
       </div>
 
       <div class="flex flex-col gap-3">
         <h3 class="font-semibold uppercase">Latest articles</h3>
+
         <LatestArticles />
       </div>
 
       <div class="flex flex-col gap-3">
-        <h3 class="font-semibold uppercase">My Articles</h3>
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold uppercase">My Articles</h3>
+          <Button variant="outline" size="sm" @click="myArticlesStore.refreshArticles()">
+            Refresh
+          </Button>
+        </div>
 
-        <div v-if="myArticlesStore.isLoading" class="space-y-4">
+        <div v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="space-y-4">
           <Skeleton v-for="i in 3" :key="i" class="h-36 w-full rounded-lg" />
         </div>
 
@@ -90,28 +86,26 @@ const formatDate = (dateString: string): string => {
           </Button>
         </div>
 
-        <div
-          v-else-if="myArticlesStore.articles.length === 0"
-          class="p-8 text-center bg-gray-50 rounded-lg"
-        >
+        <div v-else-if="myArticlesStore.articles.length === 0" class="p-8 text-center bg-gray-50 rounded-lg">
           <p class="text-gray-500">No articles found.</p>
         </div>
 
-        <div v-else>
+        <div v-else class="space-y-4">
           <ArticlePost
             v-for="article in myArticlesStore.articles"
             :key="article.article_id"
             :article="{
               title: article.article_title,
-              description: article.article_description, // No description in the API response
-              totalLikes: myArticlesStore?.countData?.reactCount || 0,
-              totalViews: myArticlesStore?.countData?.totalViewCount || 0,
+              description: article.article_description,
+              totalLikes: 0, // need data from BE
+              totalViews: 0, 
               date: formatDate(article.created_at),
               status: myArticlesStore.statusText(article.status),
             }"
           />
 
           <Pagination
+            v-if="myArticlesStore.totalPages > 1"
             :current-page="myArticlesStore.currentPage"
             :total-pages="myArticlesStore.totalPages"
             @page-change="myArticlesStore.setPage"

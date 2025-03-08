@@ -43,10 +43,7 @@ const article = props.article
       </div>
     </div>
     
-    <p class="text-sm">{{ article.description }}</p>
-
-    
-    
+    <p v-if="article.description" class="text-sm mb-0">{{ article.description }}</p>
 
   </Card>
 </template>

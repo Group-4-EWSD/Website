@@ -10,11 +10,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useMyArticlesStore } from '@/stores/my-articles'
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
+
+const myArticlesStore = useMyArticlesStore()
+
 </script>
 
 <template>
   <Card class="p-4">
-    <Table>
+    <Skeleton v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="w-full h-14" />
+
+    <div v-else-if="myArticlesStore.hasLoaded && myArticlesStore.latestArticles.length === 0" class="flex items-center justify-center h-12">
+      <p>No articles found</p>
+    </div>
+
+    <Table v-if="myArticlesStore.latestArticles.length > 0">
       <TableHeader>
         <TableRow>
           <TableHead> Tile </TableHead>
@@ -26,12 +37,12 @@ import {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow>
-          <TableCell> Article 3 </TableCell>
-          <TableCell> 12/12/2021 </TableCell>
-          <TableCell> Pending </TableCell>
-          <TableCell> Science </TableCell>
-          <TableCell> 0 </TableCell>
+        <TableRow v-for="article in myArticlesStore.latestArticles" :key="article.article_id">
+          <TableCell> {{ article.article_title }} </TableCell>
+          <TableCell> {{ article.created_at }} </TableCell>
+          <TableCell> {{ myArticlesStore.statusText(article.status) }} </TableCell>
+          <TableCell> - </TableCell>
+          <TableCell> - </TableCell>
           <TableCell>
             <div class="flex gap-2">
               <PencilIcon class="h-4 w-4" />
@@ -40,5 +51,6 @@ import {
         </TableRow>
       </TableBody>
     </Table>
+
   </Card>
 </template>

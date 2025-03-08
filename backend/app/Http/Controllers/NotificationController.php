@@ -18,4 +18,8 @@ class NotificationController extends Controller
         $notificationData = $this->notificationService->getNotificationList();
         return response()->json($notificationData);
     }
+
+    public function setSeen(Request $request){
+        $this->notificationService->setSeen($request->notificationId);
+    }
 }

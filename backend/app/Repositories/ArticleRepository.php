@@ -12,25 +12,27 @@ use Illuminate\Support\Str;
 
 class ArticleRepository
 {
-    public function createArticle($articleId, $userId, $systemId, $request)
+    public function createOrUpdateArticle($articleId, $userId, $systemId, $request)
     {
-        DB::table('articles')->insert([
-            'article_id' => $articleId,
-            'article_title' => $request->article_title,
-            'article_description' => $request->article_description,
-            'user_id' => $userId,
-            'system_id' => $systemId,
-            'article_type_id' => $request->article_type_id,
-            'delete_flag' => false,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::table('articles')->updateOrInsert(
+            ['article_id' => $articleId], // Condition to check if the record exists
+            [
+                'article_title' => $request->article_title,
+                'article_description' => $request->article_description,
+                'user_id' => $userId,
+                'system_id' => $systemId,
+                'article_type_id' => $request->article_type_id,
+                'delete_flag' => false,
+                'updated_at' => now(),
+                'created_at' => DB::raw('IFNULL(created_at, NOW())') // Preserve `created_at` if updating
+            ]
+        );
     }
 
     public function createArticleDetail($articleId, $filePath, $fileName, $fileType)
     {
         DB::table('article_details')->insert([
-            'article_detail_id' => Str::random(10),
+            'article_detail_id' => Str::uuid(),
             'article_id' => $articleId,
             'file_path' => $filePath,
             'file_name' => $fileName,
@@ -38,8 +40,12 @@ class ArticleRepository
         ]);
     }
 
-    public function createActivity($articleId, $userId, $systemId, $request){
-        DB::table('activities')->insert([
+    public function deleteArticleDetail($file_name){
+        ArticleDetail::where('file_name', $file_name)->delete();
+    }
+
+    public function createActivity($articleId, $userId, $request){
+        $activity = DB::table('activities')->insert([
             'activity_id' => Str::uuid(),
             'article_id' => $articleId,
             'user_id' => $userId,
@@ -47,13 +53,19 @@ class ArticleRepository
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        return $activity;
     }
 
     public function getSystemId($userId){
-        $systemId = DB::table('system_datas as sd')
-            ->join('users as u', 'u.faculty_id', '=', 'sd.faculty_id')
-            ->where('u.id', $userId)
-            ->first()->system_id;
+        $systemId = DB::select("
+                    SELECT sd.*
+                    FROM system_datas AS sd
+                    JOIN academic_years AS ay ON ay.academic_year = CONCAT(YEAR(CURDATE()), '-', YEAR(CURDATE()) + 1)
+                    JOIN users AS u ON u.faculty_id = sd.faculty_id
+                    WHERE u.id = ?
+                    LIMIT 1
+                ", [$userId])[0]->system_id; // Use parameter binding to prevent SQL injection
+
         return $systemId;
     }
 
@@ -72,10 +84,11 @@ class ArticleRepository
     {
         $articles = DB::table('articles as art')
                 ->select([
+                    'art.article_id',
                     'art.article_title',
                     'art.user_id',
                     'u.user_name',
-                    'u.user_photo_path',
+                    DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
                     'art.created_at',
                     'art.updated_at',
@@ -100,7 +113,20 @@ class ArticleRepository
             $articles->where('art.user_id','=',$userId);
             $articles->havingRaw("status IN (1, 2, 3)");
         } else {
-            $articles->havingRaw("status IN (2, 3)");
+            if (!empty($request->status)) {
+                $status = $request->status;
+                if($status == '0'){
+                    $articles->havingRaw(" status IN (0, 1, 2, 3) ");
+                } else if($status == '1'){
+                    $articles->havingRaw(" status IN (1, 2, 3) ");
+                } else if($status == '2'){
+                    $articles->havingRaw(" status IN (2, 3) ");
+                } else if($status == '3'){
+                    $articles->havingRaw(" status = 3 ");
+                } else {
+                    $articles->havingRaw(" status IN (2, 3) ");
+                }
+            }
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([
@@ -175,9 +201,7 @@ class ArticleRepository
     }
 
     public function getFileList($articleId){
-        $files = ArticleDetail::where('article_id', $articleId)
-            ->pluck('file_path')
-            ->toArray();
+        $files = ArticleDetail::where('article_id', $articleId)->get();
         return $files ?: []; // Ensures an empty array if no files found
     }
     

@@ -35,8 +35,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
-        Route::delete('/commentDelete', [ActionController::class, 'articleCommentDelete']);
-        Route::post('/create', [ArticleController::class, 'articleCreate']); // create an article
+        Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
+        Route::post('/create', [ArticleController::class, 'articleCreateUpdate']); // create an article
+        Route::post('/update', [ArticleController::class, 'articleCreateUpdate']); // create an article
+        Route::post('/change-status/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
     });
     Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 
@@ -52,7 +54,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User routes
     Route::prefix('/notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/seen', [NotificationController::class, 'setSeen']);
     });
+
+    Route::post('/update-user-photo', [UserController::class, 'updateUserPhoto']);
+    Route::get('/get-user-photo', [UserController::class, 'getUserPhoto']);
+    Route::delete('/delete-user-photo', [UserController::class, 'deleteUserPhoto']);
+    Route::patch('/edit-user-detail', [UserController::class, 'updateProfile']);
+    Route::get('/user-list', [UserController::class, 'getUserList']);
+
 });
 Route::get('/termsCondition', [UserController::class, 'termsCondition']);
 

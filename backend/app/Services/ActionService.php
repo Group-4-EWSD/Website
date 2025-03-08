@@ -59,8 +59,4 @@ class ActionService
     public function commentDeleteArticle($request){
         return $this->actionRepository->deleteComment($request);
     }
-
-    public function academicYearList(){
-        return $this->actionRepository->academicYearList();
-    }
 }

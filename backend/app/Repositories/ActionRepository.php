@@ -130,9 +130,4 @@ class actionRepository extends BaseRepository
         $deleted = Comment::where('comment_id', $request->commentId)->delete();
         return $deleted > 0;
     }
-
-    public function academicYearList(){
-        $academicYearList = DB::table("academic_years")->select('academic_year_id','academic_year')->get();
-        return $academicYearList;
-    }
 }

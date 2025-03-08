@@ -12,9 +12,4 @@ class FacultyService
     {
         $this->facultyRepository = $facultyRepository;
     }
-
-    public function facultyDropdown()
-    {
-        return $this->facultyRepository->getFacultyDropdown();
-    }
 }

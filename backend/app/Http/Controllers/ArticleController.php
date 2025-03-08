@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-// use App\Mail\UserCreatedMail;
+use App\Mail\UserCreatedMail;
 use App\Services\ArticleService;
 use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Tag(
@@ -62,12 +63,15 @@ class ArticleController extends Controller
      */
     public function homePageInitial(Request $request)
     {
-
         $userId = Auth::id();
+        // dd(Auth::id());
         $homePageData = $this->articleService->getHomePageData($userId, $request);
-        dd("ok");
-        // Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
-        return response()->json($homePageData);
+        $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
+        if ($mailSent) {
+            return response()->json($homePageData);
+        } else {
+            return response()->json(['message' => 'Failed to send email.'], 201);
+        }
     }
 
     public function myArticleInitial(Request $request)

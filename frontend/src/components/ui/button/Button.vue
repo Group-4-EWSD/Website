@@ -12,15 +12,18 @@ interface Props extends PrimitiveProps {
   size?: ButtonVariants['size']
   class?: HTMLAttributes['class']
   processing?: boolean
+  type?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   as: 'button',
+  type: 'button',
 })
 </script>
 
 <template>
   <Primitive
+    :type="props.type"
     :as="as"
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"

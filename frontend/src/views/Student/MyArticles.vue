@@ -79,7 +79,7 @@ const sampleArticles = [
         <Card class="p-5 flex flex-row gap-5 items-center">
           <CalendarDays class="h-14 w-14 text-destructive" />
           <div class="flex flex-col gap-3">
-            <h2 class="font-semibold">Pre Upload Deadline</h2>
+            <h2 class="font-semibold">Actual Deadline</h2>
             <p>{{ actualDeadlineDate }}</p>
           </div>
         </Card>

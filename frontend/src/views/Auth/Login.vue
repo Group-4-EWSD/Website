@@ -45,29 +45,28 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         toast.error('Invalid credentials')
       } else {
         cookies.set('token', response.data.token)
-        let userRole = response.data.user.role; 
-        userRole = 'student';
+        let userRole = response.data.user.role
+        userRole = 'student'
 
         // Role-based redirection
         switch (userRole) {
           case 'student':
-            console.log('hit');
-            router.push('/student/home'); 
-            break;
+            router.push('/student/home')
+            break
           case 'guest':
-            router.push('/guest/home');
-            break;
+            router.push('/guest/home')
+            break
           case 'coordinator':
-            router.push('/coordinator/dashboard');
-            break;
+            router.push('/coordinator/dashboard')
+            break
           case 'admin':
-            router.push('/admin/dashboard');
-            break;
+            router.push('/admin/dashboard')
+            break
           case 'manager':
-            router.push('/manager/dashboard');
-            break;
+            router.push('/manager/dashboard')
+            break
           default:
-            router.push('/');
+            router.push('/')
         }
       }
       loading.value = false
@@ -114,7 +113,9 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       </Button>
     </form>
     <div class="flex justify-between text-sm">
-      <router-link to="/auth/forgot-password" class="text-primary hover:underline">Forgot password?</router-link>
+      <router-link to="/auth/forgot-password" class="text-primary hover:underline"
+        >Forgot password?</router-link
+      >
       <router-link to="/auth/register" class="text-primary hover:underline">Register</router-link>
     </div>
   </AuthBaseLayout>

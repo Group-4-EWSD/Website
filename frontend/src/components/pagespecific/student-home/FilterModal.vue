@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { FilterX } from 'lucide-vue-next'
+import { ref } from 'vue'
+
 import Select from '@/components/shared/Select.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 
 const selectedCategory = ref('all')
 const selectedYear = ref('all')

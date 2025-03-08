@@ -16,7 +16,7 @@ const studentRoutes = [
     name: 'Student Home',
     component: StudentHome,
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
     },
   },
   {
@@ -29,7 +29,7 @@ const studentRoutes = [
   },
   {
     path: '/articles/:id',
-    name: 'Article Details',
+    name: 'getArticleDetails',
     component: ArticleDetails,
     meta: {
       // requiresAuth: true,

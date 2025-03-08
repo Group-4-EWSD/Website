@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import dayjs from 'dayjs'
 
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import { Card } from '@/components/ui/card'
@@ -14,8 +15,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { getArticles, getArticleDetails } from '@/api/articles'
+import type { Articles, CountData } from '@/types/article'
 
+const countData = ref<CountData | null>(null)
+const articles = ref<Articles[]>([])
 const sortOption = ref<string>('')
+const isFetched = ref(false)
 
 const sortOptions = ref([
   { value: 'created asc', label: 'Newest First' },
@@ -27,74 +33,94 @@ const sortOptions = ref([
 const sortBy = (option: string) => {
   sortOption.value = option
   console.log('Sorting by:', option)
-  // Implement sorting logic in your computed properties or API call
 }
 
-const articles = [
-  {
-    id: 1,
-    title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
-    description:
-      'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
-    author: 'Zar Li',
-    date: '15 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-  },
-  {
-    id: 2,
-    title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    date: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    id: 3,
-    title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    date: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    id: 4,
-    title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    date: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    id: 5,
-    title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    date: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    id: 6,
-    title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    date: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    id: 7,
-    title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    date: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-]
+const fetchArticles = async () => {
+  try {
+    const response = await getArticles({
+      displayNumber: 5,
+      pageNumber: 1,
+      status: 0,
+    })
+    countData.value = response.countData
+    articles.value = response.allArticles
+    isFetched.value = true
+  } catch (error) {
+    console.error('Error fetching articles:', error)
+  }
+}
+
+onMounted(() => {
+  if (!isFetched.value) {
+    fetchArticles()
+  }
+})
+
+// const articles = [
+//   {
+//     id: 1,
+//     title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
+//     description:
+//       'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
+//     author: 'Zar Li',
+//     date: '15 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+//   },
+//   {
+//     id: 2,
+//     title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     date: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     id: 3,
+//     title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     date: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     id: 4,
+//     title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     date: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     id: 5,
+//     title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     date: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     id: 6,
+//     title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     date: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     id: 7,
+//     title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     date: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+// ]
 </script>
 
 <template>
@@ -110,7 +136,7 @@ const articles = [
           </div>
           <div>
             <p class="text-4xl font-bold text-blue-500 py-2">
-              45 <span class="text-primary text-3xl"> Likes</span>
+              {{ countData?.reactCount }} <span class="text-primary text-3xl"> Likes</span>
             </p>
             <p class="text-sm text-muted-foreground">Up to 10% from Last Week</p>
           </div>
@@ -120,7 +146,7 @@ const articles = [
             <h2 class="text-lg uppercase">Uploaded Articles</h2>
           </div>
           <div>
-            <p class="text-4xl font-bold py-2">21</p>
+            <p class="text-4xl font-bold py-2">{{ countData?.currentYearArticleCount }}</p>
             <p class="text-sm text-muted-foreground">Articles for this year</p>
           </div>
         </Card>
@@ -130,7 +156,7 @@ const articles = [
             <component :is="Eye" />
           </div>
           <div>
-            <p class="text-4xl font-bold py-2">35</p>
+            <p class="text-4xl font-bold py-2">{{ countData?.totalViewCount }}</p>
             <p class="text-sm text-muted-foreground">75% total numbers of views</p>
           </div>
         </Card>
@@ -172,28 +198,29 @@ const articles = [
             <TableBody>
               <TableRow
                 v-for="article in articles.slice(0, 6)"
-                :key="article.id"
+                :key="article.article_id"
                 class="border-b hover:bg-gray-50 transition-all"
               >
                 <TableCell>
                   <div class="flex items-center gap-4">
                     <img
                       src="@/assets/profile.png"
-                      class="w-10 h-10 rounded-full border border-white hidden sm:flex"
+                      class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white"
                     />
                     <div class="flex-1">
-                      <a
-                        :href="`/articles/${article.id}`"
+                      <router-link
+                        :to="{ name: 'getArticleDetails', params: { id: article.article_id } }"
                         class="text-blue-600 font-semibold hover:underline py-1"
                       >
-                        {{ article.title }}
-                      </a>
+                        {{ article.article_title }}
+                      </router-link>
                       <p class="text-sm text-gray-500 py-1">
-                        {{ article.description }}
+                        {{ article.article_title }}
                       </p>
                     </div>
-
-                    <span class="text-gray-600 text-sm">{{ article.date }}</span>
+                    <span class="text-gray-600 text-sm">
+                      {{ dayjs(article.created_at).format('MMM D, YYYY') }}
+                    </span>
                   </div>
                 </TableCell>
               </TableRow>

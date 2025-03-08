@@ -52,9 +52,11 @@ class NotificationRepository extends BaseRepository
         ]);
     }
 
-    public function seenAllNotifications(){
-        $this->model()::where('user_id', Auth::id())->update([
-            'seen' => 1
-        ]);
+    public function seenNotifications($notificationId){
+        $this->model()::where('user_id', Auth::id())
+            ->where('notification_id', '=', $notificationId)
+            ->update([
+                'seen' => 1
+            ]);
     }
 }

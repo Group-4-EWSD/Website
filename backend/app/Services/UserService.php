@@ -78,7 +78,7 @@ class UserService
             $this->fileService->deleteFile($user->user_photo_path);
         }
 
-        $photoPath = $this->fileService->uploadFile($photo)['file_path']; 
+        $photoPath = $this->fileService->uploadFile($photo)['file_path'];
         $this->userRepository->updatePhoto($id, $photoPath);
 
         return $photoPath;
@@ -116,5 +116,9 @@ class UserService
             throw new \Exception('User not found', 404);
         }
         return $this->userRepository->updateUser($id, $data);
+    }
+
+    public function getUserList(){
+        return $this->userRepository->getUserList();
     }
 }

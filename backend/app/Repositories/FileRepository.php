@@ -32,7 +32,7 @@ class FileRepository
             'Body' => file_get_contents($filePath),
         ]);
     }
-    
+
     public function deleteFromS3($s3Path): void
     {
         $this->s3Client->deleteObject([
@@ -55,28 +55,6 @@ class FileRepository
             }
         }
         return $files;
-    }
-
-    public function downloadAsZip($s3Path, $fileName)
-    {
-        $result = $this->s3Client->getObject([
-            'Bucket' => 'ewsdcloud',
-            'Key' => $s3Path,
-        ]);
-
-        $fileContent = $result['Body']->getContents();
-        $zipFileName = time() . '_download.zip';
-        $zipPath = storage_path('app/' . $zipFileName);
-        $zip = new ZipArchive();
-
-        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-            throw new \Exception('Could not create ZIP');
-        }
-
-        $zip->addFromString($fileName, $fileContent);
-        $zip->close();
-
-        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 
     public function readFileContents($s3Path)
@@ -108,5 +86,52 @@ class FileRepository
         unlink($tempPath); // Delete temp file
 
         return trim($text);
+    }
+
+    public function downloadAsZip($s3Path, $fileName)
+    {
+        $result = $this->s3Client->getObject([
+            'Bucket' => 'ewsdcloud',
+            'Key' => $s3Path,
+        ]);
+
+        $fileContent = $result['Body']->getContents();
+        $zipFileName = time() . '_download.zip';
+        $zipPath = storage_path('app/' . $zipFileName);
+        $zip = new ZipArchive();
+
+        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
+            throw new \Exception('Could not create ZIP');
+        }
+
+        $zip->addFromString($fileName, $fileContent);
+        $zip->close();
+
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
+    }
+
+    public function downloadMultipleAsZip($files)
+    {
+        $zipFileName = time() . '_download.zip';
+        $zipPath = storage_path('app/' . $zipFileName);
+        $zip = new ZipArchive();
+
+        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
+            throw new \Exception('Could not create ZIP');
+        }
+
+        foreach ($files as $file) {
+            $s3Path = $file->file_path;
+            $result = $this->s3Client->getObject([
+                'Bucket' => 'ewsdcloud',
+                'Key' => $s3Path,
+            ]);
+            $fileContent = $result['Body']->getContents();
+            $zip->addFromString($file->file_path, $fileContent);
+        }
+
+        $zip->close();
+
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
     }
 }

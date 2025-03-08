@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserCreatedMail;
 use App\Services\ArticleService;
 use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Tag(
@@ -61,8 +64,14 @@ class ArticleController extends Controller
     public function homePageInitial(Request $request)
     {
         $userId = Auth::id();
+        // dd(Auth::id());
         $homePageData = $this->articleService->getHomePageData($userId, $request);
-        return response()->json($homePageData);
+        $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
+        if ($mailSent) {
+            return response()->json($homePageData);
+        } else {
+            return response()->json(['message' => 'Failed to send email.'], 201);
+        }
     }
 
     public function myArticleInitial(Request $request)
@@ -73,13 +82,17 @@ class ArticleController extends Controller
         return response()->json($myArticleData);
     }
 
-    public function articleCreate(Request $request)
+    public function articleCreateUpdate(Request $request)
     {
         $userId = Auth::id();
-        $result = $this->articleService->createArticle($userId, $request);
+        $result = $this->articleService->createUpdateArticle($userId, $request);
 
         if ($result['success']) {
-            return response()->json(['message' => 'Article created successfully'], 201);
+            if (empty($request->article_id)) {
+                return response()->json(['message' => 'Article created successfully'], 201);
+            } else {
+                return response()->json(['message' => 'Article updated successfully'], 201);
+            }
         } else {
             return response()->json(['error' => $result['message']], 500);
         }
@@ -96,18 +109,21 @@ class ArticleController extends Controller
         }
     }
 
-    public function draftArticleList(){
+    public function draftArticleList()
+    {
         $userId = Auth::id();
         $articles = $this->articleService->draftArticleList($userId);
         return response()->json($articles);
     }
 
-    public function articleDownload($articleId){
+    public function articleDownload($articleId)
+    {
         $articleFileList = $this->articleService->getFileList($articleId);
         if (!empty($articleFileList)) {
-            for ($i=0; $i < $articleFileList; $i++) {
-                $this->fileService->downloadAsZip($articleFileList[$i]);
-            }
+            return $this->fileService->downloadMultipleAsZip($articleFileList);
         }
+        // Mail::to(Auth::user()->email)->send(new UserCreatedMail(Auth::user()));
+
+        return response()->json(['message' => 'No files found'], 404);
     }
 }

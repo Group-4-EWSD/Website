@@ -12,9 +12,4 @@ class UserTypeService
     {
         $this->userTypeRepository = $userTypeRepository;
     }
-
-    public function userTypeDropdown()
-    {
-        return $this->userTypeRepository->getUserTypeDropdown();
-    }
 }

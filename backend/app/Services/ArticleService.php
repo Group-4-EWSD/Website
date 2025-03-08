@@ -119,4 +119,8 @@ class ArticleService
     public function getFileList($articleId){
         return $this->articleRepository->getFileList($articleId);
     }
+
+    public function getItemList($item){
+        return $this->articleRepository->getItemList($item);
+    }
 }

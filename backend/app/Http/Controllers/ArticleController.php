@@ -66,12 +66,12 @@ class ArticleController extends Controller
         $userId = Auth::id();
         // dd(Auth::id());
         $homePageData = $this->articleService->getHomePageData($userId, $request);
-        $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
-        if ($mailSent) {
+        // $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
+        // if ($mailSent) {
             return response()->json($homePageData);
-        } else {
-            return response()->json(['message' => 'Failed to send email.'], 201);
-        }
+        // } else {
+            // return response()->json(['message' => 'Failed to send email.'], 201);
+        // }
     }
 
     public function myArticleInitial(Request $request)
@@ -125,5 +125,11 @@ class ArticleController extends Controller
         // Mail::to(Auth::user()->email)->send(new UserCreatedMail(Auth::user()));
 
         return response()->json(['message' => 'No files found'], 404);
+    }
+
+    public function getItemList(Request $request){
+        $item = $request->item;
+        $itemList = $this->articleService->getItemList($item);
+        return $itemList;
     }
 }

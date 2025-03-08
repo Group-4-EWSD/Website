@@ -14,10 +14,4 @@ class UserTypeController extends Controller
     {
         $this->userTypeService = $userTypeService;
     }
-
-    public function UserTypeDropdown(): JsonResponse
-    {
-        $userTypeDropdown = $this->userTypeService->userTypeDropdown();
-        return response()->json($userTypeDropdown, 200);
-    }
 }

@@ -14,10 +14,4 @@ class FacultyController extends Controller
     {
         $this->facultyService = $facultyService;
     }
-
-    public function FacultyDropdown(): JsonResponse
-    {
-        $facultyDropdown = $this->facultyService->facultyDropdown();
-        return response()->json($facultyDropdown, 200);
-    }
 }

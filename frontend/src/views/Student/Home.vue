@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
@@ -13,15 +13,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+} from '@/components/ui/pagination'
+
 import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { getArticles, getArticleDetails } from '@/api/articles'
 import type { Articles, CountData } from '@/types/article'
+import Button from '@/components/ui/button/Button.vue'
+import { number } from 'yup'
 
 const countData = ref<CountData | null>(null)
 const articles = ref<Articles[]>([])
 const sortOption = ref<string>('')
 const isFetched = ref(false)
+const currentPage = ref<number>(1)
+const displayNumber = 5
+const totalPages = ref(1)
 
 const sortOptions = ref([
   { value: 'created asc', label: 'Newest First' },
@@ -35,15 +51,16 @@ const sortBy = (option: string) => {
   console.log('Sorting by:', option)
 }
 
-const fetchArticles = async () => {
+const fetchArticles = async (page: number) => {
   try {
     const response = await getArticles({
-      displayNumber: 5,
-      pageNumber: 1,
+      displayNumber,
+      pageNumber: page,
       status: 0,
     })
     countData.value = response.countData
     articles.value = response.allArticles
+    // totalPages.value = Math.ceil(articles.value.length / displayNumber)
     isFetched.value = true
   } catch (error) {
     console.error('Error fetching articles:', error)
@@ -52,75 +69,19 @@ const fetchArticles = async () => {
 
 onMounted(() => {
   if (!isFetched.value) {
-    fetchArticles()
+    console.log('ht', isFetched.value)
+    fetchArticles(currentPage.value)
   }
 })
 
-// const articles = [
-//   {
-//     id: 1,
-//     title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
-//     description:
-//       'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
-//     author: 'Zar Li',
-//     date: '15 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-//   },
-//   {
-//     id: 2,
-//     title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     date: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     id: 3,
-//     title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     date: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     id: 4,
-//     title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     date: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     id: 5,
-//     title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     date: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     id: 6,
-//     title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     date: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     id: 7,
-//     title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     date: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-// ]
+watch(currentPage, fetchArticles)
+
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    fetchArticles(page)
+  }
+}
 </script>
 
 <template>
@@ -226,6 +187,35 @@ onMounted(() => {
               </TableRow>
             </TableBody>
           </Table>
+
+          <Pagination
+            v-slot=""
+            :items-per-page="displayNumber"
+            :total="24"
+            :sibling-count="1"
+            show-edges
+            :default-page="currentPage"
+            @update:page="goToPage"
+          >
+            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+              <PaginationFirst />
+              <PaginationPrev />
+              <template v-for="(item, index) in items" :key="index">
+                <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+                  <Button
+                    class="w-10 h-10 p-0"
+                    :variant="item.value === currentPage ? 'default' : 'outline'"
+                    @click="goToPage(item.value)"
+                  >
+                    {{ item.value }}
+                  </Button>
+                </PaginationListItem>
+                <PaginationEllipsis v-else />
+              </template>
+              <PaginationNext />
+              <PaginationLast />
+            </PaginationList>
+          </Pagination>
         </div>
       </div>
     </div>

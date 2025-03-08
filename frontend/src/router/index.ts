@@ -86,6 +86,7 @@ router.beforeEach((to, from, next) => {
       to.path === '/auth/register' ||
       to.path === '/auth/forgot-password')
   ) {
+    console.log(token)
     // If user is already authenticated and tries to access login/register, redirect to home
     next({ path: '/student/home', replace: true })
   } else if (to.meta.requiresAuth && !token) {

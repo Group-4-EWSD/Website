@@ -7,7 +7,7 @@ const BASE_URL = 'http://127.0.0.1:8000/api/'
 // Create Axios instance
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // Allows sending cookies with requests
+  withCredentials: false, // Allows sending cookies with requests
 })
 
 // Request interceptor to attach token automatically

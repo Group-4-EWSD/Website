@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/sidebar'
 
 import Separator from './separator/Separator.vue'
+import { forceSignOut } from '@/lib/utils'
 
 const items = [
   {
@@ -43,7 +44,7 @@ const items = [
   <Sidebar class="h-[80vh] overflow-y-auto">
     <SidebarContent>
       <SidebarMenu class="flex flex-col h-full">
-        <SidebarMenuItem v-for="item in items.slice(0, -1)" :key="item.title">
+        <SidebarMenuItem v-for="item in items" :key="item.title">
           <SidebarMenuButton as-child>
             <RouterLink :to="item.url" class="p-6" active-class="bg-primary text-white rounded-lg">
               <component :is="item.icon" />
@@ -56,10 +57,10 @@ const items = [
 
         <SidebarMenuItem :key="items[items.length - 1].title">
           <SidebarMenuButton as-child>
-            <a :href="items[items.length - 1].url" class="p-6">
-              <component :is="items[items.length - 1].icon" />
-              <span>{{ items[items.length - 1].title }}</span>
-            </a>
+            <button class="p-6" @click="forceSignOut">
+              <LogOut />
+              <span>Log out</span>
+            </button>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

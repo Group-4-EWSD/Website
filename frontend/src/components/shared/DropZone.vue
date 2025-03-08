@@ -1,15 +1,34 @@
 <script setup lang="ts">
 import { FileText, Image as ImageIcon } from 'lucide-vue-next';
-import { ref } from 'vue';
-
+import { ref, watch, defineEmits } from 'vue';
 import { Button } from '@/components/ui/button';
 
-const files = ref<File[]>([]);
+const props = defineProps({
+  value: {
+    type: Array as () => File[],
+    default: () => []
+  },
+  acceptedTypes: {
+    type: Array as () => string[],
+    default: () => ['image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+  },
+  maxFileSize: {
+    type: Number,
+    default: 5 * 1024 * 1024 // 5MB
+  }
+});
+
+const emit = defineEmits(['files-added', 'update:modelValue']);
+
+const files = ref<File[]>(props.value || []);
 const isDragging = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-const allowedTypes = ['image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-const maxSize = 5 * 1024 * 1024; // 5MB
+// Watch for changes in files and emit events
+watch(files, (newFiles) => {
+  emit('files-added', newFiles);
+  emit('update:modelValue', newFiles);
+}, { deep: true });
 
 const onDragOver = () => {
   isDragging.value = true;
@@ -39,7 +58,15 @@ const onFileSelect = (event: Event) => {
 };
 
 const handleFiles = (selectedFiles: File[]) => {
-  const validFiles = selectedFiles.filter(file => allowedTypes.includes(file.type) && file.size <= maxSize);
+  const validFiles = selectedFiles.filter(file => 
+    props.acceptedTypes.includes(file.type) && file.size <= props.maxFileSize
+  );
+  
+  if (validFiles.length !== selectedFiles.length) {
+    // Could add notification here for invalid files
+    console.warn('Some files were rejected due to invalid type or size');
+  }
+  
   files.value = [...files.value, ...validFiles];
 };
 
@@ -50,6 +77,22 @@ const removeFile = (index: number) => {
 const getFileIcon = (file: File) => {
   return file.type.includes('image') ? ImageIcon : FileText;
 };
+
+const getFileTypeLabel = (file: File) => {
+  if (file.type.includes('image')) {
+    return 'Image';
+  } else if (file.type.includes('wordprocessingml') || file.type.includes('msword')) {
+    return 'Document';
+  }
+  return 'File';
+};
+
+// Format file size to human-readable format
+const formatFileSize = (bytes: number) => {
+  if (bytes < 1024) return bytes + ' B';
+  else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  else return (bytes / 1048576).toFixed(1) + ' MB';
+};
 </script>
 
 <template>
@@ -58,20 +101,52 @@ const getFileIcon = (file: File) => {
     @dragover.prevent="onDragOver"
     @dragleave="onDragLeave"
     @drop.prevent="onDrop"
-    :class="{ 'bg-input': isDragging }"
+    :class="{ 'bg-muted': isDragging }"
   >
     <div class="flex flex-col items-center gap-2" v-if="!files.length">
-      <span>Drag & drop files here</span>
-      <span>or</span>
-      <Button variant="link" @click="selectFile">Upload</Button>
+      <span class="text-muted-foreground">Drag & drop files here</span>
+      <span class="text-muted-foreground">or</span>
+      <Button variant="outline" size="sm" @click="selectFile">Browse</Button>
+      <p class="text-xs text-muted-foreground mt-2 text-center">
+        <!-- Accepted file types: {{ props.acceptedTypes.join(', ') }}<br> -->
+        Max size: {{ formatFileSize(props.maxFileSize) }}
+      </p>
     </div>
-    <div v-if="files.length" class="flex flex-row gap-4 flex-wrap">
-      <div v-for="(file, index) in files" :key="index" class="p-2 border rounded-md text-center relative flex flex-col items-center w-[100px]">
-        <component :is="getFileIcon(file)" class="w-10 h-10 text-gray-500 mb-2" />
-        <span class="block truncate text-sm w-[100px]">{{ file.name }}</span>
-        <button @click="removeFile(index)" class="absolute top-1 right-1 text-destructive rounded-full w-6 h-6 flex items-center justify-center">×</button>
+    
+    <div v-if="files.length" class="w-full">
+      <div class="flex justify-between items-center mb-4">
+        <h4 class="text-sm font-medium">Uploaded Files ({{ files.length }})</h4>
+        <Button variant="ghost" size="sm" @click="selectFile">Add More</Button>
+      </div>
+      
+      <div class="flex flex-row gap-4 flex-wrap">
+        <div 
+          v-for="(file, index) in files" 
+          :key="index" 
+          class="p-3 border rounded-md relative flex flex-col items-center w-[120px] hover:bg-muted transition-colors"
+        >
+          <component :is="getFileIcon(file)" class="w-10 h-10 text-primary mb-2" />
+          <span class="block truncate text-sm w-full text-center">{{ file.name }}</span>
+          <span class="text-xs text-muted-foreground mt-1">{{ getFileTypeLabel(file) }}</span>
+          <span class="text-xs text-muted-foreground">{{ formatFileSize(file.size) }}</span>
+          <button 
+            @click="removeFile(index)" 
+            class="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center hover:bg-destructive/90 transition-colors"
+            aria-label="Remove file"
+          >
+            ×
+          </button>
+        </div>
       </div>
     </div>
-    <input type="file" ref="fileInput" @change="onFileSelect" multiple hidden />
+    
+    <input 
+      type="file" 
+      ref="fileInput" 
+      @change="onFileSelect" 
+      multiple 
+      hidden 
+      :accept="props.acceptedTypes.join(',')" 
+    />
   </div>
 </template>

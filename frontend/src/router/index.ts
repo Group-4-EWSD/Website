@@ -24,7 +24,7 @@ const studentRoutes = [
     name: 'My Articles',
     component: MyArticles,
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
     },
   },
   {
@@ -40,7 +40,7 @@ const studentRoutes = [
     name: 'Draft Articles',
     component: DraftArticles,
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
     },
   },
   {
@@ -56,7 +56,7 @@ const studentRoutes = [
     name: 'Settings',
     component: Settings,
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
     },
   },
 ]
@@ -87,7 +87,7 @@ router.beforeEach((to, from, next) => {
       to.path === '/auth/forgot-password')
   ) {
     // If user is already authenticated and tries to access login/register, redirect to home
-    next({ path: '/', replace: true })
+    next({ path: '/student/home', replace: true })
   } else if (to.meta.requiresAuth && !token) {
     // If route requires auth and user is not authenticated, redirect to login
     next({ path: '/auth/login', replace: true })

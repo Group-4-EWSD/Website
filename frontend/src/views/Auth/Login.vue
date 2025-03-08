@@ -41,6 +41,8 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
 
   login(values as Credentials)
     .then((response) => {
+      console.log(response)
+
       if (!response.data) {
         toast.error('Invalid credentials')
       } else {
@@ -112,11 +114,10 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         {{ loading ? 'Logging in...' : 'Login' }}
       </Button>
     </form>
-    <div class="flex justify-between text-sm">
+    <div class="flex justify-end text-sm">
       <router-link to="/auth/forgot-password" class="text-primary hover:underline"
         >Forgot password?</router-link
       >
-      <router-link to="/auth/register" class="text-primary hover:underline">Register</router-link>
     </div>
   </AuthBaseLayout>
 </template>

@@ -1,4 +1,4 @@
-export interface articleParams {
+export interface ArticleParams {
   displayNumber?: number
   pageNumber?: number
   academicYearId?: string
@@ -24,4 +24,12 @@ export interface CountData {
   reactCount: number
   totalViewCount: number
   currentYearArticleCount: number
+}
+
+export interface ArticleData {
+  article_title: string
+  article_description: string
+  article_type_id: string
+  status: number
+  article_details: File[]
 }

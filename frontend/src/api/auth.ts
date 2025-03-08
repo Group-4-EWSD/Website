@@ -2,22 +2,14 @@ import api from '@/api/axios'
 import type { Credentials, RegisterData } from '@/types/auth'
 
 export const login = async (credentials: Credentials) => {
-  return await api.post(`login`, credentials)
-}
+  const formData = new FormData()
 
-export const register = async (userData: RegisterData) => {
-  return await api.post(`register`, userData)
+  formData.append('email', credentials.email)
+  formData.append('password', credentials.password)
+
+  return await api.post(`login`, formData)
 }
 
 export const logout = async () => {
-    const token = localStorage.getItem("token");
-
-    await api.post(
-      `logout`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    localStorage.removeItem("token");
-};
+  return await api.post(`logout`)
+}

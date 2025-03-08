@@ -17,81 +17,123 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 
+// Import the API function
+import { ArticleStatus, uploadArticle } from '@/api/article'
+import { toast } from 'vue-sonner'
+import * as yup from 'yup'
+
 interface UploadArticleSchema {
   title: string
   description: string
   category: string
-  type: string
+  agreeToterm: boolean
   files: File[]
 }
 
-// Create a ref to control the dialog open state
+// Create refs to control the dialog and loading states
 const isOpen = ref(false)
 const isLoading = ref(false)
 
-const { handleSubmit, errors, values, setValues } = useForm<UploadArticleSchema>({
+const acceptedFileTypes = ['image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+
+const validationSchema = yup.object({
+    title: yup.string()
+      .required('Title is required')
+      .min(3, 'Title must be at least 3 characters')
+      .max(100, 'Title must be less than 100 characters'),
+    description: yup.string()
+      .required('Description is required')
+      .min(10, 'Description must be at least 10 characters')
+      .max(500, 'Description must be less than 500 characters'),
+    category: yup.string()
+      .required('Category is required')
+      .oneOf(['coffee', 'tea', 'coke'], 'Please select a valid category'),
+    type: yup.string()
+      .required('Type is required')
+      .oneOf(['docx', 'image'], 'Please select a valid type'),
+    files: yup.array()
+      .of(yup.mixed<File>())
+      .test('required', 'At least one file is required', (files) => files && files.length > 0)
+      .test('fileSize', 'File size is too large', (files) => {
+        if (!files) return true
+        return files.every(file => file && file.size <= 5 * 1024 * 1024) // 5MB limit
+      }),
+    agreeToterm: yup.boolean()
+      .required('You must agree to the terms')
+      .oneOf([true], 'You must agree to the terms')
+})
+
+
+const { handleSubmit, errors, values, setValues, resetForm } = useForm<UploadArticleSchema>({
   initialValues: {
     title: '',
     description: '',
     category: '',
-    type: '',
+    agreeToterm: false,
     files: []
-  }
+  },
 })
 
-// Function to submit the article
 const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
+
+  if (isLoading.value) return
+
   try {
     isLoading.value = true
-    console.log('Submitting article:', formValues)
     
-    // Here you would typically make an API call to submit the article
-    // Example:
-    // await articleApi.submitArticle(formValues)
+    // Map form values to API data structure
+    const articleData = {
+      article_title: formValues.title,
+      article_description: formValues.description,
+      article_type_id: formValues.category,
+      status: ArticleStatus.SUBMITTED,
+      article_details: formValues.files
+    }
     
-    // Simulate API call with timeout
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Submit the article using the API
+    await uploadArticle(articleData)
+
+    toast.success('Article submitted successfully')
     
     // Close the dialog after successful submission
     isOpen.value = false
     
-    // Reset form after submission
+    // Reset form
     resetForm()
-    
-    // You might want to show a success notification here
   } catch (error) {
     console.error('Error submitting article:', error)
-    // Handle error (show error notification, etc.)
+    toast.error('Failed to submit article. Please try again.')
   } finally {
     isLoading.value = false
   }
 })
 
-// Function to save article as draft
 const saveAsDraft = async () => {
+  if (isLoading.value) return
+
   try {
     isLoading.value = true
-    const formValues = values
+
+    const articleData = {
+      article_title: values.title,
+      article_description: values.description,
+      article_type_id: values.category,
+      status: ArticleStatus.DRAFT,
+      article_details: values.files
+    }
     
-    console.log('Saving article as draft:', formValues)
-    
-    // Here you would typically make an API call to save the draft
-    // Example:
-    // await articleApi.saveAsDraft(formValues)
-    
-    // Simulate API call with timeout
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await uploadArticle(articleData)
+
+    toast.success('Article saved as draft')
     
     // Close the dialog after saving
     isOpen.value = false
     
-    // Reset form after saving
+    // Reset form
     resetForm()
-    
-    // You might want to show a success notification here
   } catch (error) {
     console.error('Error saving draft:', error)
-    // Handle error (show error notification, etc.)
+    toast.error('Failed to save draft. Please try again.')
   } finally {
     isLoading.value = false
   }
@@ -103,14 +145,11 @@ const closeModal = () => {
   resetForm()
 }
 
-// Function to reset the form
-const resetForm = () => {
+// Handle files from DropZone
+const handleFilesAdded = (files: File[]) => {
   setValues({
-    title: '',
-    description: '',
-    category: '',
-    type: '',
-    files: []
+    ...values,
+    files
   })
 }
 </script>
@@ -127,21 +166,21 @@ const resetForm = () => {
       <form @submit.prevent="onSubmit" class="space-y-4 pt-5">
         <FormElement :errors="errors" layout="row">
           <template #label>
-            <Label form="title">Title</Label>
+            <Label for="title">Title</Label>
           </template>
           <template #field>
-            <Input name="title" id="title" placeholder="" :errors="errors" />
+            <Input name="title" id="title" placeholder="Enter article title" :errors="errors" />
           </template>
         </FormElement>
         <FormElement :errors="errors" layout="row">
           <template #label>
-            <Label form="description">Description</Label>
+            <Label for="description">Description</Label>
           </template>
           <template #field>
             <Input
               name="description"
               id="description"
-              placeholder=""
+              placeholder="Enter article description"
               :errors="errors"
               as="textarea"
               class="min-h-[120px]"
@@ -150,7 +189,7 @@ const resetForm = () => {
         </FormElement>
         <FormElement :errors="errors" layout="row">
           <template #label>
-            <Label form="category">Category</Label>
+            <Label for="category">Category</Label>
           </template>
           <template #field>
             <Select
@@ -167,7 +206,7 @@ const resetForm = () => {
         </FormElement>
         <FormElement :errors="errors" layout="row">
           <template #label>
-            <Label form="type">Type</Label>
+            <Label for="type">Type</Label>
           </template>
           <template #field>
             <Select
@@ -182,14 +221,18 @@ const resetForm = () => {
             </Select>
           </template>
         </FormElement>
-        <DropZone />
+        <DropZone 
+            @files-added="handleFilesAdded" 
+            :acceptedTypes="acceptedFileTypes" 
+            :value="values.files"
+          />
       </form>
       <DialogFooter>
         <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading">Cancel</Button>
-        <Button type="button" variant="outline" @click="saveAsDraft" :processing="isLoading">
+        <Button type="button" variant="outline" @click="saveAsDraft" :disabled="isLoading">
           {{ isLoading ? 'Saving...' : 'Save as draft' }}
         </Button>
-        <Button type="submit" @click="onSubmit" :processing="isLoading">
+        <Button type="submit" @click="onSubmit" :disabled="isLoading">
           {{ isLoading ? 'Submitting...' : 'Submit' }}
         </Button>
       </DialogFooter>

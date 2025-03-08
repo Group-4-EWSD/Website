@@ -204,5 +204,24 @@ class ArticleRepository
         $files = ArticleDetail::where('article_id', $articleId)->get();
         return $files ?: []; // Ensures an empty array if no files found
     }
+
+    public function getItemList($item)
+    {
+        $tables = [
+            '1' => ['article_types', ['article_type_id', 'article_type_name']],
+            '2' => ['user_types', ['user_type_id', 'user_type_name']],
+            '3' => ['faculties', ['faculty_id', 'faculty_name']],
+            '4' => ['academic_years', ['academic_year_id', 'academic_year']]
+        ];
+
+        if (!isset($tables[$item])) {
+            return []; // Return empty array if item is invalid
+        }
+
+        [$table, $selectColumns] = $tables[$item];
+
+        return DB::table($table)->select($selectColumns)->get();
+    }
+
     
 }

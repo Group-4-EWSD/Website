@@ -29,8 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('/articles')->group(function () {
         // Normal Routes
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
-        Route::get('/myArticles', [ArticleController::class, 'myArticleInitial']); // Get all articles
-        Route::get('/draftList', [ArticleController::class, 'draftArticleList']); // draft article list
+        Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
+        Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
         Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
@@ -40,31 +40,27 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update', [ArticleController::class, 'articleCreateUpdate']); // create an article
         Route::post('/change-status/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
     });
-    Route::get('/academicYearList', [ActionController::class, 'academicYearList']);
 
     // Category routes
-    Route::prefix('/categories')->group(function () {
-    });
+    Route::get('/item-list', [ArticleController::class, 'getItemList']);
 
     // User routes
     Route::prefix('/user')->group(function () {
+        Route::post('/update-photo', [UserController::class, 'updateUserPhoto']);
+        Route::get('/get-photo', [UserController::class, 'getUserPhoto']);
+        Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
+        Route::patch('/edit-detail', [UserController::class, 'updateProfile']);
+        Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
     Route::post('/logout', [UserController::class, 'logout']);
-
     // User routes
     Route::prefix('/notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
         Route::post('/seen', [NotificationController::class, 'setSeen']);
     });
 
-    Route::post('/update-user-photo', [UserController::class, 'updateUserPhoto']);
-    Route::get('/get-user-photo', [UserController::class, 'getUserPhoto']);
-    Route::delete('/delete-user-photo', [UserController::class, 'deleteUserPhoto']);
-    Route::patch('/edit-user-detail', [UserController::class, 'updateProfile']);
-    Route::get('/user-list', [UserController::class, 'getUserList']);
-
 });
-Route::get('/termsCondition', [UserController::class, 'termsCondition']);
+Route::get('/terms-condition', [UserController::class, 'termsCondition']);
 
 // Unnecessory, Just for testing
 Route::post('upload', [FileController::class, 'upload']);
@@ -72,5 +68,3 @@ Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
 Route::post('/list-file', [FileController::class, 'listFiles']); // New route
 Route::get('/test-list-files', [FileController::class, 'listFiles']); 
-Route::get('/usertype-dropdown', [UserTypeController::class, 'UserTypeDropdown']);
-Route::get('/faculty-dropdown', [FacultyController::class, 'FacultyDropdown']);

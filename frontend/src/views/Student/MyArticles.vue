@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { CalendarDays } from 'lucide-vue-next'
-
+import { onMounted } from 'vue'
 import ArticlePost from '@/components/pagespecific/my-articles/ArticlePost.vue'
 import LatestArticles from '@/components/pagespecific/my-articles/LatestArticles.vue'
 import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.vue'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
+import { Pagination } from '@/components/ui/pagination'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useMyArticlesStore } from '@/stores/my-articles'
 
+// Date formatting
 const preUploadDate = new Intl.DateTimeFormat('en', {
   day: 'numeric',
   month: 'short',
@@ -20,44 +24,26 @@ const actualDeadlineDate = new Intl.DateTimeFormat('en', {
   year: 'numeric',
 }).format(new Date())
 
-const sampleArticles = [
-  {
-    title: 'Article 1',
-    description:
-      'loren ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-    category: 'Category 1',
-    totalLikes: 10,
-    totalViews: 100,
-    date: '12/12/2025',
-    status: 'Approved',
-  },
-  {
-    title: 'Article 2',
-    description:
-      'loren ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-    category: 'Category 2',
-    totalLikes: 20,
-    totalViews: 200,
-    date: '12/12/2025',
-    status: 'Pending',
-  },
-  {
-    title: 'Article 3',
-    description:
-      'loren ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-    category: 'Category 3',
-    totalLikes: 30,
-    totalViews: 300,
-    date: '12/12/2025',
-    status: 'Rejected',
-  },
-]
+const myArticlesStore = useMyArticlesStore()
+
+onMounted(() => {
+  // Only fetch if we haven't loaded data yet
+  myArticlesStore.fetchArticles()
+})
+
+// Format date for display
+const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+}
 </script>
 
 <template>
   <Layout>
     <h2 class="text-xl font-bold mb-4 uppercase">My Articles</h2>
-
     <div class="flex flex-col gap-5">
       <div class="grid md:grid-cols-3 grid-cols-1 gap-5">
         <Card class="p-5 flex flex-col gap-5">
@@ -92,7 +78,45 @@ const sampleArticles = [
 
       <div class="flex flex-col gap-3">
         <h3 class="font-semibold uppercase">My Articles</h3>
-        <ArticlePost v-for="article in sampleArticles" :key="article.title" :article="article" />
+
+        <div v-if="myArticlesStore.isLoading" class="space-y-4">
+          <Skeleton v-for="i in 3" :key="i" class="h-36 w-full rounded-lg" />
+        </div>
+
+        <div v-else-if="myArticlesStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
+          {{ myArticlesStore.error }}
+          <Button variant="outline" size="sm" class="ml-2" @click="myArticlesStore.fetchArticles(true)">
+            Try Again
+          </Button>
+        </div>
+
+        <div
+          v-else-if="myArticlesStore.articles.length === 0"
+          class="p-8 text-center bg-gray-50 rounded-lg"
+        >
+          <p class="text-gray-500">No articles found.</p>
+        </div>
+
+        <div v-else>
+          <ArticlePost
+            v-for="article in myArticlesStore.articles"
+            :key="article.article_id"
+            :article="{
+              title: article.article_title,
+              description: article.article_description, // No description in the API response
+              totalLikes: myArticlesStore?.countData?.reactCount || 0,
+              totalViews: myArticlesStore?.countData?.totalViewCount || 0,
+              date: formatDate(article.created_at),
+              status: myArticlesStore.statusText(article.status),
+            }"
+          />
+
+          <Pagination
+            :current-page="myArticlesStore.currentPage"
+            :total-pages="myArticlesStore.totalPages"
+            @page-change="myArticlesStore.setPage"
+          />
+        </div>
       </div>
     </div>
   </Layout>

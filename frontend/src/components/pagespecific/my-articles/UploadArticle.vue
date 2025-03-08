@@ -18,7 +18,7 @@ import {
 import { Label } from '@/components/ui/label'
 
 // Import the API function
-import { ArticleStatus, uploadArticle } from '@/api/article'
+import { ArticleStatus, uploadArticle } from '@/api/articles'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'

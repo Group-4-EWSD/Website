@@ -10,6 +10,7 @@ export interface ArticleParams {
 export interface Articles {
   article_id: string
   article_title: string
+  article_description: string
   user_id: string
   user_name: string
   user_photo_path: string

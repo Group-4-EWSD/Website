@@ -1,3 +1,4 @@
+import router from '@/router'
 import axios from 'axios'
 import { useCookies } from 'vue3-cookies'
 
@@ -21,6 +22,25 @@ api.interceptors.request.use(
     return config
   },
   (error) => Promise.reject(error),
+)
+
+// Response interceptor to handle 401 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Check if error is 401 Unauthorized
+    if (error.response && error.response.status === 401) {
+      const { cookies } = useCookies()
+      
+      // Clear the token
+      cookies.remove('token')
+      
+      // Redirect to login page
+      router.replace("auth/login")
+    }
+    
+    return Promise.reject(error)
+  }
 )
 
 export default api

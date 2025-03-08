@@ -1,32 +1,27 @@
 <script setup lang="ts">
-import { FileText, Image as ImageIcon } from 'lucide-vue-next'
+import { FileText, Image as ImageIcon, XIcon } from 'lucide-vue-next'
 import { ref, watch, defineEmits } from 'vue'
 import { Button } from '@/components/ui/button'
+import { ErrorMessage } from 'vee-validate'
 
-const props = defineProps({
-  value: {
-    type: Array as () => File[],
-    default: () => [],
-  },
-  acceptedTypes: {
-    type: Array as () => string[],
-    default: () => [
-      'image/jpeg',
-      'image/png',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ],
-  },
-  maxFileSize: {
-    type: Number,
-    default: 5 * 1024 * 1024, // 5MB
-  },
-  errors: {
-    type: String,
-    default: null,
-  },
+interface Props {
+  value?: File[]
+  acceptedTypes?: string[]
+  maxFileSize?: number
+  errors?: Record<string, string | string[] | null | undefined>
+  name?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  value: () => [],
+  acceptedTypes: () => [
+    'image/jpeg',
+    'image/png',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ],
+  maxFileSize: 5 * 1024 * 1024, // 5MB
+  name: 'files'
 })
-
-console.log("---> props", props.errors)
 
 const emit = defineEmits(['files-added', 'update:modelValue'])
 
@@ -115,7 +110,7 @@ const formatFileSize = (bytes: number) => {
     @dragover.prevent="onDragOver"
     @dragleave="onDragLeave"
     @drop.prevent="onDrop"
-    :class="{ 'bg-muted': isDragging, 'border-red-500': props.errors }"
+    :class="{ 'bg-muted': isDragging, 'border-red-500': props.errors && props.errors[props.name] }"
   >
     <div class="flex flex-col items-center gap-2" v-if="!files.length">
       <span class="text-muted-foreground">Drag & drop files here</span>
@@ -144,11 +139,12 @@ const formatFileSize = (bytes: number) => {
           <span class="text-xs text-muted-foreground mt-1">{{ getFileTypeLabel(file) }}</span>
           <span class="text-xs text-muted-foreground">{{ formatFileSize(file.size) }}</span>
           <button
+            type="button"
             @click="removeFile(index)"
             class="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center hover:bg-destructive/90 transition-colors"
             aria-label="Remove file"
           >
-            ×
+            <XIcon class="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -163,5 +159,9 @@ const formatFileSize = (bytes: number) => {
       :accept="props.acceptedTypes.join(',')"
     />
   </div>
-  <ErrorMessage v-if="props.errors" class="text-sm text-red-500"> {{ props.errors }}</ErrorMessage>
+  <ErrorMessage
+    v-if="props.errors && props.errors[props.name]"
+    :name="props.name"
+    class="text-sm text-red-500"
+  />
 </template>

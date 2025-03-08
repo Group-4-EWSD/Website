@@ -1,5 +1,5 @@
 import api from '@/api/axios'
-import type { Articles, ArticleParams, CountData, ArticleData, MyArticlesResponse } from '@/types/article'
+import type { Articles, ArticleParams, CountData, ArticleData, MyArticlesResponse, DraftArticle } from '@/types/article'
 
 interface ArticlesResponse {
   countData: CountData
@@ -18,6 +18,11 @@ export const getArticles = async (params: ArticleParams): Promise<ArticlesRespon
 
 export const getMyArticles = async (params: ArticleParams): Promise<MyArticlesResponse> => {
   const response = await api.get(`articles/my-articles`, { params })
+  return response.data
+}
+
+export const getDraftArticles = async (): Promise<DraftArticle[]> => {
+  const response = await api.get('articles/draft-list')
   return response.data
 }
 

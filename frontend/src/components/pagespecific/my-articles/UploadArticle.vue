@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ErrorMessage, useForm } from 'vee-validate'
+import { ErrorMessage, useForm, Field } from 'vee-validate'
 import { ref } from 'vue'
 
 import DropZone from '@/components/shared/DropZone.vue'
@@ -34,6 +34,7 @@ interface UploadArticleSchema {
 // Create refs to control the dialog and loading states
 const isOpen = ref(false)
 const isLoading = ref(false)
+const isOnSubmit = ref(false)
 
 const acceptedFileTypes = [
   'image/jpeg',
@@ -49,10 +50,7 @@ const validationSchema = yup.object({
     .max(100, 'Title must be less than 100 characters'),
   description: yup.string().max(500, 'Description must be less than 500 characters'),
   category: yup.string().required('Category is required'),
-  agreeToterm: yup
-    .boolean()
-    .required('You must agree to the terms')
-    .oneOf([true], 'You must agree to the terms'),
+  agreeToterm: yup.boolean(),
   files: yup
     .array()
     .of(yup.mixed<File>())
@@ -65,17 +63,17 @@ const validationSchema = yup.object({
 
 const { handleSubmit, errors, values, setValues, resetForm } = useForm<UploadArticleSchema>({
   validationSchema,
-  initialValues: {
-    title: '',
-    description: '',
-    category: '',
-    agreeToterm: false,
-    files: [],
-  },
 })
 
 const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
   if (isLoading.value) return
+
+  console.log('Form values:', formValues)
+
+  // if (!formValues.agreeToterm) {
+  //   toast.error('Please agree to the terms and conditions')
+  //   return
+  // }
 
   try {
     isLoading.value = true
@@ -207,23 +205,30 @@ const handleFilesAdded = (files: File[]) => {
           @files-added="handleFilesAdded"
           :acceptedTypes="acceptedFileTypes"
           :value="values.files"
-          :errors="errors.files"
+          :errors="errors"
+          name="files"
         />
 
-        <FormElement :errors="errors">
+        <FormElement>
           <template #label>
             <div class="flex items-center gap-2">
-              <Checkbox name="agreeToterm" id="agreeToterm" />
+              <!-- <Field v-slot="{ field }" name="agreeToterm" id="agreeToterm"> -->
+                <Checkbox
+                  name="agreeToterm"
+                  id="agreeToterm"
+                />
+              <!-- </Field> -->
               <Label for="agreeToterm" class="text-sm cursor-pointer">
                 I agree to the terms and conditions
               </Label>
             </div>
 
-            <ErrorMessage
-              v-if="errors.agreeToterm"
-              :name="'agreeToterm'"
+            <!-- <ErrorMessage
+              v-if="errors && errors.agreeToterm"
+              :message="errors.agreeToterm"
+              name="'agreeToterm'"
               class="text-sm text-red-500"
-            />
+            /> -->
           </template>
         </FormElement>
       </form>

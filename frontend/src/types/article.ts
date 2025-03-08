@@ -34,3 +34,15 @@ export interface ArticleData {
   status: number
   article_details: File[]
 }
+
+export interface MyArticlesResponse {
+  preUploadDeadline: string;
+  actualUploadDeadline: string;
+  latestArticles: Articles[];
+  myArticles: Articles[];
+}
+
+export interface DraftArticle {
+  article_title: string
+  article_description: string
+}

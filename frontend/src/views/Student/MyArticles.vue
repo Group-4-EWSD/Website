@@ -20,11 +20,9 @@ onMounted(() => {
 
 // Format date for display
 const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
+  const date = new Date(dateString)
+  const options = { year: 'numeric' as const, month: 'short' as const, day: 'numeric' as const }
+  return date.toLocaleDateString('en-US', options)
 }
 </script>
 

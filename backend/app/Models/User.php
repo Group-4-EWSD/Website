@@ -30,6 +30,8 @@ class User extends Authenticatable
         'user_type_id',
         'faculty_id',
         'gender',
+        'date_of_birth',
+        'phone_number',
         'user_photo_path',
         'delete_flag',
     ];

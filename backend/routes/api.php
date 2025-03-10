@@ -30,6 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Normal Routes
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
+        Route::get('/artilcle-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
         Route::post('/like', [ActionController::class, 'articleLike']);

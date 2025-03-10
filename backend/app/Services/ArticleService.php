@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\ArticleRepository;
 use App\Repositories\ActionRepository;
 use App\Repositories\FileRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -12,30 +13,49 @@ class ArticleService
 {
     protected $articleRepository;
     protected $actionRepository;
+    protected $userRepository;
     protected $fileRepository;
     protected $fileService;
 
-    public function __construct(ArticleRepository $articleRepository, ActionRepository $actionRepository, FileRepository $fileRepository, FileService $fileService)
+    public function __construct(ArticleRepository $articleRepository, ActionRepository $actionRepository, UserRepository $userRepository, FileRepository $fileRepository, FileService $fileService)
     {
         $this->articleRepository = $articleRepository;
         $this->actionRepository = $actionRepository;
+        $this->userRepository = $userRepository;
         $this->fileRepository = $fileRepository;
         $this->fileService = $fileService;
     }
 
-    public function getHomePageData($userId, $request)
+    public function getGuestHomePageData(){
+        
+    }
+    public function getStudentHomePageData($userId, $request)
     {
         return [
-            'countData' => $this->articleRepository->getCountData(),
-            'allArticles' => $this->articleRepository->getAllArticles($userId, $request)->get()
+            'countData' => $this->articleRepository->getStudentHomeCountData(),
+            'allArticles' => $this->articleRepository->getAllArticles(0, $userId, $request)->get()
         ];
+    }
+    public function getCoordinatorHomePageData($userId){
+        return [
+            'countData' => $this->articleRepository->getCoordinatorHomeCountData($userId),
+            'allArticles' => $this->articleRepository->getAllArticles( 0)->get(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'guestList' => $this->userRepository->getGuestList()
+        ];
+    }
+    public function getManagerHomePageData(){
+        
+    }
+    public function getAdminHomePageData(){
+        
     }
 
     public function getMyArticles($userId, $facultyId, $request)
     {
         $deadlines = $this->articleRepository->getDeadlines($facultyId);
-        $countData = $this->articleRepository->getCountData();
-        $myArticles = $this->articleRepository->getAllArticles($userId, $request);
+        $countData = $this->articleRepository->getStudentHomeCountData();
+        $myArticles = $this->articleRepository->getAllArticles(1,$userId, $request);
         $latestArticles = $myArticles->orderBy('created_at', 'desc')->take(3)->get();
         return [
             'preUploadDeadline' => $deadlines->pre_submission_date,
@@ -43,6 +63,13 @@ class ArticleService
             'countData' => $countData,
             'latestArticles' => $latestArticles,
             'myArticles' => $myArticles->get()
+        ];
+    }
+
+    public function getArticleList($user_id, $faculty_id, $request){
+        return [
+            'countData' => $this->articleRepository->getCountDataByFaculty($faculty_id),
+            'articleList' => $this->articleRepository->getAllArticles(3, $faculty_id, $request),
         ];
     }
 
@@ -115,7 +142,7 @@ class ArticleService
     }
 
     public function draftArticleList($userId){
-        return $this->articleRepository->draftArticleList($userId);
+        return $this->articleRepository->getAllArticles(2, $userId);
     }
 
     public function getFileList($articleId){

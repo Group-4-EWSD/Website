@@ -83,6 +83,19 @@ class UserRepository extends BaseRepository
         return $user->save();
     }
 
+    public function getGuestList(){
+        return DB::table('users as u')
+        ->select([
+            'u.user_name',
+            'u.user_email',
+            'f.faculty_name',
+            'u.date_of_birth',
+            'u.gender',
+            'u.phone_number'
+        ])
+        ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
+        ->where('u.user_type_id','=','0');
+    }
     public function getUserList(){
         $userList = "
             

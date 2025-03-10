@@ -18,7 +18,6 @@ class NotificationService
     public function getNotificationList()
     {
         $notifications = $this->notificationRepository->getNotificationList();
-        $this->notificationRepository->();
         return $notifications;
     }
 

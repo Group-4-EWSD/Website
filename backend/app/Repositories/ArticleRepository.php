@@ -86,10 +86,13 @@ class ArticleRepository
                 ->select([
                     'art.article_id',
                     'art.article_title',
+                    'art.article_description',
                     'art.user_id',
+                    'at.article_type_name',
                     'u.user_name',
                     DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
+                    'art.submission_date',
                     'art.created_at',
                     'art.updated_at',
                     DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path"),
@@ -98,7 +101,8 @@ class ArticleRepository
                 ->join('users as u', 'u.id', '=', 'art.user_id')
                 ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
                 ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
-                ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');
+                ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id')
+                ->join('feedbacks as fb', 'fb.article_id', '=', 'art.article_id');
 
         // Apply search filter if `articleTitle` exists in the request
         if (!empty($request->academicYearId)) {
@@ -162,6 +166,7 @@ class ArticleRepository
             $articles->orderBy('art.created_at', 'desc');
         }        
 
+        $articles->orderBy('fb.created_at', 'desc');
         // Apply LIMIT only if `displayNumber` is set
         if ($request->displayNumber > 0) {
             $articles->limit($request->displayNumber);

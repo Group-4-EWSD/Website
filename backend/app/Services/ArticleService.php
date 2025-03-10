@@ -34,11 +34,13 @@ class ArticleService
     public function getMyArticles($userId, $facultyId, $request)
     {
         $deadlines = $this->articleRepository->getDeadlines($facultyId);
+        $countData = $this->articleRepository->getCountData();
         $myArticles = $this->articleRepository->getAllArticles($userId, $request);
         $latestArticles = $myArticles->orderBy('created_at', 'desc')->take(3)->get();
         return [
             'preUploadDeadline' => $deadlines->pre_submission_date,
             'actualUploadDeadline' => $deadlines->actual_submission_date,
+            'countData' => $countData,
             'latestArticles' => $latestArticles,
             'myArticles' => $myArticles->get()
         ];

@@ -23,10 +23,32 @@ class UserRepository extends BaseRepository
 
     public function findByEmail($email)
     {
-        return $this->model()::where('user_email', $email)->first(); // laravel eloquent
-        // return DB::raw("SELECT * FROM users WHERE email = $email LIMIT 1 "); // raw query 
+        return $this->model()::select([
+            'users.id',
+            'users.user_name',
+            'users.nickname',
+            'users.user_email',
+            'users.user_password',
+            DB::raw("
+                CASE 
+                    WHEN users.user_type_id = 'a' THEN 0
+                    WHEN users.user_type_id = 'b' THEN 1
+                    WHEN users.user_type_id = 'c' THEN 2
+                    WHEN users.user_type_id = 'd' THEN 3
+                    ELSE NULL
+                END AS user_type
+            "),
+            'ut.user_type_name',
+            'f.faculty_name',
+            'users.gender',
+            DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', users.user_photo_path) AS user_photo_path"),
+        ])
+        ->where('users.user_email', $email)
+        ->join('user_types as ut', 'ut.user_type_id', '=', 'users.user_type_id')
+        ->join('faculties as f', 'f.faculty_id', '=', 'users.faculty_id')
+        ->first();
     }
-
+    
     public function getUserById($id)
     {
         return User::findOrFail($id);

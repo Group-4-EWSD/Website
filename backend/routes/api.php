@@ -28,7 +28,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Articles routes
     Route::prefix('/articles')->group(function () {
         // Normal Routes
-        Route::get('/detail', [ActionController::class, 'articlePageInitial']);
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
@@ -38,6 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
         Route::post('/create', [ArticleController::class, 'articleCreateUpdate']); // create an article
         Route::post('/update', [ArticleController::class, 'articleCreateUpdate']); // create an article
+        Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/change-status/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
     });
 

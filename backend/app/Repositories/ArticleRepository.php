@@ -106,18 +106,16 @@ class ArticleRepository
                     'u.user_name',
                     DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
-                    'fb.message',
                     'art.submission_date',
                     'art.created_at',
                     'art.updated_at',
                     DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path"),
-                    DB::raw("(SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status")
+                    DB::raw("(SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
                 ])
                 ->join('users as u', 'u.id', '=', 'art.user_id')
                 ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
                 ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
-                ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id')
-                ->join('feedbacks as fb', 'fb.article_id', '=', 'art.article_id');
+                ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');
 
         // Apply search filter if `articleTitle` exists in the request
         if (!empty($request->academicYearId)) {
@@ -129,6 +127,9 @@ class ArticleRepository
         }
         // state = 0,  All
         if ($state == 1) { // My Articles (userId)
+            $articles->addSelect(
+                DB::raw("(SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) AS last_feedback")
+            );
             $articles->where('art.user_id','=',$primaryKey);
             $articles->havingRaw("status IN (1, 2, 3)");
         } else if ($state == 2) { // My Draft Articles (userId)
@@ -151,6 +152,13 @@ class ArticleRepository
             }
         }
         if($state == 3){ // All Articles for Coordinator
+            $articles->addSelect(DB::raw("
+                CASE 
+                    WHEN (SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
+                    THEN (SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) 
+                    ELSE NULL 
+                END AS reject_reason
+            "));
             $articles->where('art.faculty_id','=',$primaryKey);
         }
         // Ensure GROUP BY is valid by including `art.article_id`
@@ -187,7 +195,6 @@ class ArticleRepository
             $articles->orderBy('art.created_at', 'desc');
         }        
 
-        $articles->orderBy('fb.created_at', 'desc');
         // Apply LIMIT only if `displayNumber` is set
         if ($request->displayNumber > 0) {
             $articles->limit($request->displayNumber);

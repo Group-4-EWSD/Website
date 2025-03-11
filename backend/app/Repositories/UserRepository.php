@@ -23,10 +23,24 @@ class UserRepository extends BaseRepository
 
     public function findByEmail($email)
     {
-        return $this->model()::where('user_email', $email)->first(); // laravel eloquent
-        // return DB::raw("SELECT * FROM users WHERE email = $email LIMIT 1 "); // raw query 
+        return $this->model()::select([
+            'users.id',
+            'users.user_name',
+            'users.nickname',
+            'users.user_email',
+            'users.user_password',
+            'users.user_type_id',
+            'ut.user_type_name',
+            'f.faculty_name',
+            'users.gender',
+            DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', users.user_photo_path) AS user_photo_path"),
+        ])
+        ->where('users.user_email', $email)
+        ->join('user_types as ut', 'ut.user_type_id', '=', 'users.user_type_id')
+        ->join('faculties as f', 'f.faculty_id', '=', 'users.faculty_id')
+        ->first();
     }
-
+    
     public function getUserById($id)
     {
         return User::findOrFail($id);
@@ -61,6 +75,19 @@ class UserRepository extends BaseRepository
         return $user->save();
     }
 
+    public function getGuestList(){
+        return DB::table('users as u')
+        ->select([
+            'u.user_name',
+            'u.user_email',
+            'f.faculty_name',
+            'u.date_of_birth',
+            'u.gender',
+            'u.phone_number'
+        ])
+        ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
+        ->where('u.user_type_id','=','0');
+    }
     public function getUserList(){
         $userList = "
             

@@ -63,15 +63,30 @@ class ArticleController extends Controller
      */
     public function homePageInitial(Request $request)
     {
-        $userId = Auth::id();
-        // dd(Auth::id());
-        $homePageData = $this->articleService->getHomePageData($userId, $request);
-        // $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
-        // if ($mailSent) {
-            return response()->json($homePageData);
-        // } else {
-            // return response()->json(['message' => 'Failed to send email.'], 201);
-        // }
+        $user = Auth::user();
+        $userId = $user->id;
+        $userType = $user->user_type_id;
+        if($userType == '0'){ // Guest
+            $homePageData = $this->articleService->getGuestHomePageData($userId, $request);
+        }else if($userType == '1'){ // Student
+            // dd(Auth::id());
+            $homePageData = $this->articleService->getStudentHomePageData($userId, $request);
+            // $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
+            // if ($mailSent) {
+            // } else {
+                //  return response()->json($homePageData);
+                // return response()->json(['message' => 'Failed to send email.'], 201);
+            // }
+        }else if($userType == '2'){ // Marketing Coordinator
+            $homePageData = $this->articleService->getCoordinatorHomePageData($userId, $request);
+        }else if($userType == '3'){ // Marketing Manager
+            $homePageData = $this->articleService->getManagerHomePageData($userId, $request);
+        }else if($userType == '4'){ // Marketing Manager
+            $homePageData = $this->articleService->getGuestHomePageData($userId, $request);
+        }else{
+            return response()->json(['message'=> "User Role Missing"], 201);
+        }
+        return response()->json($homePageData);
     }
 
     public function myArticleInitial(Request $request)
@@ -80,6 +95,16 @@ class ArticleController extends Controller
         $facultyId = Auth::user()->faculty_id;
         $myArticleData = $this->articleService->getMyArticles($userId, $facultyId, $request);
         return response()->json($myArticleData);
+    }
+
+    
+    public function articleList(Request $request)
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+        $facultyId = $user->faculty_id;
+        $articleList = $this->articleService->getArticleList($userId, $facultyId, $request);
+        return response()->json($articleList);
     }
 
     public function articleCreateUpdate(Request $request)

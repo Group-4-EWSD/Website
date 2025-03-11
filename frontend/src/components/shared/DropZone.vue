@@ -3,6 +3,7 @@ import { FileText, Image as ImageIcon, XIcon } from 'lucide-vue-next'
 import { ref, watch, defineEmits } from 'vue'
 import { Button } from '@/components/ui/button'
 import { ErrorMessage } from 'vee-validate'
+import Input from '@/components/shared/Input.vue'
 
 interface Props {
   value?: File[]
@@ -20,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ],
   maxFileSize: 5 * 1024 * 1024, // 5MB
-  name: 'files'
+  name: 'files',
 })
 
 const emit = defineEmits(['files-added', 'update:modelValue'])
@@ -150,6 +151,13 @@ const formatFileSize = (bytes: number) => {
       </div>
     </div>
 
+    <Input
+      :name="props.name"
+      type="file"
+      @change="onFileSelect"
+      :accept="props.acceptedTypes.join(',')"
+      class="hidden"
+    />
     <input
       type="file"
       ref="fileInput"

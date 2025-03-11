@@ -50,7 +50,7 @@ const validationSchema = yup.object({
     .max(100, 'Title must be less than 100 characters'),
   description: yup.string().max(500, 'Description must be less than 500 characters'),
   category: yup.string().required('Category is required'),
-  agreeToterm: yup.boolean(),
+  agreeToterm: yup.boolean().oneOf([true], 'Please agree to the terms and conditions'),
   files: yup
     .array()
     .of(yup.mixed<File>())
@@ -61,9 +61,17 @@ const validationSchema = yup.object({
     }),
 })
 
-const { handleSubmit, errors, values, setValues, resetForm } = useForm<UploadArticleSchema>({
-  validationSchema,
-})
+const { handleSubmit, errors, values, setValues, resetForm, setFieldValue } =
+  useForm<UploadArticleSchema>({
+    validationSchema,
+    initialValues: {
+      title: '',
+      description: '',
+      category: '',
+      agreeToterm: false,
+      files: [],
+    },
+  })
 
 const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
   if (isLoading.value) return
@@ -144,10 +152,7 @@ const closeModal = () => {
 
 // Handle files from DropZone
 const handleFilesAdded = (files: File[]) => {
-  setValues({
-    ...values,
-    files,
-  })
+  setFieldValue('files', files)
 }
 </script>
 
@@ -211,24 +216,24 @@ const handleFilesAdded = (files: File[]) => {
 
         <FormElement>
           <template #label>
-            <div class="flex items-center gap-2">
-              <!-- <Field v-slot="{ field }" name="agreeToterm" id="agreeToterm"> -->
+            <Field name="agreeToterm" v-slot="{ field, handleChange }">
+              <div class="flex items-center gap-2">
                 <Checkbox
-                  name="agreeToterm"
-                  id="agreeToterm"
+                  :id="field.name"
+                  :name="field.name"
+                  @update:modelValue="
+                    (value) => {
+                      setFieldValue('agreeToterm', Boolean(value), true)
+                      handleChange(Boolean(value))
+                    }
+                  "
                 />
-              <!-- </Field> -->
-              <Label for="agreeToterm" class="text-sm cursor-pointer">
-                I agree to the terms and conditions
-              </Label>
-            </div>
-
-            <!-- <ErrorMessage
-              v-if="errors && errors.agreeToterm"
-              :message="errors.agreeToterm"
-              name="'agreeToterm'"
-              class="text-sm text-red-500"
-            /> -->
+                <Label :for="field.name" class="text-sm cursor-pointer">
+                  I agree to the terms and conditions
+                </Label>
+              </div>
+            </Field>
+            <ErrorMessage name="agreeToterm" class="text-sm text-red-500" />
           </template>
         </FormElement>
       </form>

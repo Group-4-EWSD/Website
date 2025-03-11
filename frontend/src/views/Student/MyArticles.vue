@@ -93,6 +93,7 @@ const formatDate = (dateString: string): string => {
             v-for="article in myArticlesStore.articles"
             :key="article.article_id"
             :article="{
+              id: article.article_id,
               title: article.article_title,
               description: article.article_description,
               totalLikes: 0, // need data from BE
@@ -102,12 +103,12 @@ const formatDate = (dateString: string): string => {
             }"
           />
 
-          <Pagination
+          <!-- <Pagination
             v-if="myArticlesStore.totalPages > 1"
             :current-page="myArticlesStore.currentPage"
             :total-pages="myArticlesStore.totalPages"
             @page-change="myArticlesStore.setPage"
-          />
+          /> -->
         </div>
       </div>
     </div>

@@ -46,7 +46,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       if (!response.data) {
         toast.error('Invalid credentials')
       } else {
-        cookies.set('token', response.data.token)
+        cookies.set('token', response.data.token, '1d', '/')
         let userRole = response.data.user.role
         userRole = 'student'
 

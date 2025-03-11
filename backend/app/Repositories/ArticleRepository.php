@@ -111,6 +111,9 @@ class ArticleRepository
                     'art.updated_at',
                     DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path"),
                     DB::raw("(SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
+                    DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = '') AS view_count"),
+                    DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1) AS like_count"),
+                    DB::raw("(SELECT COUNT(*) FROM comments cmmt WHERE cmmt.article_id = art.article_id ) AS comment_count")
                 ])
                 ->join('users as u', 'u.id', '=', 'art.user_id')
                 ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
@@ -125,14 +128,19 @@ class ArticleRepository
         if (!empty($request->articleTitle)) {
             $articles->where('art.article_title', 'LIKE', '%' . $request->articleTitle . '%');
         }
-        // state = 0,  All
-        if ($state == 1) { // My Articles (userId)
+        if ($state == 0){ // All Student (userId)
             $articles->addSelect(
-                DB::raw("(SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) AS last_feedback")
+                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = ?)) AS current_user_react", [$primaryKey])
+            );
+        }
+        else if ($state == 1) { // My Articles Student (userId)
+            $articles->addSelect(
+                DB::raw("(SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) AS last_feedback"),
+                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = ?)) AS current_user_react", [$primaryKey])
             );
             $articles->where('art.user_id','=',$primaryKey);
             $articles->havingRaw("status IN (1, 2, 3)");
-        } else if ($state == 2) { // My Draft Articles (userId)
+        } else if ($state == 2) { // My Draft Articles Student (userId)
             $articles->where('art.user_id','=',$primaryKey);
             $articles->havingRaw("status = 0");
         } else {

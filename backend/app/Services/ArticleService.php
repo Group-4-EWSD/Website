@@ -39,7 +39,7 @@ class ArticleService
     public function getCoordinatorHomePageData($userId){
         return [
             'countData' => $this->articleRepository->getCoordinatorHomeCountData($userId),
-            'allArticles' => $this->articleRepository->getAllArticles( 0)->get(),
+            'allArticles' => $this->articleRepository->getAllArticles(3)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'guestList' => $this->userRepository->getGuestList()
         ];

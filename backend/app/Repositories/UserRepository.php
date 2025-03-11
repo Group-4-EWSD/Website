@@ -29,15 +29,7 @@ class UserRepository extends BaseRepository
             'users.nickname',
             'users.user_email',
             'users.user_password',
-            DB::raw("
-                CASE 
-                    WHEN users.user_type_id = 'a' THEN 0
-                    WHEN users.user_type_id = 'b' THEN 1
-                    WHEN users.user_type_id = 'c' THEN 2
-                    WHEN users.user_type_id = 'd' THEN 3
-                    ELSE NULL
-                END AS user_type
-            "),
+            'users.user_type_id',
             'ut.user_type_name',
             'f.faculty_name',
             'users.gender',

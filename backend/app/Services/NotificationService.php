@@ -26,7 +26,7 @@ class NotificationService
         return $this->notificationRepository->setNotification($type, $articleId);
     }
 
-    public function setSeen($notificationId){
-        $this->notificationRepository->seenNotification($notificationId);
+    public function viewNotification($notificationId){
+        $this->notificationRepository->viewNotification($notificationId);
     }
 }

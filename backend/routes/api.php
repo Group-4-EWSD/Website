@@ -57,7 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User routes
     Route::prefix('/notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
-        Route::post('/seen', [NotificationController::class, 'setSeen']);
+        Route::get('/{notificationId}', [NotificationController::class, 'notificationView']);
     });
 
 });

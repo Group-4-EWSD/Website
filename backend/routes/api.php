@@ -30,14 +30,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Normal Routes
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
+        Route::get('/artilcle-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
-        Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
         Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
         Route::post('/create', [ArticleController::class, 'articleCreateUpdate']); // create an article
         Route::post('/update', [ArticleController::class, 'articleCreateUpdate']); // create an article
+        Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
         Route::post('/change-status/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
     });
 
@@ -56,7 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User routes
     Route::prefix('/notifications')->group(function () {
         Route::get('/', [NotificationController::class, 'index']);
-        Route::post('/seen', [NotificationController::class, 'setSeen']);
+        Route::get('/{notificationId}', [NotificationController::class, 'notificationView']);
     });
 
 });
@@ -68,3 +69,4 @@ Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
 Route::post('/list-file', [FileController::class, 'listFiles']); // New route
 Route::get('/test-list-files', [FileController::class, 'listFiles']); 
+Route::get('/item-list', [ArticleController::class, 'getItemList']);

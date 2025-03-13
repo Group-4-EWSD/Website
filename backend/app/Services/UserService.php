@@ -41,6 +41,7 @@ class UserService
                 'logged_in_at' => now(),
             ],
         ]);
+        unset($user->user_password);
         return [
             'status' => 200,
             'message' => 'Login successful',

@@ -52,7 +52,7 @@ class NotificationRepository extends BaseRepository
         ]);
     }
 
-    public function seenNotifications($notificationId){
+    public function viewNotification($notificationId){
         $this->model()::where('user_id', Auth::id())
             ->where('notification_id', '=', $notificationId)
             ->update([

@@ -14,6 +14,8 @@ import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import type { Credentials } from '@/types/auth'
+import { useUserStore } from '@/stores/user'
+import { setCookie } from '@/lib/utils'
 
 const router = useRouter()
 const { cookies } = useCookies()
@@ -46,7 +48,11 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       if (!response.data) {
         toast.error('Invalid credentials')
       } else {
-        cookies.set('token', response.data.token, '1d', '/')
+        setCookie('token', response.data.token)
+
+        const userStore = useUserStore()
+        userStore.setUser(response.data.user)
+
         let userRole = response.data.user.role
         userRole = 'student'
 

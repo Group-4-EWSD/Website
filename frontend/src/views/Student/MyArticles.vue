@@ -62,26 +62,24 @@ const formatDate = (dateString: string): string => {
       <div class="flex flex-col gap-3">
         <h3 class="font-semibold uppercase">Latest articles</h3>
 
-        <LatestArticles />
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <div class="flex justify-between items-center">
-          <h3 class="font-semibold uppercase">My Articles</h3>
-          <Button variant="outline" size="sm" @click="myArticlesStore.refreshArticles()">
-            Refresh
-          </Button>
-        </div>
-
-        <div v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="space-y-4">
-          <Skeleton v-for="i in 3" :key="i" class="h-36 w-full rounded-lg" />
-        </div>
-
-        <div v-else-if="myArticlesStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
+        <div v-if="myArticlesStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
           {{ myArticlesStore.error }}
           <Button variant="outline" size="sm" class="ml-2" @click="myArticlesStore.fetchArticles(true)">
             Try Again
           </Button>
+        </div>
+
+        <LatestArticles v-else/>
+
+      </div>
+
+      <div class="flex flex-col gap-3" v-if="!myArticlesStore.error">
+        <div class="flex justify-between items-center">
+          <h3 class="font-semibold uppercase">My Articles</h3>
+        </div>
+
+        <div v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="space-y-4">
+          <Skeleton v-for="i in 3" :key="i" class="h-36 w-full rounded-lg" />
         </div>
 
         <div v-else-if="myArticlesStore.articles.length === 0" class="p-8 text-center bg-gray-50 rounded-lg">

@@ -10,20 +10,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import type { User } from '@/types/user'
+import { useUserStore } from '@/stores/user'
 
 const showEditDialog = ref(false)
 
-// sample User data
-const user = reactive<User>({
-  name: 'Zar Li',
-  nickName: 'Diana',
-  email: 'zlmaw1@kmd.edu.mm',
-  faculty: 'Art & Science',
-  dateOfBirth: '01.Jan.2000',
-  gender: 'Female',
-  phoneNumber: '+95 091234 567809',
-  photoUrl: null,
-})
+const userStore = useUserStore();
+const user = userStore.currentUser!;
 
 const getAvatarFallBack = (name: string): string => {
   return name
@@ -43,9 +35,9 @@ const getAvatarFallBack = (name: string): string => {
             <h2 class="md:text-lg font-semibold mb-4">Profile</h2>
             <div class="flex flex-row items-center gap-6">
               <Avatar size="medium">
-                <AvatarImage :src="user.photoUrl ?? ''" alt="@unovue" />
+                <AvatarImage :src="userStore.profilePhotoUrl ?? ''" alt="@unovue" />
                 <AvatarFallback class="text-white">{{
-                  getAvatarFallBack(user.name)
+                  getAvatarFallBack(userStore.fullName)
                 }}</AvatarFallback>
               </Avatar>
               <div class="flex flex-row flex-wrap gap-2">
@@ -78,63 +70,17 @@ const getAvatarFallBack = (name: string): string => {
               </EditInformationDialog>
             </div>
             <div class="flex flex-col">
-              <SettingsRow label="Name" :value="user.name" />
-              <SettingsRow label="Nick Name" :value="user.nickName" />
-              <SettingsRow label="Email" :value="user.email" />
-              <SettingsRow label="Faculty" :value="user.faculty" />
-              <SettingsRow label="Date of Birth" :value="user.dateOfBirth" />
-              <SettingsRow label="Gender" :value="user.gender" />
-              <SettingsRow label="Phone Number" :value="user.phoneNumber" />
+              <SettingsRow label="Name" :value="user?.user_name" />
+              <SettingsRow label="Nick Name" :value="user?.nickname" />
+              <SettingsRow label="Email" :value="user?.user_email" />
+              <SettingsRow label="Faculty" :value="user?.faculty_name" />
+              <SettingsRow label="Date of Birth" :value="user?.date_of_birth" />
+              <SettingsRow label="Gender" :value="user?.gender" />
+              <SettingsRow label="Phone Number" :value="user?.phone_number" />
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <!-- Edit Dialog -->
-      <!-- <Dialog :open="showDialog" @update:open="showDialog = $event">
-      <DialogContent class="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit {{ currentField }}</DialogTitle>
-          <DialogDescription>
-            Make changes to your {{ currentField.toLowerCase() }}. Click save when you're done.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div class="py-4">
-          <div class="space-y-4">
-            <div v-if="currentField !== 'gender'">
-              <Label :for="currentField">{{ currentField }}</Label>
-              <Input
-                :id="currentField"
-                v-model="editValue"
-                :type="currentField === 'password' ? 'password' : 'text'"
-                :placeholder="`Enter your ${currentField.toLowerCase()}`"
-                class="w-full"
-              />
-            </div>
-            <div v-else>
-              <Label for="gender">Gender</Label>
-              <Select v-model="editValue">
-                <SelectTrigger id="gender">
-                  <SelectValue placeholder="Select a gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Male">Male</SelectItem>
-                  <SelectItem value="Female">Female</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                  <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" @click="showDialog = false">Cancel</Button>
-          <Button @click="saveEdit">Save changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog> -->
     </div>
   </Layout>
 </template>

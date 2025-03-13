@@ -1,3 +1,4 @@
+import { forceSignOut } from '@/lib/utils'
 import router from '@/router'
 import axios from 'axios'
 import { useCookies } from 'vue3-cookies'
@@ -9,6 +10,9 @@ const BASE_URL = 'http://127.0.0.1:8000/api/'
 const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: false, // Allows sending cookies with requests
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
 })
 
 // Request interceptor to attach token automatically
@@ -30,13 +34,7 @@ api.interceptors.response.use(
   (error) => {
     // Check if error is 401 Unauthorized
     if (error.response && error.response.status === 401) {
-      const { cookies } = useCookies()
-      
-      // Clear the token
-      cookies.remove('token')
-      
-      // Redirect to login page
-      router.replace("auth/login")
+      forceSignOut(false);
     }
     
     return Promise.reject(error)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ErrorMessage, useForm, Field } from 'vee-validate'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import DropZone from '@/components/shared/DropZone.vue'
 import FormElement from '@/components/shared/FormElement.vue'
@@ -18,10 +18,12 @@ import {
 import { Label } from '@/components/ui/label'
 
 // Import the API function
-import { ArticleStatus, uploadArticle } from '@/api/articles'
+import { ArticleStatus, getCategories, testUserPhoto, uploadArticle } from '@/api/articles'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
+import { useMyArticlesStore } from '@/stores/my-articles'
+import type { Category } from '@/types/article'
 
 interface UploadArticleSchema {
   title: string
@@ -34,7 +36,7 @@ interface UploadArticleSchema {
 // Create refs to control the dialog and loading states
 const isOpen = ref(false)
 const isLoading = ref(false)
-const isOnSubmit = ref(false)
+const categories = ref<{label: string, value: string}[]>([])
 
 const acceptedFileTypes = [
   'image/jpeg',
@@ -76,13 +78,6 @@ const { handleSubmit, errors, values, setValues, resetForm, setFieldValue } =
 const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
   if (isLoading.value) return
 
-  console.log('Form values:', formValues)
-
-  // if (!formValues.agreeToterm) {
-  //   toast.error('Please agree to the terms and conditions')
-  //   return
-  // }
-
   try {
     isLoading.value = true
 
@@ -97,6 +92,9 @@ const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
 
     // Submit the article using the API
     await uploadArticle(articleData)
+
+    const myArticlesStore = useMyArticlesStore();
+    void myArticlesStore.fetchArticles(true)
 
     toast.success('Article submitted successfully')
 
@@ -129,6 +127,9 @@ const saveAsDraft = async () => {
 
     await uploadArticle(articleData)
 
+    const myArticlesStore = useMyArticlesStore();
+    void myArticlesStore.fetchArticles(true)
+
     toast.success('Article saved as draft')
 
     // Close the dialog after saving
@@ -154,6 +155,14 @@ const closeModal = () => {
 const handleFilesAdded = (files: File[]) => {
   setFieldValue('files', files)
 }
+
+onMounted(async () => {
+  const rawCategories = await getCategories();
+  categories.value = rawCategories.map((category: Category) => ({
+    label: category.article_type_name,
+    value: category.article_type_id,
+  }))
+})
 </script>
 
 <template>
@@ -198,11 +207,7 @@ const handleFilesAdded = (files: File[]) => {
               name="category"
               id="category"
               :errors="errors"
-              :options="[
-                { label: 'Coffee', value: 'coffee' },
-                { label: 'Tea', value: 'tea' },
-                { label: 'Coke', value: 'coke' },
-              ]"
+              :options="categories"
             ></Select>
           </template>
         </FormElement>
@@ -237,7 +242,7 @@ const handleFilesAdded = (files: File[]) => {
           </template>
         </FormElement>
       </form>
-      <DialogFooter>
+      <DialogFooter class="gap-2">
         <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading"
           >Cancel</Button
         >

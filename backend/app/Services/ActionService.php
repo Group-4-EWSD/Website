@@ -59,4 +59,12 @@ class ActionService
     public function commentDeleteArticle($request){
         return $this->actionRepository->deleteComment($request);
     }
+
+    public function getNotificationList($userId){
+        return $this->actionRepository->getNotificationList($userId);
+    }
+
+    public function setNotificationView($request){
+        return $this->actionRepository->setNotificationView($request);
+    }
 }

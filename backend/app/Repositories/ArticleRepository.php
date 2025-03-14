@@ -130,13 +130,13 @@ class ArticleRepository
         }
         if ($state == 0){ // All Student (userId)
             $articles->addSelect(
-                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = ?)) AS current_user_react", [$primaryKey])
+                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = '$primaryKey')) AS current_user_react")
             );
         }
         else if ($state == 1) { // My Articles Student (userId)
             $articles->addSelect(
                 DB::raw("(SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) AS last_feedback"),
-                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = ?)) AS current_user_react", [$primaryKey])
+                DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = '$primaryKey')) AS current_user_react")
             );
             $articles->where('art.user_id','=',$primaryKey);
             $articles->havingRaw("status IN (1, 2, 3)");

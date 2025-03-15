@@ -1,5 +1,11 @@
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import type Cropper from 'cropperjs'
+import { Upload } from 'lucide-vue-next'
+import { onMounted, ref, type Ref } from 'vue'
+import { toast } from 'vue-sonner'
+
+import { updateProfilePhoto } from '@/api/user'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -7,58 +13,51 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Upload } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
-import { updateProfilePhoto } from '@/api/user'
-import { toast } from 'vue-sonner'
 
-// Props definition
-const props = defineProps({
-  currentImageUrl: {
-    type: String,
-    default: '',
-  },
-})
+interface FileReaderEvent extends ProgressEvent {
+  target: FileReader
+}
+
+interface CropperEventData {
+  detail: {
+    x: number
+    y: number
+    width: number
+    height: number
+    rotate: number
+    scaleX: number
+    scaleY: number
+  }
+}
 
 const userStore = useUserStore()
-const isOpen = ref(false)
-const isDragging = ref(false)
-const isLoading = ref(false)
-const selectedFile = ref(null)
-const cropperInstance = ref(null)
-const cropperContainer = ref(null)
+const isOpen = ref<boolean>(false)
+const isDragging = ref<boolean>(false)
+const isLoading = ref<boolean>(false)
+const selectedFile = ref<File | null>(null)
+const cropperInstance: Ref<Cropper | null> = ref(null)
+const cropperContainer: Ref<HTMLImageElement | null> = ref(null)
 
 // Initial cropper setup
 onMounted(() => {
   if (typeof window !== 'undefined') {
     // Dynamically import Cropper.js when component mounts
     import('cropperjs').then((module) => {
-      const Cropper = module.default
-      if (cropperContainer.value && selectedFile.value) {
-        cropperInstance.value = new Cropper(cropperContainer.value, {
-          aspectRatio: 1,
-          viewMode: 1,
-          dragMode: 'move',
-          autoCropArea: 0.8,
-          responsive: true,
-          crop(event) {
-            // Access cropped area data via event.detail
-          },
-        })
-      }
+      // Cropper initialization happens later when a file is selected
     })
   }
 })
 
-const onFileSelected = (event) => {
-  const file = event.target.files[0]
+const onFileSelected = (event: Event): void => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
   if (file) {
     handleFile(file)
   }
 }
 
-const handleFile = (file) => {
+const handleFile = (file: File): void => {
   // Validate file type
   if (!file.type.match('image.*')) {
     toast.error('Please select an image file')
@@ -75,53 +74,63 @@ const handleFile = (file) => {
 
   // Create URL for the image
   const reader = new FileReader()
-  reader.onload = (e) => {
-    initCropper(e.target.result)
+  reader.onload = (e: ProgressEvent<FileReader>) => {
+    // Use proper type checking for the target result
+    if (e.target && e.target.result) {
+      initCropper(e.target.result as string)
+    }
   }
   reader.readAsDataURL(file)
 }
 
-const initCropper = (imageUrl) => {
+const initCropper = (imageUrl: string): void => {
   if (cropperInstance.value) {
     cropperInstance.value.destroy()
   }
 
   // Set the image source
-  cropperContainer.value.src = imageUrl
+  if (cropperContainer.value) {
+    cropperContainer.value.src = imageUrl
 
-  // Initialize cropper
-  import('cropperjs').then((module) => {
-    const Cropper = module.default
-    cropperInstance.value = new Cropper(cropperContainer.value, {
-      aspectRatio: 1,
-      viewMode: 1,
-      dragMode: 'move',
-      autoCropArea: 0.8,
-      responsive: true,
+    // Initialize cropper
+    import('cropperjs').then((module) => {
+      const Cropper = module.default
+      if (cropperContainer.value) {
+        cropperInstance.value = new Cropper(cropperContainer.value, {
+          aspectRatio: 1,
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.8,
+          responsive: true,
+          crop(event: CropperEventData) {
+            // Access cropped area data via event.detail if needed
+          },
+        })
+      }
     })
-  })
+  }
 }
 
-const handleDragOver = (event) => {
+const handleDragOver = (event: DragEvent): void => {
   event.preventDefault()
   isDragging.value = true
 }
 
-const handleDragLeave = () => {
+const handleDragLeave = (): void => {
   isDragging.value = false
 }
 
-const handleDrop = (event) => {
+const handleDrop = (event: DragEvent): void => {
   event.preventDefault()
   isDragging.value = false
 
-  const file = event.dataTransfer.files[0]
+  const file = event.dataTransfer?.files[0]
   if (file) {
     handleFile(file)
   }
 }
 
-const saveChanges = async () => {
+const saveChanges = async (): Promise<void> => {
   if (!cropperInstance.value) return
 
   try {
@@ -134,8 +143,8 @@ const saveChanges = async () => {
     })
 
     // Convert canvas to blob
-    const blob = await new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8)
+    const blob = await new Promise<Blob>((resolve) => {
+      canvas.toBlob((blob) => resolve(blob as Blob), 'image/jpeg', 0.8)
     })
 
     // Create a File object from the blob
@@ -143,13 +152,12 @@ const saveChanges = async () => {
 
     // Call your API function directly with the file
     const { photo_path } = await updateProfilePhoto({
-      user_photo: file
+      user_photo: file,
     })
 
     if (photo_path) {
       userStore.setProfilePhoto(photo_path)
     }
-
 
     toast.success('Profile image updated successfully')
 
@@ -157,15 +165,15 @@ const saveChanges = async () => {
       isOpen.value = false
       resetCropper()
     }, 1500)
-
-  } catch (err) {
-    toast.error(err.message || 'An error occurred while updating profile image')
+  } catch (err: unknown) {
+    const error = err as Error
+    toast.error(error.message || 'An error occurred while updating profile image')
   } finally {
     isLoading.value = false
   }
 }
 
-const resetCropper = () => {
+const resetCropper = (): void => {
   if (cropperInstance.value) {
     cropperInstance.value.destroy()
     cropperInstance.value = null
@@ -173,7 +181,7 @@ const resetCropper = () => {
   selectedFile.value = null
 }
 
-const cancelChanges = () => {
+const cancelChanges = (): void => {
   resetCropper()
   isOpen.value = false
 }
@@ -217,7 +225,12 @@ const cancelChanges = () => {
         </div>
         <div class="mt-4 flex justify-end space-x-2">
           <Button variant="outline" @click="cancelChanges"> Cancel </Button>
-          <Button @click="saveChanges" :disabled="isLoading" :processing="isLoading" variant="default">
+          <Button
+            @click="saveChanges"
+            :disabled="isLoading"
+            :processing="isLoading"
+            variant="default"
+          >
             Submit
           </Button>
         </div>

@@ -3,7 +3,6 @@ import { useForm } from 'vee-validate'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { useCookies } from 'vue3-cookies'
 import * as yup from 'yup'
 
 import { login } from '@/api/auth'
@@ -13,12 +12,11 @@ import FormElement from '@/components/shared/FormElement.vue'
 import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import type { Credentials } from '@/types/auth'
-import { useUserStore } from '@/stores/user'
 import { setCookie } from '@/lib/utils'
+import { useUserStore } from '@/stores/user'
+import type { Credentials } from '@/types/auth'
 
 const router = useRouter()
-const { cookies } = useCookies()
 const loading = ref(false)
 
 const schema = yup.object({

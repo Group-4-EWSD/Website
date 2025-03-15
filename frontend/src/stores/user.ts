@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
-import type { User } from '@/types/user';
-import { useCookies } from 'vue3-cookies';
+
 import { setCookie } from '@/lib/utils';
+import type { User } from '@/types/user';
 
 interface UserState {
   user: User | null;

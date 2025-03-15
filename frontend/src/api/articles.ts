@@ -1,5 +1,5 @@
 import api from '@/api/axios'
-import type { Articles, ArticleParams, CountData, ArticleData, MyArticlesResponse, DraftArticle, Category } from '@/types/article'
+import type { ArticleData, ArticleParams, Articles, Category, CountData, DraftArticle, MyArticlesResponse } from '@/types/article'
 
 interface ArticlesResponse {
   countData: CountData

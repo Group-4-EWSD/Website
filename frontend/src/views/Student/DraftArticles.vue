@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { PencilIcon, TrashIcon } from 'lucide-vue-next'
+import { onMounted, ref } from 'vue'
+import { toast } from 'vue-sonner'
 
+import { getDraftArticles } from '@/api/articles'
+import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import {
   Table,
   TableBody,
@@ -12,12 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { onMounted, ref } from 'vue'
-import { getDraftArticles } from '@/api/articles'
-import { toast } from 'vue-sonner'
 import type { DraftArticle } from '@/types/article'
-import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.vue'
 
 const isLoading = ref(false)
 const articles = ref<DraftArticle[]>([])

@@ -1,4 +1,5 @@
 import animate from 'tailwindcss-animate'
+import tailwindcssAnimate from 'tailwindcss-animate'
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -112,5 +113,5 @@ module.exports = {
   		}
   	}
   },
-  plugins: [animate, require("tailwindcss-animate")],
+  plugins: [animate, tailwindcssAnimate],
 }

@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ErrorMessage, useForm, Field } from 'vee-validate'
+import { ErrorMessage, Field, useForm } from 'vee-validate'
 import { onMounted, ref } from 'vue'
+import { toast } from 'vue-sonner'
+import * as yup from 'yup'
 
+import { ArticleStatus, getCategories, uploadArticle } from '@/api/articles'
 import DropZone from '@/components/shared/DropZone.vue'
 import FormElement from '@/components/shared/FormElement.vue'
 import Input from '@/components/shared/Input.vue'
 import Select from '@/components/shared/Select.vue'
 import { Button } from '@/components/ui/button'
+import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import {
   Dialog,
   DialogContent,
@@ -16,12 +20,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-
-// Import the API function
-import { ArticleStatus, getCategories, uploadArticle } from '@/api/articles'
-import { toast } from 'vue-sonner'
-import * as yup from 'yup'
-import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
 import { useMyArticlesStore } from '@/stores/my-articles'
 import type { Category } from '@/types/article'
 
@@ -63,7 +61,7 @@ const validationSchema = yup.object({
     }),
 })
 
-const { handleSubmit, errors, values, setValues, resetForm, setFieldValue } =
+const { handleSubmit, errors, values, resetForm, setFieldValue } =
   useForm<UploadArticleSchema>({
     validationSchema,
     initialValues: {
@@ -157,11 +155,12 @@ const handleFilesAdded = (files: File[]) => {
 }
 
 onMounted(async () => {
-  const rawCategories = await getCategories();
-  categories.value = rawCategories.map((category: Category) => ({
-    label: category.article_type_name,
-    value: category.article_type_id,
-  }))
+  // const rawCategories = await getCategories();
+  // categories.value = rawCategories.map((category: Category) => ({
+  //   label: category.article_type_name,
+  //   value: category.article_type_id,
+  // }))
+  resetForm()
 })
 </script>
 

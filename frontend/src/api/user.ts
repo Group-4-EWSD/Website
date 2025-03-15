@@ -1,4 +1,5 @@
 import type { ProfilePhotoParams, ProfilePhotoResponse, User, UserDetailsParams } from "@/types/user"
+
 import api from "./axios"
 
 export const updateUserDetail = async (params: UserDetailsParams): Promise<User> => {

@@ -1,17 +1,17 @@
-import { logout } from '@/api/auth'
 import type { Updater } from '@tanstack/vue-table'
-import type { Ref } from 'vue'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import type { Ref } from 'vue'
 import { useCookies } from 'vue3-cookies'
-import { useRouter } from 'vue-router'
+
+import { logout } from '@/api/auth'
 import router from '@/router' // Import the router instance directly
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
+export function valueUpdater<T extends Updater<unknown>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === 'function' ? updaterOrValue(ref.value) : updaterOrValue
 }
 
@@ -39,11 +39,11 @@ export async function forceSignOut(clearToken: boolean = true) {
 
 export function getCookie(name: string) {
   const { cookies } = useCookies()
-  let cookieData = cookies.get(name)
+  const cookieData = cookies.get(name)
   if (!cookieData) return null
   try {
     return JSON.parse(cookieData)
-  } catch (e) {
+  } catch {
     return cookieData
   }
 }

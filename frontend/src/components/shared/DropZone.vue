@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { FileText, Image as ImageIcon, XIcon } from 'lucide-vue-next'
-import { ref, watch, defineEmits } from 'vue'
-import { Button } from '@/components/ui/button'
 import { ErrorMessage } from 'vee-validate'
+import { defineEmits, ref, watch } from 'vue'
+
 import Input from '@/components/shared/Input.vue'
+import { Button } from '@/components/ui/button'
 
 interface Props {
   value?: File[]

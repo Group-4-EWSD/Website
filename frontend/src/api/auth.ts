@@ -1,5 +1,5 @@
 import api from '@/api/axios'
-import type { Credentials, RegisterData } from '@/types/auth'
+import type { Credentials } from '@/types/auth'
 
 export const login = async (credentials: Credentials) => {
   return await api.post(`login`, credentials)

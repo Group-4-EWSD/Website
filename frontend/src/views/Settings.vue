@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import {} from 'lucide-vue-next'
 import { PencilIcon } from 'lucide-vue-next'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
+import ChangeProfileImageDialog from '@/components/pagespecific/settings/ChangeProfileImageDialog.vue'
 import EditInformationDialog from '@/components/pagespecific/settings/EditInformationDialog.vue'
 import SettingsRow from '@/components/pagespecific/settings/SettingsRow.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
-import { GenderOptions, type User } from '@/types/user'
 import { useUserStore } from '@/stores/user'
-import ChangeProfileImageDialog from '@/components/pagespecific/settings/ChangeProfileImageDialog.vue'
+import { GenderOptions } from '@/types/user'
 
 const showEditDialog = ref(false)
 

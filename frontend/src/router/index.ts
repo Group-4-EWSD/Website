@@ -1,7 +1,7 @@
+import { createRouter, createWebHistory } from 'vue-router'
+
 import { getCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
-import { createRouter, createWebHistory } from 'vue-router'
-import { useCookies } from 'vue3-cookies'
 
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')

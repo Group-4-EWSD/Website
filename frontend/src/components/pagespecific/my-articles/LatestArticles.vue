@@ -2,6 +2,7 @@
 import { PencilIcon } from 'lucide-vue-next'
 
 import { Card } from '@/components/ui/card'
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import {
   Table,
   TableBody,
@@ -11,7 +12,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useMyArticlesStore } from '@/stores/my-articles'
-import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 
 const myArticlesStore = useMyArticlesStore()
 

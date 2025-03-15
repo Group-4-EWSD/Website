@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { EyeIcon, HeartIcon } from 'lucide-vue-next'
 import { defineProps } from 'vue'
+
 import { Card } from '@/components/ui/card'
 
 interface Article {

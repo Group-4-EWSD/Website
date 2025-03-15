@@ -1,6 +1,7 @@
-import { forceSignOut } from '@/lib/utils'
 import axios from 'axios'
 import { useCookies } from 'vue3-cookies'
+
+import { forceSignOut } from '@/lib/utils'
 
 // const BASE_URL = 'https://ewsd-project.vercel.app/v1/'
 const BASE_URL = 'http://127.0.0.1:8000/api/'

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ErrorMessage, Field, useField } from 'vee-validate'
 import { useAttrs, watchEffect } from 'vue'
+
 import {
   Select,
   SelectContent,
@@ -31,8 +32,7 @@ const { value, setValue } = useField(() => props.name)
 
 // Watch for external modelValue updates and sync with vee-validate
 watchEffect(() => {
-  console.log('props.modelValue', props.modelValue, props.options)
-  if (props.modelValue !== undefined) {
+  if (!!props.modelValue) {
     setValue(props.modelValue)
   }
 })
@@ -40,7 +40,7 @@ watchEffect(() => {
 
 <template>
   <div class="w-full">
-    <Field v-bind="attrs" :name="props.name">
+    <Field v-bind="attrs" :name="props.name" :validate-on-mount="false">
       <Select :model-value="value" @update:model-value="setValue">
         <SelectTrigger
           :class="

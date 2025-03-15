@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { ref, onMounted } from 'vue'
-import { useUserStore } from '@/stores/user'
+import { onMounted, ref } from 'vue'
+import { toast } from 'vue-sonner'
+import * as yup from 'yup'
 
+import { updateUserDetail } from '@/api/user'
 import FormElement from '@/components/shared/FormElement.vue'
 import Input from '@/components/shared/Input.vue'
 import Select from '@/components/shared/Select.vue'
@@ -17,10 +19,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { useUserStore } from '@/stores/user'
 import type { User, UserDetailsParams } from '@/types/user'
-import * as yup from 'yup'
-import { updateUserDetail } from '@/api/user'
-import { toast } from 'vue-sonner'
+
+
+
 
 // Create a ref to control the dialog open state
 const dialogOpen = ref(false)
@@ -87,7 +90,7 @@ const schema = yup.object({
 })
 
 // Use vee-validate for form handling
-const { handleSubmit, errors, setValues, resetForm, values } = useForm<User>({
+const { handleSubmit, errors, setValues, values } = useForm<User>({
   validationSchema: schema,
 })
 

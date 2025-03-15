@@ -8,9 +8,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { forceSignOut } from '@/lib/utils'
 
 import Separator from './separator/Separator.vue'
-import { forceSignOut } from '@/lib/utils'
 
 const items = [
   {

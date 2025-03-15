@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
-import dayjs from 'dayjs'
 
+import { getArticles } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import { Card } from '@/components/ui/card'
 import {
@@ -15,7 +16,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import { getArticles, getArticleDetails } from '@/api/articles'
 import type { Articles, CountData } from '@/types/article'
 
 const countData = ref<CountData | null>(null)

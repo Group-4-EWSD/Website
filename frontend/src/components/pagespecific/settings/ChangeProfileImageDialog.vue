@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Upload } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import { updateProfilePhoto } from '@/api/user'
+import { toast } from 'vue-sonner'
 
 // Props definition
 const props = defineProps({
@@ -60,17 +61,16 @@ const onFileSelected = (event) => {
 const handleFile = (file) => {
   // Validate file type
   if (!file.type.match('image.*')) {
-    error.value = 'Please select an image file'
+    toast.error('Please select an image file')
     return
   }
 
   // Validate file size (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    error.value = 'Image size should be less than 5MB'
+    toast.error('Image size should be less than 5MB')
     return
   }
 
-  error.value = ''
   selectedFile.value = file
 
   // Create URL for the image

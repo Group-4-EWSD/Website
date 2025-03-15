@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-import { onMounted, ref, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { computed } from 'vue'
 import dayjs from 'dayjs'
+import { useArticleStore } from '@/stores/articles'
+import { getArticleDetails } from '@/api/articles'
 
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import { Card } from '@/components/ui/card'
@@ -23,21 +26,16 @@ import {
   PaginationNext,
   PaginationPrev,
 } from '@/components/ui/pagination'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import { getArticles, getArticleDetails } from '@/api/articles'
-import type { Articles, CountData } from '@/types/article'
 import Button from '@/components/ui/button/Button.vue'
-import { number } from 'yup'
+import { useRouter } from 'vue-router'
 
-const countData = ref<CountData | null>(null)
-const articles = ref<Articles[]>([])
-const sortOption = ref<string>('')
-const isFetched = ref(false)
-const currentPage = ref<number>(1)
-const displayNumber = 5
-const totalPages = ref(1)
+const router = useRouter()
+const articleStore = useArticleStore()
+const { countData, currentPage, isFetched, fetchArticles, displayNumber } = articleStore
 
 const sortOptions = ref([
   { value: 'created asc', label: 'Newest First' },
@@ -46,42 +44,108 @@ const sortOptions = ref([
   { value: 'title-desc', label: 'Name (Z → A)' },
 ])
 
-const sortBy = (option: string) => {
-  sortOption.value = option
-  console.log('Sorting by:', option)
+const goToArticleDetails = (articleId: number) => {
+  router.push({ name: 'getArticleDetails', params: { id: articleId } })
 }
 
-const fetchArticles = async (page: number) => {
-  try {
-    const response = await getArticles({
-      displayNumber,
-      pageNumber: page,
-      status: 0,
-    })
-    countData.value = response.countData
-    articles.value = response.allArticles
-    // totalPages.value = Math.ceil(articles.value.length / displayNumber)
-    isFetched.value = true
-  } catch (error) {
-    console.error('Error fetching articles:', error)
-  }
+const sortBy = (option: string) => {
+  articleStore.sortOption = option
+  console.log('Sorting by:', option)
+}
+const isLoading = ref(true)
+
+const simulateLoading = () => {
+  setTimeout(() => {
+    isLoading.value = false
+  }, 3000) // Set the timeout duration as needed
 }
 
 onMounted(() => {
-  if (!isFetched.value) {
-    console.log('ht', isFetched.value)
-    fetchArticles(currentPage.value)
-  }
+  simulateLoading()
 })
 
-watch(currentPage, fetchArticles)
+watch(
+  () => articleStore.currentPage,
+  (newPage) => {
+    isLoading.value = true
+    setTimeout(() => {
+      isLoading.value = false
+    }, 3000)
+    fetchArticles(newPage)
+  },
+)
+
+// const isLoading = computed(() => !articleStore.isFetched)
 
 const goToPage = (page: number) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-    fetchArticles(page)
-  }
+  articleStore.currentPage = page
 }
+
+const articles = [
+  {
+    article_id: 1,
+    article_title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
+    description:
+      'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
+    author: 'Zar Li',
+    created_at: '15 Jan 2025',
+    avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+  },
+  {
+    article_id: 2,
+    article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+    description:
+      'The rise of artificial intelligence has sparked numerous debates across various fields...',
+    author: 'Swe Thu Htet',
+    created_at: '05 Jan 2025',
+    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  },
+  {
+    article_id: 3,
+    article_title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
+    description:
+      'The rise of artificial intelligence has sparked numerous debates across various fields...',
+    author: 'Swe Thu Htet',
+    created_at: '05 Jan 2025',
+    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  },
+  {
+    article_id: 4,
+    article_title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
+    description:
+      'The rise of artificial intelligence has sparked numerous debates across various fields...',
+    author: 'Swe Thu Htet',
+    created_at: '05 Jan 2025',
+    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  },
+  {
+    article_id: 5,
+    article_title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
+    description:
+      'The rise of artificial intelligence has sparked numerous debates across various fields...',
+    author: 'Swe Thu Htet',
+    created_at: '05 Jan 2025',
+    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  },
+  // {
+  //   article_id: 6,
+  //   article_title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
+  //   description:
+  //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
+  //   author: 'Swe Thu Htet',
+  //   created_at: '05 Jan 2025',
+  //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  // },
+  // {
+  //   article_id: 7,
+  //   article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+  //   description:
+  //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
+  //   author: 'Swe Thu Htet',
+  //   created_at: '05 Jan 2025',
+  //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  // },
+]
 </script>
 
 <template>
@@ -158,9 +222,11 @@ const goToPage = (page: number) => {
           <Table class="w-full">
             <TableBody>
               <TableRow
+                v-if="!isLoading"
                 v-for="article in articles.slice(0, 6)"
                 :key="article.article_id"
-                class="border-b hover:bg-gray-50 transition-all"
+                class="border-b hover:bg-gray-50 transition-all cursor-pointer"
+                @click="goToArticleDetails(article.article_id)"
               >
                 <TableCell>
                   <div class="flex items-center gap-4">
@@ -185,37 +251,48 @@ const goToPage = (page: number) => {
                   </div>
                 </TableCell>
               </TableRow>
+              <TableRow
+                v-else
+                v-for="n in 5"
+                :key="n"
+                class="border-b hover:bg-gray-50 transition-all"
+              >
+                <TableCell>
+                  <Skeleton class="h-12" animate-pulse />
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
-
-          <Pagination
-            v-slot=""
-            :items-per-page="displayNumber"
-            :total="24"
-            :sibling-count="1"
-            show-edges
-            :default-page="currentPage"
-            @update:page="goToPage"
-          >
-            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-              <PaginationFirst />
-              <PaginationPrev />
-              <template v-for="(item, index) in items" :key="index">
-                <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
-                  <Button
-                    class="w-10 h-10 p-0"
-                    :variant="item.value === currentPage ? 'default' : 'outline'"
-                    @click="goToPage(item.value)"
-                  >
-                    {{ item.value }}
-                  </Button>
-                </PaginationListItem>
-                <PaginationEllipsis v-else />
-              </template>
-              <PaginationNext />
-              <PaginationLast />
-            </PaginationList>
-          </Pagination>
+          <div class="flex justify-end mt-4">
+            <Pagination
+              v-slot=""
+              :items-per-page="displayNumber"
+              :total="24"
+              :sibling-count="1"
+              show-edges
+              :default-page="currentPage"
+              @update:page="goToPage"
+            >
+              <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+                <PaginationFirst />
+                <PaginationPrev />
+                <template v-for="(item, index) in items" :key="index">
+                  <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+                    <Button
+                      class="w-10 h-10 p-0"
+                      :variant="item.value === articleStore.currentPage ? 'default' : 'outline'"
+                      @click="goToPage(item.value)"
+                    >
+                      {{ item.value }}
+                    </Button>
+                  </PaginationListItem>
+                  <PaginationEllipsis v-else />
+                </template>
+                <PaginationNext />
+                <PaginationLast />
+              </PaginationList>
+            </Pagination>
+          </div>
         </div>
       </div>
     </div>

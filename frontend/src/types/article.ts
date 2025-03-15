@@ -20,6 +20,28 @@ export interface Articles {
   status: number
 }
 
+export interface ArticleDetail {
+  article_title: string
+  article_description: string
+  created_at: string
+  updated_at: string
+  creator_name: string
+  creator_gender: number
+  article_status: number
+  view_count: number
+  like_count: number
+  current_user_react: number
+  comment_count: number
+}
+
+export interface ArticleResponse {
+  articleDetail: ArticleDetail | null
+  articleContent: any[]
+  articlePhotos: Record<string, string>
+  commentList: any[]
+  feedbackList: any[]
+}
+
 export interface CountData {
   reactCount: number
   totalViewCount: number

@@ -6,7 +6,7 @@ import { toast } from 'vue-sonner'
 import { useCookies } from 'vue3-cookies'
 import * as yup from 'yup'
 
-import { login } from '@/api/auth'
+import { login, handleAuthChange } from '@/api/auth'
 import Logo from '@/assets/logo.png'
 import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
 import FormElement from '@/components/shared/FormElement.vue'
@@ -47,6 +47,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         toast.error('Invalid credentials')
       } else {
         cookies.set('token', response.data.token)
+        // handleAuthChange(response.data.token)
         let userRole = response.data.user.role
         userRole = 'student'
 

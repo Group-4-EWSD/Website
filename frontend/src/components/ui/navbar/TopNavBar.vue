@@ -70,7 +70,7 @@ const toggleSearch = () => {
 
       <div class="hidden sm:flex flex-col text-white font-medium">
         <p>Welcome, Zarli</p>
-        <p class="text-sm text-gray-300">Student - Engineering</p>
+        <p class="text-sm text-gray-300">Engineering - Student</p>
       </div>
 
       <img

@@ -43,8 +43,14 @@ export const useUserStore = defineStore('user', {
   actions: {
     setUser(user: User): void {
       this.user = user;
-      setCookie('user', user);
+      setCookie('user', JSON.stringify(user));
       this.isAuthenticated = true;
+    },
+    setProfilePhoto(photoPath: string): void {
+      if (this.user) {
+        this.user.user_photo_path = photoPath;
+        setCookie('user', JSON.stringify(this.user));
+      }
     }
   }
 });

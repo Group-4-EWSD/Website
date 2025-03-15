@@ -18,7 +18,7 @@ import {
 import { Label } from '@/components/ui/label'
 
 // Import the API function
-import { ArticleStatus, getCategories, testUserPhoto, uploadArticle } from '@/api/articles'
+import { ArticleStatus, getCategories, uploadArticle } from '@/api/articles'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 import Checkbox from '@/components/ui/checkbox/Checkbox.vue'
@@ -208,6 +208,7 @@ onMounted(async () => {
               id="category"
               :errors="errors"
               :options="categories"
+              :modelValue="values.category"
             ></Select>
           </template>
         </FormElement>

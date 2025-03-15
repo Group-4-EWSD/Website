@@ -13,3 +13,24 @@ export interface User {
   user_photo_path: string;
   user_profile_url: string;
 }
+
+export interface UserDetailsParams {
+  user_name: string;
+  nickname: string;
+  date_of_birth: string | null;
+  phone_number: string | null;
+}
+
+export interface ProfilePhotoParams {
+  user_photo: File
+}
+
+export interface ProfilePhotoResponse {
+  photo_path: string
+}
+
+export const GenderOptions = {
+  0: "Prefer not to say",
+  1: "Male",
+  2: "Female"
+}

@@ -1,3 +1,5 @@
+import { getCookie } from '@/lib/utils'
+import { useUserStore } from '@/stores/user'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useCookies } from 'vue3-cookies'
 
@@ -77,11 +79,15 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const { cookies } = useCookies()
-  const token = cookies.get('token')
+
+  const token = getCookie('token')
+  const userInfo = getCookie('user')
+
+  const userStore = useUserStore()
+  userStore.setUser(userInfo)
 
   if (
-    token &&
+    token && userInfo &&
     (to.path === '/auth/login' ||
       to.path === '/auth/register' ||
       to.path === '/auth/forgot-password')

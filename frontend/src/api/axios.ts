@@ -1,5 +1,4 @@
 import { forceSignOut } from '@/lib/utils'
-import router from '@/router'
 import axios from 'axios'
 import { useCookies } from 'vue3-cookies'
 

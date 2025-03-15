@@ -9,8 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
-import type { User } from '@/types/user'
+import { GenderOptions, type User } from '@/types/user'
 import { useUserStore } from '@/stores/user'
+import ChangeProfileImageDialog from '@/components/pagespecific/settings/ChangeProfileImageDialog.vue'
 
 const showEditDialog = ref(false)
 
@@ -44,7 +45,8 @@ const getAvatarFallBack = (name: string): string => {
                 <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white"
                   >Remove</Button
                 >
-                <Button variant="secondary">Change</Button>
+                <!-- <Button variant="secondary">Change</Button> -->
+                 <ChangeProfileImageDialog />
               </div>
             </div>
           </CardContent>
@@ -75,7 +77,7 @@ const getAvatarFallBack = (name: string): string => {
               <SettingsRow label="Email" :value="user?.user_email" />
               <SettingsRow label="Faculty" :value="user?.faculty_name" />
               <SettingsRow label="Date of Birth" :value="user?.date_of_birth" />
-              <SettingsRow label="Gender" :value="user?.gender" />
+              <SettingsRow label="Gender" :value="GenderOptions[user?.gender]" />
               <SettingsRow label="Phone Number" :value="user?.phone_number" />
             </div>
           </CardContent>

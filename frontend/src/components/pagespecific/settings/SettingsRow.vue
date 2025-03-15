@@ -16,7 +16,7 @@ defineProps<{
       {{ label }}
     </div>
     <div class="col-span-12 md:col-span-8 flex items-center">
-      {{ value }}
+      {{ value || '-' }}
     </div>
   </div>
 </template>

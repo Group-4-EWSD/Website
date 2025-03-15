@@ -52,12 +52,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
         Route::patch('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getUserList']);
+        Route::patch('/update-password', [UserController::class, 'updatePassword']);
     });
     Route::post('/logout', [UserController::class, 'logout']);
     // User routes
     Route::prefix('/notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'index']);
-        Route::get('/{notificationId}', [NotificationController::class, 'notificationView']);
+        Route::get('/', [ActionController::class, 'getNotificationList']);
+        Route::post('/', [ActionController::class, 'setNotificationView']);
     });
 
 });

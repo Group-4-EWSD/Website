@@ -130,4 +130,66 @@ class actionRepository extends BaseRepository
         $deleted = Comment::where('comment_id', $request->commentId)->delete();
         return $deleted > 0;
     }
+
+    public function getNotificationList($userId)
+    {
+        $notifications = DB::table(DB::raw("(  
+            SELECT 
+                art.user_id, 
+                a.action_id as action_id, 
+                NULL as message, 
+                a.created_at as created_at, 
+                a.seen,
+                '1' as action_type 
+            FROM actions a 
+            JOIN articles art ON art.article_id = a.article_id 
+            WHERE art.user_id = ? AND a.react = 0
+            UNION
+            SELECT 
+                c.user_id, 
+                c.comment_id as action_id, 
+                c.message, 
+                c.created_at as created_at, 
+                c.seen,
+                '2' as action_type 
+            FROM comments c 
+            JOIN articles art ON art.article_id = c.article_id 
+            WHERE art.user_id = ?
+        ) AS notifications"))
+        ->join('users as u', 'u.id', '=', 'notifications.user_id')
+        ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
+        ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+        ->selectRaw('
+            notifications.action_id,
+            COALESCE(notifications.message, NULL) as message,
+            notifications.created_at,
+            notifications.seen,
+            notifications.action_type,
+            u.user_name,
+            CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/", u.user_photo_path) AS user_photo_path,
+            u.gender,
+            f.faculty_name,
+            ut.user_type_name
+        ')
+        ->setBindings([$userId, $userId]) // Prevents SQL injection
+        ->get();
+
+        return $notifications;
+    }
+
+    public function setNotificationView($request)
+    {
+        $actionId = $request->actionId;
+        $actionType = $request->actionType;
+        if ($actionType == '1') {
+            DB::table('actions')
+                ->where('action_id', $actionId)
+                ->update(['seen' => 1]);
+        } elseif ($actionType == '2') {
+            DB::table('comments')
+                ->where('comment_id', $actionId)
+                ->update(['seen' => 1]);
+        }
+    }
+
 }

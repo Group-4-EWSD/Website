@@ -76,7 +76,7 @@ class ArticleService
     public function createUpdateArticle($userId, $request)
     {
         
-        $systemId = $this->articleRepository->getSystemId($userId, $request->status);
+        $systemId = $this->articleRepository->getSystemId($userId);
         DB::beginTransaction();
 
         try {

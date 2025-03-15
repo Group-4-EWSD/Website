@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ActionService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ActionController extends Controller
 {
@@ -93,5 +94,20 @@ class ActionController extends Controller
     public function articleCommentDelete(Request $request){
         $this->actionService->commentDeleteArticle($request);
         return response()->json(['message' => 'Comment deleted successfully']);
+    }
+
+    public function getNotificationList(){
+        $userId = Auth::id();
+        return $this->actionService->getNotificationList($userId);
+    }
+
+    public function setNotificationView(Request $request){
+        $success = $this->actionService->setNotificationView($request);
+        return $success;
+        // if ($success) {
+        //     return response()->json(['message' => 'Notification seen'], 201);
+        // } else {
+        //     return response()->json(['message' => 'Notification view failed.'], 500);
+        // }
     }
 }

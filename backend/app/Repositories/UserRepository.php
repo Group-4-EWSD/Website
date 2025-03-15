@@ -33,6 +33,8 @@ class UserRepository extends BaseRepository
             'ut.user_type_name',
             'f.faculty_name',
             'users.gender',
+            'users.date_of_birth',
+            'users.phone_number',
             DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', users.user_photo_path) AS user_photo_path"),
         ])
         ->where('users.user_email', $email)

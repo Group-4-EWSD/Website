@@ -56,8 +56,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
     // User routes
     Route::prefix('/notifications')->group(function () {
-        Route::get('/', [NotificationController::class, 'index']);
-        Route::get('/{notificationId}', [NotificationController::class, 'notificationView']);
+        Route::get('/', [ActionController::class, 'getNotificationList']);
+        Route::post('/', [ActionController::class, 'setNotificationView']);
     });
 
 });

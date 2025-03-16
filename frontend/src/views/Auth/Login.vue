@@ -13,8 +13,9 @@ import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { setCookie } from '@/lib/utils'
-import { useUserStore } from '@/stores/user'
 import type { Credentials } from '@/types/auth'
+import { useUserStore } from '@/stores/user'
+import type { User } from '@/types/user'
 
 const router = useRouter()
 const loading = ref(false)
@@ -49,10 +50,12 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       } else {
         setCookie('token', response.data.token)
 
-        const userStore = useUserStore()
-        userStore.setUser(response.data.user)
+        const user = response.data.user as User
 
-        const userRole = response.data.user.user_type_name
+        const userStore = useUserStore()
+        userStore.setUser(user)
+
+        const userRole = user.user_type_name
 
         // Role-based redirection
         switch (userRole) {

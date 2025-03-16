@@ -7,7 +7,12 @@ export interface ArticleParams {
   status?: number
 }
 
-export interface Articles {
+export type ArticleList = {
+  countData: CountData
+  allArticles: Article[]
+}
+
+export interface Article {
   article_id: string
   article_title: string
   article_description: string
@@ -26,6 +31,28 @@ export interface Articles {
   comment_count: number
   current_user_react: number
   last_feedback: string
+}
+
+export interface ArticleDetail {
+  article_title: string
+  article_description: string
+  created_at: string
+  updated_at: string
+  creator_name: string
+  creator_gender: number
+  article_status: number
+  view_count: number
+  like_count: number
+  current_user_react: number
+  comment_count: number
+}
+
+export interface ArticleResponse {
+  articleDetail: ArticleDetail | null
+  articleContent: any[]
+  articlePhotos: Record<string, string>
+  commentList: any[]
+  feedbackList: any[]
 }
 
 export interface CountData {

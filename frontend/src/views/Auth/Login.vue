@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 
-import { login } from '@/api/auth'
+import { login, handleAuthChange } from '@/api/auth'
 import Logo from '@/assets/logo.png'
 import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
 import FormElement from '@/components/shared/FormElement.vue'
@@ -15,9 +15,11 @@ import { Label } from '@/components/ui/label'
 import { setCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
 import type { Credentials } from '@/types/auth'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const loading = ref(false)
+const userStore = useUserStore()
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Please enter your email'),
@@ -56,19 +58,19 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
 
         // Role-based redirection
         switch (userRole) {
-          case 'student':
+          case 'Student':
             router.push('/student/home')
             break
-          case 'guest':
+          case 'Guest':
             router.push('/guest/home')
             break
-          case 'coordinator':
+          case 'Marketing Coordinator':
             router.push('/coordinator/dashboard')
             break
-          case 'admin':
+          case 'Admin':
             router.push('/admin/dashboard')
             break
-          case 'manager':
+          case 'Marketing Manager':
             router.push('/manager/dashboard')
             break
           default:

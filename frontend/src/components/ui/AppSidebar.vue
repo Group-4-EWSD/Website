@@ -33,11 +33,6 @@ const items = [
     url: '/student/settings',
     icon: Settings,
   },
-  {
-    title: 'Log Out',
-    url: '/auth/logout',
-    icon: LogOut,
-  },
 ]
 </script>
 <template>

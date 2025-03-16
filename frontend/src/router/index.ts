@@ -34,7 +34,7 @@ const studentRoutes = [
     name: 'getArticleDetails',
     component: ArticleDetails,
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
     },
   },
   {
@@ -50,7 +50,7 @@ const studentRoutes = [
     name: 'Student Notifications',
     component: Notification,
     meta: {
-      // requiresAuth: true,
+      requiresAuth: true,
     },
   },
   {
@@ -92,12 +92,16 @@ router.beforeEach((to, from, next) => {
       to.path === '/auth/register' ||
       to.path === '/auth/forgot-password')
   ) {
+    console.log(token)
+    // cookies.remove('token')
     // If user is already authenticated and tries to access login/register, redirect to home
     next({ path: '/student/home', replace: true })
   } else if (to.meta.requiresAuth && !token) {
+    console.log(token)
     // If route requires auth and user is not authenticated, redirect to login
     next({ path: '/auth/login', replace: true })
   } else {
+    console.log('redirect from else', token)
     // Otherwise, proceed as normal
     next()
   }

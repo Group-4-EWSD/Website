@@ -3,8 +3,8 @@ export interface User {
   user_name: string;
   nickname: string;
   user_email: string;
-  user_password: string;
   user_type_id: string;
+  user_type_name: string;
   faculty_id: string;
   faculty_name: string;
   gender: number;

@@ -9,7 +9,3 @@ export const logout = async () => {
   console.log('logout api call')
   return await api.post(`logout`)
 }
-
-export const register = async (userData: RegisterData) => {
-  return await api.post(`register`, userData)
-}

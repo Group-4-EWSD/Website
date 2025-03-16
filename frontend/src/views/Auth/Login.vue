@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 
-import { login, handleAuthChange } from '@/api/auth'
+import { login } from '@/api/auth'
 import Logo from '@/assets/logo.png'
 import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
 import FormElement from '@/components/shared/FormElement.vue'
@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label'
 import { setCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
 import type { Credentials } from '@/types/auth'
-import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const loading = ref(false)

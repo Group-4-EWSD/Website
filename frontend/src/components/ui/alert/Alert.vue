@@ -3,13 +3,16 @@ import type { HTMLAttributes } from 'vue'
 
 import { cn } from '@/lib/utils'
 
+import { type AlertVariants, alertVariants } from '.'
+
 const props = defineProps<{
   class?: HTMLAttributes['class']
+  variant?: AlertVariants['variant']
 }>()
 </script>
 
 <template>
-  <span :class="cn('ml-auto text-xs tracking-widest opacity-60', props.class)">
+  <div :class="cn(alertVariants({ variant }), props.class)" role="alert">
     <slot />
-  </span>
+  </div>
 </template>

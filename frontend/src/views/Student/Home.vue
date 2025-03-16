@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { useArticleStore } from '@/stores/articles'
 import type { Article } from '@/types/article'
 
+import { getArticles } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import { Card } from '@/components/ui/card'
 import {

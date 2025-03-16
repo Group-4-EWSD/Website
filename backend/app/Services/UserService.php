@@ -55,11 +55,6 @@ class UserService
         return $this->userRepository->getUserById($id);
     }
 
-    // public function updateUserProfile($id, array $data)
-    // {
-    //     return $this->userRepository->updateUser($id, $data);
-    // }
-
     public function getTermsCondition()
     {
         $termsConditions = $this->userRepository->getTermsCondition();        

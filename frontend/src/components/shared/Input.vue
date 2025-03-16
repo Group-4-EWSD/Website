@@ -9,7 +9,7 @@ interface Props {
   type?: string
   name: string
   class?: string
-  errors?: Record<string, string | string[] | null>
+  errors?: Record<string, string | string[] | null | undefined>
 }
 
 const props = withDefaults(defineProps<Props>(), {

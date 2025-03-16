@@ -1,22 +1,12 @@
 import api from '@/api/axios'
-import type { Credentials, RegisterData } from '@/types/auth'
-import { useCookies } from 'vue3-cookies'
-
-export const handleAuthChange = (newToken: string) => {
-  const { cookies } = useCookies()
-  cookies.set('token', newToken)
-}
+import type { Credentials } from '@/types/auth'
 
 export const login = async (credentials: Credentials) => {
-  const formData = new FormData()
-
-  formData.append('email', credentials.email)
-  formData.append('password', credentials.password)
-
-  return await api.post(`login`, formData)
+  return await api.post(`login`, credentials)
 }
 
 export const logout = async () => {
+  console.log('logout api call')
   return await api.post(`logout`)
 }
 

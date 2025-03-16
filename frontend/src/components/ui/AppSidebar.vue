@@ -8,9 +8,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { forceSignOut } from '@/lib/utils'
 
 import Separator from './separator/Separator.vue'
-import { forceSignOut } from '@/lib/utils'
 
 const items = [
   {
@@ -52,7 +52,7 @@ const items = [
 
         <SidebarMenuItem :key="items[items.length - 1].title">
           <SidebarMenuButton as-child>
-            <button class="p-6" @click="forceSignOut">
+            <button class="p-6" @click="() => forceSignOut(true)">
               <LogOut />
               <span>Log out</span>
             </button>

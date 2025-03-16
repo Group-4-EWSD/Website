@@ -11,8 +11,10 @@ import { createComment, type actionParams } from '@/api/notification'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
+const userStore = useUserStore()
 
 const activeTab = ref('comments')
 const article = ref<ArticleResponse>({
@@ -32,6 +34,8 @@ const articlePhotos = ref<Record<string, string>>({
   '67cbf0b9c7b5d_Exercise Activity 4.jpg':
     'https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/documents/1741418681_victor shoes.jpg',
 })
+
+const params = ref<actionParams>()
 
 dayjs.extend(relativeTime)
 
@@ -59,16 +63,17 @@ const addComment = () => {
   if (newComment.value.trim()) {
     comments.value.push({
       id: Date.now(),
-      name: 'You',
+      name: userStore.user?.user_name,
       text: newComment.value,
       timestamp: dayjs().toISOString(),
     })
 
     try {
-      createComment({
-        actionId: null,
+      params.value = {
+        actionId: 'test',
         actionType: 2,
-      })
+      }
+      createComment(params.value)
     } catch (error) {
       console.error('Error updating notification:', error)
     }

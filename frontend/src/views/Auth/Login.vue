@@ -19,7 +19,6 @@ import type { User } from '@/types/user'
 
 const router = useRouter()
 const loading = ref(false)
-const userStore = useUserStore()
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Please enter your email'),

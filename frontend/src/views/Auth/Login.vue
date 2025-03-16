@@ -52,8 +52,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         const userStore = useUserStore()
         userStore.setUser(response.data.user)
 
-        let userRole = response.data.user.role
-        userRole = 'student'
+        const userRole = response.data.user.user_type_name
 
         // Role-based redirection
         switch (userRole) {

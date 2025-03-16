@@ -3,13 +3,14 @@ import { EyeIcon, HeartIcon } from 'lucide-vue-next'
 import { defineProps } from 'vue'
 
 import { Card } from '@/components/ui/card'
+import StatusIndicator from '@/components/shared/StatusIndicator.vue'
 
 interface Article {
   title: string
   date: string
   totalLikes: number
   totalViews: number
-  status: string
+  status: number
   description: string
   id: string | number
 }
@@ -42,9 +43,7 @@ const article = props.article
             <EyeIcon class="h-4 w-4" />
             <p class="text-sm">{{ article.totalViews }}</p>
           </div>
-          <div class="text-sm w-fit p-1 px-2 bg-secondary text-white rounded-md">
-            {{ article.status }}
-          </div>
+          <StatusIndicator :status="article.status" />
         </div>
       </div>
       <p v-if="article.description" class="text-sm mb-0">{{ article.description }}</p>

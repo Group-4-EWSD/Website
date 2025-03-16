@@ -97,7 +97,7 @@ const formatDate = (dateString: string): string => {
               totalLikes: 0, // need data from BE
               totalViews: 0, 
               date: formatDate(article.created_at),
-              status: myArticlesStore.statusText(article.status),
+              status: article.status,
             }"
           />
 

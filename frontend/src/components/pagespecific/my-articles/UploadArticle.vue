@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ErrorMessage, Field, useForm } from 'vee-validate'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 
@@ -17,11 +17,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useMyArticlesStore } from '@/stores/my-articles'
-import type { Category } from '@/types/article'
+import type { Category, Articles } from '@/types/article'
 
 interface UploadArticleSchema {
   title: string
@@ -31,10 +30,51 @@ interface UploadArticleSchema {
   files: File[]
 }
 
+const props = defineProps<{
+  article?: Articles
+  modelValue?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+}>()
+
 // Create refs to control the dialog and loading states
-const isOpen = ref(false)
+const isOpen = ref(props.modelValue || false)
 const isLoading = ref(false)
 const categories = ref<{label: string, value: string}[]>([])
+const isEditMode = ref(!!props.article)
+
+// Computed property to check if article is already submitted
+const isAlreadySubmitted = computed(() => {
+  return props.article && props.article.status !== undefined && props.article.status !== ArticleStatus.DRAFT;
+})
+
+// Watch for changes in isOpen and emit events
+watch(isOpen, (value) => {
+  emit('update:modelValue', value)
+})
+
+// Watch for changes in props.modelValue
+watch(() => props.modelValue, (value) => {
+  isOpen.value = value || false
+})
+
+// Watch for changes in props.article
+watch(() => props.article, (article) => {
+  isEditMode.value = !!article
+  if (article) {
+    setFieldValue('title', article.article_title || '')
+    setFieldValue('description', article.article_description || '')
+    setFieldValue('category', article.article_type_id || '')
+    setFieldValue('agreeToterm', true)
+    // Note: Existing files handling depends on your API structure
+    // This is a placeholder - you might need to adjust based on your actual data structure
+    // if (article.article_details && Array.isArray(article.article_details)) {
+    //   setFieldValue('files', article.article_details)
+    // }
+  }
+})
 
 const acceptedFileTypes = [
   'image/jpeg',
@@ -65,10 +105,10 @@ const { handleSubmit, errors, values, resetForm, setFieldValue } =
   useForm<UploadArticleSchema>({
     validationSchema,
     initialValues: {
-      title: '',
-      description: '',
-      category: '',
-      agreeToterm: false,
+      title: props.article?.article_title || '',
+      description: props.article?.article_description || '',
+      category: props.article?.article_type_id || '',
+      agreeToterm: !!props.article, // Pre-check for edit mode
       files: [],
     },
   })
@@ -81,20 +121,25 @@ const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
 
     // Map form values to API data structure
     const articleData = {
+      article_id: null as string | null,
       article_title: formValues.title,
       article_description: formValues.description,
       article_type_id: formValues.category,
-      status: ArticleStatus.SUBMITTED,
+      status: ArticleStatus.PENDING,
       article_details: formValues.files,
     }
 
-    // Submit the article using the API
+    // For both new articles and updates, use uploadArticle
+    // If in edit mode, add the article_id to update the existing record
+    if (isEditMode.value && props.article?.article_id) {
+      articleData.article_id = props.article.article_id
+    }
+
     await uploadArticle(articleData)
+    toast.success(isEditMode.value ? 'Article updated successfully' : 'Article submitted successfully')
 
-    const myArticlesStore = useMyArticlesStore();
+    const myArticlesStore = useMyArticlesStore()
     void myArticlesStore.fetchArticles(true)
-
-    toast.success('Article submitted successfully')
 
     // Close the dialog after successful submission
     isOpen.value = false
@@ -103,7 +148,7 @@ const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
     resetForm()
   } catch (error) {
     console.error('Error submitting article:', error)
-    toast.error('Failed to submit article. Please try again.')
+    toast.error(`Failed to ${isEditMode.value ? 'update' : 'submit'} article. Please try again.`)
   } finally {
     isLoading.value = false
   }
@@ -116,6 +161,7 @@ const saveAsDraft = async () => {
     isLoading.value = true
 
     const articleData = {
+      article_id: null as string | null,
       article_title: values.title,
       article_description: values.description,
       article_type_id: values.category,
@@ -123,12 +169,16 @@ const saveAsDraft = async () => {
       article_details: values.files,
     }
 
+    // Add article_id if editing an existing article
+    if (isEditMode.value && props.article?.article_id) {
+      articleData.article_id = props.article.article_id
+    }
+
     await uploadArticle(articleData)
+    toast.success(isEditMode.value ? 'Draft updated successfully' : 'Article saved as draft')
 
-    const myArticlesStore = useMyArticlesStore();
+    const myArticlesStore = useMyArticlesStore()
     void myArticlesStore.fetchArticles(true)
-
-    toast.success('Article saved as draft')
 
     // Close the dialog after saving
     isOpen.value = false
@@ -155,23 +205,27 @@ const handleFilesAdded = (files: File[]) => {
 }
 
 onMounted(async () => {
-  // const rawCategories = await getCategories();
-  // categories.value = rawCategories.map((category: Category) => ({
-  //   label: category.article_type_name,
-  //   value: category.article_type_id,
-  // }))
-  resetForm()
+  try {
+    const rawCategories = await getCategories()
+    categories.value = rawCategories.map((category: Category) => ({
+      label: category.article_type_name,
+      value: category.article_type_id,
+    }))
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    toast.error('Failed to load categories')
+  }
 })
 </script>
 
 <template>
   <Dialog v-model:open="isOpen">
-    <DialogTrigger as-child>
-      <Button class="uppercase w-full" @click="isOpen = true">Upload</Button>
-    </DialogTrigger>
+    <slot name="trigger">
+      <Button class="uppercase w-full" @click="isOpen = true">{{ isEditMode ? 'Edit' : 'Upload' }}</Button>
+    </slot>
     <DialogContent class="sm:max-w-[700px]">
       <DialogHeader>
-        <DialogTitle class="uppercase">Upload your article</DialogTitle>
+        <DialogTitle class="uppercase">{{ isEditMode ? 'Edit your article' : 'Upload your article' }}</DialogTitle>
       </DialogHeader>
       <form @submit.prevent="onSubmit" class="space-y-4 pt-5">
         <FormElement layout="row">
@@ -226,6 +280,7 @@ onMounted(async () => {
                 <Checkbox
                   :id="field.name"
                   :name="field.name"
+                  :checked="values.agreeToterm"
                   @update:modelValue="
                     (value) => {
                       setFieldValue('agreeToterm', Boolean(value), true)
@@ -243,14 +298,21 @@ onMounted(async () => {
         </FormElement>
       </form>
       <DialogFooter class="gap-2">
-        <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading"
-          >Cancel</Button
+        <Button type="button" variant="ghost" @click="closeModal" :disabled="isLoading">Cancel</Button>
+        
+        <!-- Only show Save as Draft button if the article is not already submitted -->
+        <Button 
+          v-if="!isAlreadySubmitted" 
+          type="button" 
+          variant="outline" 
+          @click="saveAsDraft" 
+          :disabled="isLoading"
         >
-        <Button type="button" variant="outline" @click="saveAsDraft" :disabled="isLoading">
-          {{ isLoading ? 'Saving...' : 'Save as draft' }}
+          {{ isLoading ? 'Saving...' : (isEditMode ? 'Update draft' : 'Save as draft') }}
         </Button>
+        
         <Button type="submit" @click="onSubmit" :disabled="isLoading">
-          {{ isLoading ? 'Submitting...' : 'Submit' }}
+          {{ isLoading ? 'Submitting...' : (isEditMode ? 'Update' : 'Submit') }}
         </Button>
       </DialogFooter>
     </DialogContent>

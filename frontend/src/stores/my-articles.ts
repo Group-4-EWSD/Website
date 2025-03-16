@@ -33,6 +33,7 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
         case 1: return 'Pending'
         case 2: return 'Approved'
         case 3: return 'Rejected'
+        case 4: return 'Published'
         default: return 'Unknown'
       }
     }

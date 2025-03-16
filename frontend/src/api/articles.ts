@@ -8,7 +8,10 @@ interface ArticlesResponse {
 
 export const ArticleStatus = {
   DRAFT: 0,
-  SUBMITTED: 1
+  PENDING: 1,
+  APPROVED: 2,
+  REJECTED: 3,
+  PUBLISHED: 4
 }
 
 export const getArticles = async (params: ArticleParams): Promise<ArticlesResponse> => {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { useUserStore } from '@/stores/user'
 
 import Input from '../input/Input.vue'
 
@@ -10,6 +11,7 @@ const isSearchActive = ref(false)
 const toggleSearch = () => {
   isSearchActive.value = !isSearchActive.value
 }
+const userStore = useUserStore()
 </script>
 
 <template>
@@ -69,12 +71,14 @@ const toggleSearch = () => {
       <!-- <div class="hidden sm:flex text-white font-medium">Welcome, Username</div> -->
 
       <div class="hidden sm:flex flex-col text-white font-medium">
-        <p>Welcome, Zarli</p>
-        <p class="text-sm text-gray-300">Engineering - Student</p>
+        <p>Welcome, {{ userStore.current_user?.user_name }}</p>
+        <p class="text-sm text-gray-300">
+          {{ userStore.current_user?.faculty_name }} - {{ userStore.current_user?.user_type_name }}
+        </p>
       </div>
 
       <img
-        src="@/assets/profile.png"
+        :src="userStore.current_user?.user_photo_path"
         alt="Profile"
         class="w-10 h-10 rounded-full border border-white hidden sm:flex"
       />

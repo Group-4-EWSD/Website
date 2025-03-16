@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Articles, CountData } from '@/types/article'
+import type { Article, CountData } from '@/types/article'
 import { getArticles } from '@/api/articles'
 
 export const useArticleStore = defineStore('article', () => {
   const countData = ref<CountData | null>(null)
-  const articles = ref<Articles[]>([])
+  const articles = ref<Article[]>([])
   const currentPage = ref<number>(1)
   const displayNumber = 5
   const isFetched = ref(false)
@@ -17,7 +17,7 @@ export const useArticleStore = defineStore('article', () => {
       const response = await getArticles({
         displayNumber,
         pageNumber: page,
-        status: 0,
+        status: 4,
       })
       countData.value = response.countData
       articles.value = response.allArticles

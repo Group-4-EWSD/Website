@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 import { ref, onMounted, watch } from 'vue'
 import { computed } from 'vue'
 import dayjs from 'dayjs'
 import { useArticleStore } from '@/stores/articles'
-import { getArticleDetails } from '@/api/articles'
+import type { Article } from '@/types/article'
 
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import { Card } from '@/components/ui/card'
@@ -35,7 +35,9 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const articleStore = useArticleStore()
-const { countData, currentPage, isFetched, fetchArticles, displayNumber } = articleStore
+const { fetchArticles, displayNumber } = articleStore
+
+const articles = ref<Article[]>([])
 
 const sortOptions = ref([
   { value: 'created asc', label: 'Newest First' },
@@ -44,7 +46,7 @@ const sortOptions = ref([
   { value: 'title-desc', label: 'Name (Z → A)' },
 ])
 
-const goToArticleDetails = (articleId: number) => {
+const goToArticleDetails = (articleId: string) => {
   router.push({ name: 'getArticleDetails', params: { id: articleId } })
 }
 
@@ -54,14 +56,17 @@ const sortBy = (option: string) => {
 }
 const isLoading = ref(true)
 
-const simulateLoading = () => {
-  setTimeout(() => {
-    isLoading.value = false
-  }, 3000) // Set the timeout duration as needed
-}
+// const simulateLoading = () => {
+//   setTimeout(() => {
+//     isLoading.value = false
+//   }, 3000) // Set the timeout duration as needed
+// }
 
-onMounted(() => {
-  simulateLoading()
+onMounted(async () => {
+  isLoading.value = true
+  await articleStore.fetchArticles(articleStore.currentPage)
+  articles.value = articleStore.articles
+  isLoading.value = false
 })
 
 watch(
@@ -70,7 +75,7 @@ watch(
     isLoading.value = true
     setTimeout(() => {
       isLoading.value = false
-    }, 3000)
+    }, 2000)
     fetchArticles(newPage)
   },
 )
@@ -81,71 +86,71 @@ const goToPage = (page: number) => {
   articleStore.currentPage = page
 }
 
-const articles = [
-  {
-    article_id: 1,
-    article_title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
-    description:
-      'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
-    author: 'Zar Li',
-    created_at: '15 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-  },
-  {
-    article_id: 2,
-    article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    created_at: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    article_id: 3,
-    article_title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    created_at: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    article_id: 4,
-    article_title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    created_at: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  {
-    article_id: 5,
-    article_title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
-    description:
-      'The rise of artificial intelligence has sparked numerous debates across various fields...',
-    author: 'Swe Thu Htet',
-    created_at: '05 Jan 2025',
-    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  },
-  // {
-  //   article_id: 6,
-  //   article_title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
-  //   description:
-  //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
-  //   author: 'Swe Thu Htet',
-  //   created_at: '05 Jan 2025',
-  //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  // },
-  // {
-  //   article_id: 7,
-  //   article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-  //   description:
-  //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
-  //   author: 'Swe Thu Htet',
-  //   created_at: '05 Jan 2025',
-  //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  // },
-]
+// const articles = [
+//   {
+//     article_id: 1,
+//     article_title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
+//     description:
+//       'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
+//     author: 'Zar Li',
+//     created_at: '15 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+//   },
+//   {
+//     article_id: 2,
+//     article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     created_at: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     article_id: 3,
+//     article_title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     created_at: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     article_id: 4,
+//     article_title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     created_at: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   {
+//     article_id: 5,
+//     article_title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
+//     description:
+//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//     author: 'Swe Thu Htet',
+//     created_at: '05 Jan 2025',
+//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   },
+//   // {
+//   //   article_id: 6,
+//   //   article_title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
+//   //   description:
+//   //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//   //   author: 'Swe Thu Htet',
+//   //   created_at: '05 Jan 2025',
+//   //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   // },
+//   // {
+//   //   article_id: 7,
+//   //   article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
+//   //   description:
+//   //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
+//   //   author: 'Swe Thu Htet',
+//   //   created_at: '05 Jan 2025',
+//   //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+//   // },
+// ]
 </script>
 
 <template>
@@ -161,7 +166,8 @@ const articles = [
           </div>
           <div>
             <p class="text-4xl font-bold text-blue-500 py-2">
-              {{ countData?.reactCount }} <span class="text-primary text-3xl"> Likes</span>
+              {{ articleStore.countData?.reactCount || '0' }}
+              <span class="text-primary text-3xl"> Likes</span>
             </p>
             <p class="text-sm text-muted-foreground">Up to 10% from Last Week</p>
           </div>
@@ -171,7 +177,9 @@ const articles = [
             <h2 class="text-lg uppercase">Uploaded Articles</h2>
           </div>
           <div>
-            <p class="text-4xl font-bold py-2">{{ countData?.currentYearArticleCount }}</p>
+            <p class="text-4xl font-bold py-2">
+              {{ articleStore.countData?.currentYearArticleCount || '0' }}
+            </p>
             <p class="text-sm text-muted-foreground">Articles for this year</p>
           </div>
         </Card>
@@ -181,7 +189,9 @@ const articles = [
             <component :is="Eye" />
           </div>
           <div>
-            <p class="text-4xl font-bold py-2">{{ countData?.totalViewCount }}</p>
+            <p class="text-4xl font-bold py-2">
+              {{ articleStore.countData?.totalViewCount || '0' }}
+            </p>
             <p class="text-sm text-muted-foreground">75% total numbers of views</p>
           </div>
         </Card>
@@ -219,19 +229,22 @@ const articles = [
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
         <!-- <div class="flex flex-col gap-3"> -->
         <div class="max-h-[400px] overflow-y-auto">
-          <Table class="w-full">
+          <div v-if="!articleStore.articles">
+            <p>No articles found.</p>
+          </div>
+          <Table v-else class="w-full">
             <TableBody>
               <TableRow
                 v-if="!isLoading"
-                v-for="article in articles.slice(0, 6)"
+                v-for="article in articleStore.articles.slice(0, 6)"
                 :key="article.article_id"
                 class="border-b hover:bg-gray-50 transition-all cursor-pointer"
-                @click="goToArticleDetails(article.article_id)"
+                @click="goToArticleDetails(article.article_id || '')"
               >
                 <TableCell>
                   <div class="flex items-center gap-4">
                     <img
-                      src="@/assets/profile.png"
+                      :src="article.user_photo_path"
                       class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white"
                     />
                     <div class="flex-1">
@@ -270,7 +283,7 @@ const articles = [
               :total="24"
               :sibling-count="1"
               show-edges
-              :default-page="currentPage"
+              :default-page="articleStore.currentPage"
               @update:page="goToPage"
             >
               <PaginationList v-slot="{ items }" class="flex items-center gap-1">

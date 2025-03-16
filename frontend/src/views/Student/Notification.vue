@@ -4,14 +4,12 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 import Layout from '@/components/ui/Layout.vue'
 import { onMounted, ref } from 'vue'
-import type { NotificationList } from '@/types/notification'
 import { useNotificationsStore } from '@/stores/notification'
 
 dayjs.extend(relativeTime)
 
 const notificationsStore = useNotificationsStore()
 
-const notifications = ref<NotificationList>([])
 // notifications.value = [
 //   {
 //     notification_id: 1,
@@ -52,9 +50,7 @@ const notifications = ref<NotificationList>([])
 // ]
 
 onMounted(() => {
-  if (!notificationsStore.notifications) {
-    notificationsStore.fetchNotification()
-  }
+  notificationsStore.fetchNotification()
 })
 
 const handleNotificationClick = (notification: any) => {
@@ -72,7 +68,7 @@ const handleNotificationClick = (notification: any) => {
       <div class="space-y-4">
         <RouterLink
           v-for="notification in notificationsStore.notifications"
-          :key="notification.notification_id"
+          :key="notification.action_id"
           :to="`/articles/${notification.article_id}`"
           class="block"
           @click="handleNotificationClick(notification)"
@@ -81,7 +77,7 @@ const handleNotificationClick = (notification: any) => {
             class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all cursor-pointer"
           >
             <img
-              src="@/assets/profile.png"
+              :src="notification.user_photo_path"
               alt="Profile Image"
               class="w-12 h-12 rounded-full border mr-4"
             />
@@ -90,8 +86,8 @@ const handleNotificationClick = (notification: any) => {
               <!-- Left side -->
               <div>
                 <div class="text-lg font-semibold text-gray-800">
-                  From {{ notification.name }} ({{ notification.role }} -
-                  {{ notification.faculty }})
+                  From {{ notification.user_name }} ({{ notification.user_type_name }} -
+                  {{ notification.faculty_name }})
                 </div>
                 <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
               </div>
@@ -105,7 +101,7 @@ const handleNotificationClick = (notification: any) => {
                 <div class="flex-grow"></div>
 
                 <span class="text-xs text-gray-500">
-                  {{ dayjs(notification.dateTime).fromNow() }}
+                  {{ dayjs(notification.created_at).fromNow() }}
                 </span>
               </div>
             </div>

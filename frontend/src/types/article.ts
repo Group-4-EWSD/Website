@@ -7,7 +7,12 @@ export interface ArticleParams {
   status?: number
 }
 
-export interface Articles {
+export type ArticleList = {
+  countData: CountData
+  allArticles: Article[]
+}
+
+export interface Article {
   article_id: string
   article_title: string
   user_id: string

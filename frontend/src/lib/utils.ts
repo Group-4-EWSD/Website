@@ -24,7 +24,7 @@ export async function forceSignOut() {
   const { cookies } = useCookies()
   cookies.keys().forEach((element) => {
     console.log('element', element)
-    cookies.remove(element)
+    cookies.remove('token')
   })
 
   // Redirect to login

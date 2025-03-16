@@ -55,17 +55,20 @@ dayjs.extend(relativeTime)
 //   },
 // ])
 
-const addComment = (params: actionParams) => {
+const addComment = () => {
   if (newComment.value.trim()) {
     comments.value.push({
       id: Date.now(),
-      name: 'You', // to get from username of userData
+      name: 'You',
       text: newComment.value,
       timestamp: dayjs().toISOString(),
     })
 
     try {
-      createComment(params)
+      createComment({
+        actionId: null,
+        actionType: 2,
+      })
     } catch (error) {
       console.error('Error updating notification:', error)
     }
@@ -77,31 +80,11 @@ const fetchArticleDetails = async (articleId: string) => {
   try {
     const response = await getArticleDetails(articleId)
     article.value = response.data
-    // article.value = {
-    //   articleDetail: {
-    //     article_title: 'Exercise Activity 4',
-    //     article_description: 'Description of exercise activity.',
-    //     created_at: '2025-03-08T07:24:41.000000Z',
-    //     updated_at: '2025-03-08T07:24:41.000000Z',
-    //     creator_name: 'Bob Smith',
-    //     creator_gender: 1,
-    //     article_status: 0,
-    //     view_count: 42,
-    //     like_count: 18,
-    //     current_user_react: 0,
-    //     comment_count: 0,
-    //   },
-    //   articleContent: [],
-    //   articlePhotos: {
-    //     '67cbf0b9c7b5d_Exercise Activity 4.jpg':
-    //       'https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/documents/1741418681_victor shoes.jpg',
-    //   },
-    //   commentList: [],
-    //   feedbackList: [],
-    // }
+
     articleContent.value = article.value.articleContent
     articlePhotos.value = article.value.articlePhotos
     comments.value = article.value.commentList
+
     authorizedFeedbacks.value = article.value.feedbackList.length > 0 ? true : false
   } catch (error) {
     console.error('Error fetching article details:', error)
@@ -113,8 +96,8 @@ const updateLike = () => {
 }
 
 onMounted(() => {
-  const articleId = route.params.id
-  fetchArticleDetails(articleId[0])
+  const articleId = route.params.id as string
+  fetchArticleDetails(articleId)
 })
 </script>
 
@@ -208,7 +191,7 @@ onMounted(() => {
                     v-model="newComment"
                     placeholder="Write a comment..."
                     class="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
-                    @keydown.enter="addComment"
+                    @keydown.enter="addComment()"
                   />
                   <Button
                     @click="addComment"

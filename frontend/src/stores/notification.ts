@@ -13,13 +13,14 @@ export const useNotificationsStore = defineStore('notifications', {
     async fetchNotification() {
       try {
         const response = await getNotifications()
+        console.log(response.data)
         this.notifications = response.data
       } catch (error) {
         console.error('Error fetching articles:', error)
       }
     },
-    changeNotiSeen(notificationId: number) {
-      const noti = this.notifications.find((n) => n.notification_id === notificationId)
+    changeNotiSeen(action_id: string) {
+      const noti = this.notifications.find((n) => n.action_id === action_id)
       if (noti) {
         noti.seen = 1
 

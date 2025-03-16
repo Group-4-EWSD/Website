@@ -14,10 +14,12 @@ import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import type { Credentials } from '@/types/auth'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const { cookies } = useCookies()
 const loading = ref(false)
+const userStore = useUserStore()
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Please enter your email'),
@@ -46,26 +48,25 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       if (!response.data) {
         toast.error('Invalid credentials')
       } else {
-        cookies.set('token', response.data.token)
+        cookies.set('token', response.data.token, '7d')
         // handleAuthChange(response.data.token)
-        let userRole = response.data.user.role
-        userRole = 'student'
-
+        const userRole: string = response.data.user.user_type_name
+        userStore.set_current_user(response.data.user)
         // Role-based redirection
         switch (userRole) {
-          case 'student':
+          case 'Student':
             router.push('/student/home')
             break
-          case 'guest':
+          case 'Guest':
             router.push('/guest/home')
             break
-          case 'coordinator':
+          case 'Marketing Coordinator':
             router.push('/coordinator/dashboard')
             break
-          case 'admin':
+          case 'Admin':
             router.push('/admin/dashboard')
             break
-          case 'manager':
+          case 'Marketing Manager':
             router.push('/manager/dashboard')
             break
           default:

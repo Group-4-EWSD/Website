@@ -39,6 +39,8 @@ class actionRepository extends BaseRepository
         $article = Article::select([
                 'articles.article_title',
                 'articles.article_description',
+                'at.article_type_id',
+                'at.article_type_name',
                 'articles.created_at',
                 'articles.updated_at',
                 'users.user_name as creator_name',
@@ -50,6 +52,7 @@ class actionRepository extends BaseRepository
                 DB::raw("(SELECT COUNT(*) FROM comments WHERE article_id = '$articleId') AS comment_count")
             ])
             ->leftJoin('users', 'users.id', '=', 'articles.user_id')
+            ->leftJoin('article_types as at', 'at.article_type_id', '=', 'articles.article_type_id')
             ->where('articles.article_id', '=', $articleId)
             ->first();
         return $article;

@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-photo', [UserController::class, 'updateUserPhoto']);
         Route::get('/get-photo', [UserController::class, 'getUserPhoto']);
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
-        Route::patch('/edit-detail', [UserController::class, 'updateProfile']);
+        Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
     Route::post('/logout', [UserController::class, 'logout']);

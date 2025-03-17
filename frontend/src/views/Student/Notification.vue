@@ -5,52 +5,14 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import Layout from '@/components/ui/Layout.vue'
 import { onMounted, ref } from 'vue'
 import { useNotificationsStore } from '@/stores/notification'
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 
 dayjs.extend(relativeTime)
 
 const notificationsStore = useNotificationsStore()
 
-// notifications.value = [
-//   {
-//     notification_id: 1,
-//     article_id: 1,
-//     name: 'Jean Philippe A.',
-//     role: 'Student',
-//     faculty: 'Art & Science',
-//     message:
-//       'Hey, just wanted to remind you about the upcoming project submission deadline. Let me know if you have any questions!',
-//     profileImg: '@/assets/profile.png',
-//     seen: 1,
-//     dateTime: '2025-03-01 14:30',
-//   },
-//   {
-//     notification_id: 2,
-//     article_id: 2,
-//     name: 'Emily Clark',
-//     role: 'Coordinator',
-//     faculty: 'Computer Science',
-//     message:
-//       'Your research paper has been reviewed. Please check the feedback provided in the document.',
-//     profileImg: '',
-//     seen: 0,
-//     dateTime: '2025-03-01 15:45',
-//   },
-//   {
-//     notification_id: 3,
-//     article_id: 2,
-//     name: 'Emily Clark',
-//     role: 'Coordinator',
-//     faculty: 'Computer Science',
-//     message:
-//       'Your research paper has been reviewed. Please check the feedback provided in the document.',
-//     seen: 1,
-//     profileImg: '',
-//     dateTime: '2025-03-01 15:45',
-//   },
-// ]
-
 onMounted(() => {
-  notificationsStore.fetchNotification()
+  if (!notificationsStore.notifications.length) notificationsStore.fetchNotification()
 })
 
 const handleNotificationClick = (notification: any) => {
@@ -66,47 +28,71 @@ const handleNotificationClick = (notification: any) => {
 
       <!-- Notification Cards -->
       <div class="space-y-4">
-        <RouterLink
-          v-for="notification in notificationsStore.notifications"
-          :key="notification.action_id"
-          :to="`/articles/${notification.article_id}`"
-          class="block"
-          @click="handleNotificationClick(notification)"
-        >
+        <template v-if="notificationsStore.isLoading">
           <div
-            class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all cursor-pointer"
+            v-for="n in 5"
+            :key="n"
+            class="flex items-start p-4 border rounded-lg shadow-md bg-white"
           >
-            <img
-              :src="notification.user_photo_path"
-              alt="Profile Image"
-              class="w-12 h-12 rounded-full border mr-4"
-            />
+            <Skeleton class="w-12 h-12 rounded-full" />
 
-            <div class="flex-1 flex justify-between">
-              <!-- Left side -->
-              <div>
-                <div class="text-lg font-semibold text-gray-800">
-                  From {{ notification.user_name }} ({{ notification.user_type_name }} -
-                  {{ notification.faculty_name }})
-                </div>
-                <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
+            <div class="flex-1 flex justify-between ml-4">
+              <div class="space-y-2">
+                <Skeleton class="h-5 w-48 rounded" />
+
+                <Skeleton class="h-4 w-64 rounded" />
               </div>
 
-              <!-- Right side -->
-              <div class="flex flex-col items-end ml-4 flex-shrink-0 relative">
-                <span
-                  v-if="!notification.seen"
-                  class="absolute top-[-8px] right-0 w-3 h-3 bg-red-500 rounded-full"
-                ></span>
-                <div class="flex-grow"></div>
-
-                <span class="text-xs text-gray-500">
-                  {{ dayjs(notification.created_at).fromNow() }}
-                </span>
+              <div class="flex flex-col items-end ml-4 flex-shrink-0">
+                <Skeleton class="h-3 w-16 rounded" />
               </div>
             </div>
           </div>
-        </RouterLink>
+        </template>
+        <template v-else>
+          <RouterLink
+            v-for="notification in notificationsStore.notifications"
+            :key="notification.action_id"
+            :to="`/articles/${notification.article_id}`"
+            class="block"
+            @click="handleNotificationClick(notification)"
+          >
+            <div
+              class="flex items-start p-4 border rounded-lg shadow-md bg-white hover:bg-gray-50 transition-all cursor-pointer"
+            >
+              <img
+                :src="notification.user_photo_path"
+                alt="Profile Image"
+                class="w-12 h-12 rounded-full border mr-4"
+              />
+
+              <div class="flex-1 flex justify-between">
+                <!-- Left side -->
+                <div>
+                  <div class="text-lg font-semibold text-gray-800">
+                    From {{ notification.user_name }} ({{ notification.user_type_name }} -
+                    {{ notification.faculty_name }})
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
+                </div>
+
+                <!-- Right side -->
+                <div class="flex flex-col items-end ml-4 flex-shrink-0 relative">
+                  <div v-if="!notification.seen">
+                    <span
+                      class="absolute top-[-8px] right-0 w-3 h-3 bg-red-500 rounded-full"
+                    ></span>
+                    <div class="flex-grow"></div>
+                  </div>
+
+                  <span class="text-xs text-gray-500">
+                    {{ dayjs(notification.created_at).fromNow() }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </RouterLink>
+        </template>
       </div>
     </div>
   </Layout>

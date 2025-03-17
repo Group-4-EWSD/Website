@@ -39,6 +39,9 @@ const articleStore = useArticleStore()
 const { fetchArticles, displayNumber } = articleStore
 
 const articles = ref<Article[]>([])
+const selectedCategory = ref('all')
+const selectedYear = ref('all')
+const sortedValue = ref('created asc')
 
 const sortOptions = ref([
   { value: 'created asc', label: 'Newest First' },
@@ -52,106 +55,32 @@ const goToArticleDetails = (articleId: string) => {
 }
 
 const sortBy = (option: string) => {
+  sortedValue.value = option
   articleStore.sortOption = option
   console.log('Sorting by:', option)
 }
-const isLoading = ref(true)
 
-// const simulateLoading = () => {
-//   setTimeout(() => {
-//     isLoading.value = false
-//   }, 3000) // Set the timeout duration as needed
-// }
-
-onMounted(async () => {
-  isLoading.value = true
-  await articleStore.fetchArticles(articleStore.currentPage)
-  articles.value = articleStore.articles
-  isLoading.value = false
+onMounted(() => {
+  if (!articleStore.articles.length) {
+    articleStore.fetchArticles(articleStore.currentPage)
+  }
 })
 
-watch(
-  () => articleStore.currentPage,
-  (newPage) => {
-    isLoading.value = true
-    setTimeout(() => {
-      isLoading.value = false
-    }, 2000)
-    fetchArticles(newPage)
-  },
-)
+watch([() => articleStore.currentPage, () => sortedValue.value], ([newPage, newSort]) => {
+  articleStore.fetchArticles(newPage)
+})
 
-// const isLoading = computed(() => !articleStore.isFetched)
+const updateCategory = (newCategory: string) => {
+  selectedCategory.value = newCategory
+}
+
+const updateYear = (newYear: string) => {
+  selectedYear.value = newYear
+}
 
 const goToPage = (page: number) => {
   articleStore.currentPage = page
 }
-
-// const articles = [
-//   {
-//     article_id: 1,
-//     article_title: 'ARTICLES 1.1 - The Power of Picture by Zar Li',
-//     description:
-//       'Eight months after the Civil War began, in December 1861, Frederick Douglass spoke at Boston’s Tremont...',
-//     author: 'Zar Li',
-//     created_at: '15 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-//   },
-//   {
-//     article_id: 2,
-//     article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     created_at: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     article_id: 3,
-//     article_title: 'ARTICLES 3.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     created_at: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     article_id: 4,
-//     article_title: 'ARTICLES 4.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     created_at: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   {
-//     article_id: 5,
-//     article_title: 'ARTICLES 5.1 - Will AI replace the Arts? by Swe Thu Htet',
-//     description:
-//       'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//     author: 'Swe Thu Htet',
-//     created_at: '05 Jan 2025',
-//     avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   },
-//   // {
-//   //   article_id: 6,
-//   //   article_title: 'ARTICLES 6.1 - Will AI replace the Arts? by Swe Thu Htet',
-//   //   description:
-//   //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//   //   author: 'Swe Thu Htet',
-//   //   created_at: '05 Jan 2025',
-//   //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   // },
-//   // {
-//   //   article_id: 7,
-//   //   article_title: 'ARTICLES 2.2 - Will AI replace the Arts? by Swe Thu Htet',
-//   //   description:
-//   //     'The rise of artificial intelligence has sparked numerous debates across various fields...',
-//   //   author: 'Swe Thu Htet',
-//   //   created_at: '05 Jan 2025',
-//   //   avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-//   // },
-// ]
 </script>
 
 <template>
@@ -202,7 +131,12 @@ const goToPage = (page: number) => {
         <h3 class="font-semibold uppercase">AURORA's magazine articles</h3>
         <div class="flex gap-3 text-gray-600 pr-[10px] relative">
           <!-- Filter -->
-          <FilterModal />
+          <FilterModal
+            :selected-category="selectedCategory"
+            :selected-year="selectedYear"
+            @update:selectedCategory="updateCategory"
+            @update:selectedYear="updateYear"
+          />
 
           <!-- Sorting -->
           <DropdownMenu>
@@ -228,7 +162,6 @@ const goToPage = (page: number) => {
         </div>
       </div>
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
-        <!-- <div class="flex flex-col gap-3"> -->
         <div class="max-h-[400px] overflow-y-auto">
           <div v-if="!articleStore.articles">
             <p>No articles found.</p>
@@ -236,7 +169,7 @@ const goToPage = (page: number) => {
           <Table v-else class="w-full">
             <TableBody>
               <TableRow
-                v-if="!isLoading"
+                v-if="!articleStore.isLoading"
                 v-for="article in articleStore.articles.slice(0, 6)"
                 :key="article.article_id"
                 class="border-b hover:bg-gray-50 transition-all cursor-pointer"
@@ -250,7 +183,7 @@ const goToPage = (page: number) => {
                     />
                     <div class="flex-1">
                       <router-link
-                        :to="{ name: 'getArticleDetails', params: { id: article.article_id } }"
+                        :to="`/articles/${article.article_id}`"
                         class="text-blue-600 font-semibold hover:underline py-1"
                       >
                         {{ article.article_title }}

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { FilterX } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
-import Select from '@/components/shared/Select.vue'
+import { Select, SelectContent, SelectTrigger, SelectItem } from '@/components/ui/select'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,16 +15,55 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 
-const selectedCategory = ref('all')
-const selectedYear = ref('all')
+const props = defineProps<{
+  selectedCategory: string
+  selectedYear: string
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:selectedCategory', value: string): void
+  (e: 'update:selectedYear', value: string): void
+}>()
+
+const localCategory = ref(props.selectedCategory)
+const localYear = ref(props.selectedYear)
+
+// Watch for local changes and emit events to the parent
+watch(localCategory, (newVal) => {
+  emit('update:selectedCategory', newVal)
+})
+
+watch(localYear, (newVal) => {
+  emit('update:selectedYear', newVal)
+})
+
+const categoryOptions = [
+  { label: 'All', value: 'all' },
+  { label: 'Mathematics', value: 'mathematics' },
+  { label: 'Physics', value: 'physics' },
+  { label: 'Chemistry', value: 'chemistry' },
+]
+
+const yearOptions = [
+  { label: 'All', value: 'all' },
+  { label: '2025', value: '2025' },
+  { label: '2024', value: '2024' },
+  { label: '2023', value: '2023' },
+  { label: '2022', value: '2022' },
+]
+
+const getLabel = (value: string) => {
+  const found = categoryOptions.find((option) => option.value === value)
+  return found ? found.label : ''
+}
 
 const applyFilter = () => {
-  console.log('Applying filter:', { category: selectedCategory.value, date: selectedYear.value })
+  console.log('Applying filter:', { category: localCategory.value, date: localYear.value })
 }
 
 const resetFilters = () => {
-  selectedCategory.value = 'all'
-  selectedYear.value = 'all'
+  localCategory.value = 'all'
+  localYear.value = 'all'
 }
 </script>
 
@@ -49,36 +88,39 @@ const resetFilters = () => {
               <label for="category" class="block text-sm font-medium text-gray-700 mb-2"
                 >Category</label
               >
-              <Select
-                name="category"
-                id="category"
-                v-model="selectedCategory"
-                class="w-full p-2 border rounded-md"
-                :options="[
-                  { label: 'All', value: 'all' },
-                  { label: 'Mathematics', value: 'mathematics' },
-                  { label: 'Physics', value: 'physics' },
-                  { label: 'Chemistry', value: 'chemistry' },
-                ]"
-              >
+              <Select v-model="localCategory">
+                <SelectTrigger class="w-full p-2 border rounded-md">
+                  {{
+                    selectedCategory !== 'all' ? getLabel(selectedCategory) : 'Select a category'
+                  }}
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="option in categoryOptions"
+                    :key="option.value"
+                    :value="option.value"
+                  >
+                    {{ option.label }}
+                  </SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
             <div>
               <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Year</label>
-              <Select
-                name="year"
-                id="year"
-                v-model="selectedYear"
-                class="w-full p-2 border rounded-md"
-                :options="[
-                  { label: 'All', value: 'all' },
-                  { label: '2025', value: '2025' },
-                  { label: '2024', value: '2024' },
-                  { label: '2023', value: '2023' },
-                  { label: '2022', value: '2022' },
-                ]"
-              >
+              <Select v-model="localYear">
+                <SelectTrigger class="w-full p-2 border rounded-md">
+                  {{ selectedYear !== 'all' ? selectedYear : 'Select a year' }}
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="option in yearOptions"
+                    :key="option.value"
+                    :value="option.value"
+                  >
+                    {{ option.label }}
+                  </SelectItem>
+                </SelectContent>
               </Select>
             </div>
           </div>

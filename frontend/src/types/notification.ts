@@ -1,5 +1,3 @@
-export type NotificationList = Notification[]
-
 export interface Notification {
   action_id: string
   action_type: string

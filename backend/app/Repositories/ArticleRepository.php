@@ -102,11 +102,11 @@ class ArticleRepository
                     'art.article_title',
                     'art.article_description',
                     'art.user_id',
+                    'at.article_type_id',
                     'at.article_type_name',
                     'u.user_name',
                     DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
-                    'art.submission_date',
                     'art.created_at',
                     'art.updated_at',
                     DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path"),
@@ -204,13 +204,15 @@ class ArticleRepository
         }        
 
         // Apply LIMIT only if `displayNumber` is set
-        if ($request->displayNumber > 0) {
-            $articles->limit($request->displayNumber);
+        if(!empty($request->displayNumber)){
+            if ($request->displayNumber > 0) {
+                $articles->limit($request->displayNumber);
 
-            // Apply OFFSET only if `pageNumber` > 1
-            if ($request->pageNumber > 1) {
-                $offset = ($request->pageNumber - 1) * $request->displayNumber;
-                $articles->offset($offset);
+                // Apply OFFSET only if `pageNumber` > 1
+                if ($request->pageNumber > 1) {
+                    $offset = ($request->pageNumber - 1) * $request->displayNumber;
+                    $articles->offset($offset);
+                }
             }
         }
         return $articles;

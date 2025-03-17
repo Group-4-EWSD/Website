@@ -142,7 +142,7 @@ class ArticleService
     }
 
     public function draftArticleList($userId){
-        return $this->articleRepository->getAllArticles(2, $userId);
+        return $this->articleRepository->getAllArticles(2, $userId)->get();
     }
 
     public function getFileList($articleId){

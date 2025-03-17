@@ -71,14 +71,14 @@ const userStore = useUserStore()
       <!-- <div class="hidden sm:flex text-white font-medium">Welcome, Username</div> -->
 
       <div class="hidden sm:flex flex-col text-white font-medium">
-        <p>Welcome, {{ userStore.current_user?.user_name }}</p>
+        <p>Welcome, {{ userStore.currentUser?.user_name }}</p>
         <p class="text-sm text-gray-300">
-          {{ userStore.current_user?.faculty_name }} - {{ userStore.current_user?.user_type_name }}
+          {{ userStore.currentUser?.faculty_name }} - {{ userStore.currentUser?.user_type_name }}
         </p>
       </div>
 
       <img
-        :src="userStore.current_user?.user_photo_path"
+        :src="userStore.currentUser?.user_photo_path"
         alt="Profile"
         class="w-10 h-10 rounded-full border border-white hidden sm:flex"
       />

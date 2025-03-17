@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { setCookie } from '@/lib/utils'
 import type { Credentials } from '@/types/auth'
 import { useUserStore } from '@/stores/user'
+import type { User } from '@/types/user'
 
 const router = useRouter()
 const loading = ref(false)
@@ -50,10 +51,11 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         setCookie('token', response.data.token)
 
         const userStore = useUserStore()
-        userStore.setUser(response.data.user)
 
-        let userRole = response.data.user.role
-        userRole = 'student'
+        const user = response.data.user as User;
+        userStore.setUser(user)
+
+        let userRole = user.user_type_name
 
         // Role-based redirection
         switch (userRole) {

@@ -154,11 +154,13 @@ class UserController extends Controller
             'phone_number' => 'sometimes|string|max:20', 
         ]);
 
+        // echo string($data);
+
         $updatedUser = $this->userService->updateUserProfile($userId, $data);
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user' => $updatedUser
+            'user' => $data
         ], 200);
     }
 

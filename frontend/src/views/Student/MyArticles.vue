@@ -10,6 +10,16 @@ import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useMyArticlesStore } from '@/stores/my-articles'
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+} from '@/components/ui/pagination'
 
 const myArticlesStore = useMyArticlesStore()
 
@@ -45,16 +55,34 @@ const formatDate = (dateString: string): string => {
           <div class="flex flex-col gap-3">
             <h2 class="font-semibold">Pre Upload Deadline</h2>
 
-            <Skeleton v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="w-20 h-5" />
-            <p v-if="myArticlesStore.preUploadDeadline">{{ myArticlesStore.preUploadDeadline ? formatDate(myArticlesStore.preUploadDeadline) : '' }}</p>
+            <Skeleton
+              v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded"
+              class="w-20 h-5"
+            />
+            <p v-if="myArticlesStore.preUploadDeadline">
+              {{
+                myArticlesStore.preUploadDeadline
+                  ? formatDate(myArticlesStore.preUploadDeadline)
+                  : ''
+              }}
+            </p>
           </div>
         </Card>
         <Card class="p-5 flex flex-row gap-5 items-center">
           <CalendarDays class="h-14 w-14 text-destructive" />
           <div class="flex flex-col gap-3">
             <h2 class="font-semibold">Actual Deadline</h2>
-            <Skeleton v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="w-20 h-5" />
-            <p v-if="myArticlesStore.preUploadDeadline">{{ myArticlesStore.actualUploadDeadline ? formatDate(myArticlesStore.actualUploadDeadline) : '' }}</p>
+            <Skeleton
+              v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded"
+              class="w-20 h-5"
+            />
+            <p v-if="myArticlesStore.preUploadDeadline">
+              {{
+                myArticlesStore.actualUploadDeadline
+                  ? formatDate(myArticlesStore.actualUploadDeadline)
+                  : ''
+              }}
+            </p>
           </div>
         </Card>
       </div>
@@ -64,13 +92,17 @@ const formatDate = (dateString: string): string => {
 
         <div v-if="myArticlesStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
           {{ myArticlesStore.error }}
-          <Button variant="outline" size="sm" class="ml-2" @click="myArticlesStore.fetchArticles(true)">
+          <Button
+            variant="outline"
+            size="sm"
+            class="ml-2"
+            @click="myArticlesStore.fetchArticles(true)"
+          >
             Try Again
           </Button>
         </div>
 
-        <LatestArticles v-else/>
-
+        <LatestArticles v-else />
       </div>
 
       <div class="flex flex-col gap-3" v-if="!myArticlesStore.error">
@@ -82,7 +114,10 @@ const formatDate = (dateString: string): string => {
           <Skeleton v-for="i in 3" :key="i" class="h-36 w-full rounded-lg" />
         </div>
 
-        <div v-else-if="myArticlesStore.articles.length === 0" class="p-8 text-center bg-gray-50 rounded-lg">
+        <div
+          v-else-if="myArticlesStore.articles.length === 0"
+          class="p-8 text-center bg-gray-50 rounded-lg"
+        >
           <p class="text-gray-500">No articles found.</p>
         </div>
 
@@ -94,8 +129,8 @@ const formatDate = (dateString: string): string => {
               id: article.article_id,
               title: article.article_title,
               description: article.article_description,
-              totalLikes: 0, // need data from BE
-              totalViews: 0, 
+              totalLikes: article.react_count,
+              totalViews: article.view_count,
               date: formatDate(article.created_at),
               status: article.status,
             }"
@@ -107,6 +142,35 @@ const formatDate = (dateString: string): string => {
             :total-pages="myArticlesStore.totalPages"
             @page-change="myArticlesStore.setPage"
           /> -->
+
+          <Pagination
+            v-if="myArticlesStore.totalPages > 1"
+            :items-per-page="10"
+            :total="myArticlesStore.totalPages"
+            :sibling-count="1"
+            show-edges
+            :default-page="myArticlesStore.currentPage"
+            @update:page="myArticlesStore.setPage"
+          >
+            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+              <PaginationFirst />
+              <PaginationPrev />
+              <template v-for="(item, index) in items" :key="index">
+                <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+                  <Button
+                    class="w-10 h-10 p-0"
+                    :variant="item.value === myArticlesStore.currentPage ? 'default' : 'outline'"
+                    @click="myArticlesStore.setPage(item.value)"
+                  >
+                    {{ item.value }}
+                  </Button>
+                </PaginationListItem>
+                <PaginationEllipsis v-else />
+              </template>
+              <PaginationNext />
+              <PaginationLast />
+            </PaginationList>
+          </Pagination>
         </div>
       </div>
     </div>

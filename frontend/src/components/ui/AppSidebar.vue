@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Bell, FileText, Home, LogOut, Settings } from 'lucide-vue-next'
+import { BadgeHelp, Bell, CircleGauge, FileText, Home, LogOut, Settings } from 'lucide-vue-next'
 
 import {
   Sidebar,
@@ -8,32 +8,75 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import Button from './button/Button.vue'
 import { forceSignOut } from '@/lib/utils'
 
 import Separator from './separator/Separator.vue'
+import { useUserStore } from '@/stores/user'
+import { ref } from 'vue'
 
-const items = [
-  {
-    title: 'Home',
-    url: '/student/home',
-    icon: Home,
-  },
-  {
-    title: 'My Articles',
-    url: '/student/my-articles',
-    icon: FileText,
-  },
-  {
-    title: 'Notifications',
-    url: '/student/notifications',
-    icon: Bell,
-  },
-  {
-    title: 'Settings',
-    url: '/student/settings',
-    icon: Settings,
-  },
-]
+const loading = ref(false)
+
+const userStore = useUserStore()
+const userType = userStore.user?.user_type_name
+let items = []
+
+switch (userType) {
+  case 'Student':
+    items = [
+      {
+        title: 'Home',
+        url: '/student/home',
+        icon: Home,
+      },
+      {
+        title: 'My Articles',
+        url: '/student/my-articles',
+        icon: FileText,
+      },
+      {
+        title: 'Notifications',
+        url: '/student/notifications',
+        icon: Bell,
+      },
+      {
+        title: 'Settings',
+        url: '/student/settings',
+        icon: Settings,
+      },
+    ]
+    break
+
+  case 'Marketing Coordinator':
+    items = [
+      { title: 'Dashboard', url: '/coordinator/dashboard', icon: CircleGauge },
+      {
+        title: 'Articles',
+        url: '/coordinator/articles',
+        icon: FileText,
+      },
+      {
+        title: 'Notifications',
+        url: '/coordinator/notifications',
+        icon: Bell,
+      },
+      {
+        title: 'Settings',
+        url: '/coordinator/settings',
+        icon: Settings,
+      },
+    ]
+    break
+
+  default:
+    items = [{ title: 'Help', url: '/help', icon: BadgeHelp }]
+    break
+}
+
+const handleLogout = async () => {
+  loading.value = true
+  await forceSignOut(true)
+}
 </script>
 <template>
   <Sidebar class="h-[80vh] overflow-y-auto">
@@ -52,10 +95,15 @@ const items = [
 
         <SidebarMenuItem :key="items[items.length - 1].title">
           <SidebarMenuButton as-child>
-            <button class="p-6" @click="() => forceSignOut(true)">
+            <Button
+              class="p-6 bg-white text-primary hover:bg-primary hover:text-white"
+              :disabled="loading"
+              :processing="loading"
+              @click="handleLogout"
+            >
               <LogOut />
-              <span>Log out</span>
-            </button>
+              <span>{{ loading ? 'Logging out...' : 'Logout' }}</span>
+            </Button>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

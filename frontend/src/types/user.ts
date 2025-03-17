@@ -16,10 +16,10 @@ export interface User {
 }
 
 export interface UserDetailsParams {
-  user_name: string;
-  nickname: string;
-  date_of_birth: string | null;
-  phone_number: string | null;
+  user_name: string
+  nickname: string
+  date_of_birth: string | null
+  phone_number: string | null
 }
 
 export interface ProfilePhotoParams {
@@ -31,7 +31,7 @@ export interface ProfilePhotoResponse {
 }
 
 export const GenderOptions = {
-  0: "Prefer not to say",
-  1: "Male",
-  2: "Female"
+  0: 'Prefer not to say',
+  1: 'Male',
+  2: 'Female',
 }

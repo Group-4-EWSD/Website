@@ -12,6 +12,11 @@ const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 const Notification = () => import('@/views/Student/Notification.vue')
 const Settings = () => import('@/views/Settings.vue')
 
+const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
+const CoordinatorNotification = () => import('@/views/Coordinator/Notification.vue')
+const CoordinatorSettings = () => import('@/views/Coordinator/Settings.vue')
+const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
+
 const studentRoutes = [
   {
     path: '/student/home',
@@ -63,6 +68,41 @@ const studentRoutes = [
   },
 ]
 
+const coordinatorRoutes = [
+  {
+    path: '/coordinator/dashboard',
+    name: 'Coordinator Dashboard',
+    component: CoordinatorDashboard,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/coordinator/articles',
+    name: 'Articles',
+    component: CoordinatorArticles,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/coordinator/notifications',
+    name: 'Coordinator Notification',
+    component: CoordinatorNotification,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/coordinator/settings',
+    name: 'Coordinator Settings',
+    component: CoordinatorSettings,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+]
+
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
   { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
@@ -75,11 +115,10 @@ const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...studentRoutes, ...authRoutes, wildcardRoute],
+  routes: [...studentRoutes, ...coordinatorRoutes, ...authRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {
-
   const token = getCookie('token')
   const userInfo = getCookie('user')
 
@@ -87,21 +126,19 @@ router.beforeEach((to, from, next) => {
   userStore.setUser(userInfo)
 
   if (
-    token && userInfo &&
+    token &&
+    userInfo &&
     (to.path === '/auth/login' ||
       to.path === '/auth/register' ||
       to.path === '/auth/forgot-password')
   ) {
-    console.log(token)
     // cookies.remove('token')
     // If user is already authenticated and tries to access login/register, redirect to home
     next({ path: '/student/home', replace: true })
   } else if (to.meta.requiresAuth && !token) {
-    console.log(token)
     // If route requires auth and user is not authenticated, redirect to login
     next({ path: '/auth/login', replace: true })
   } else {
-    console.log('redirect from else', token)
     // Otherwise, proceed as normal
     next()
   }

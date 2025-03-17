@@ -26,14 +26,14 @@ export async function forceSignOut(clearToken: boolean = true) {
       removeCookie('token')
       removeCookie('user')
       // Redirect to login
-      router.replace('/auth/login')
+      router.push('/auth/login')
     })
   } else {
     // Remove token from cookies
     removeCookie('token')
     removeCookie('user')
     // Redirect to login
-    router.replace('/auth/login')
+    router.push('/auth/login')
   }
 }
 

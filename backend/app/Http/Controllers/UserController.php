@@ -150,7 +150,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User photo updated successfully',
-            'photo_path' => $photoPath,
+            'photo_path' => "https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/{$photoPath}",
         ], 200);
     }
 

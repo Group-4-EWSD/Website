@@ -10,12 +10,14 @@ const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 const Notification = () => import('@/views/Student/Notification.vue')
-const Settings = () => import('@/views/Settings.vue')
+const Settings = () => import('@/views/Shared/Settings.vue')
 
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
 const CoordinatorNotification = () => import('@/views/Coordinator/Notification.vue')
 const CoordinatorSettings = () => import('@/views/Coordinator/Settings.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
+
+const ManagerDashboard = () => import('@/views/Manager/Dashboard.vue')
 
 const studentRoutes = [
   {
@@ -103,6 +105,41 @@ const coordinatorRoutes = [
   },
 ]
 
+const managerRoutes = [
+  {
+    path: '/manager/dashboard',
+    name: 'Manager Dashboard',
+    component: ManagerDashboard,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  // {
+  //   path: '/manager/articles',
+  //   name: 'Articles',
+  //   component: ManagerArticles,
+  //   meta: {
+  //     requiresAuth: true,
+  //   },
+  // },
+  // {
+  //   path: '/manager/notifications',
+  //   name: 'Manager Notification',
+  //   component: Notification,
+  //   meta: {
+  //     requiresAuth: true,
+  //   },
+  // },
+  // {
+  //   path: '/manager/settings',
+  //   name: 'Manager Settings',
+  //   component: Settings,
+  //   meta: {
+  //     requiresAuth: true,
+  //   },
+  // },
+]
+
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
   { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
@@ -115,7 +152,7 @@ const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...studentRoutes, ...coordinatorRoutes, ...authRoutes, wildcardRoute],
+  routes: [...studentRoutes, ...coordinatorRoutes, ...managerRoutes, ...authRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {

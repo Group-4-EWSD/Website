@@ -125,8 +125,9 @@ class ArticleService
                     }
                 }
             }
-                       
-            $this->articleRepository->createActivity($articleId, $userId, $request);
+            if (empty($request->article_id)) {
+                $this->articleRepository->createActivity($articleId, $userId, $request);
+            }
 
             DB::commit();
             return ['success' => true];
@@ -142,7 +143,7 @@ class ArticleService
     }
 
     public function draftArticleList($userId){
-        return $this->articleRepository->getAllArticles(2, $userId);
+        return $this->articleRepository->getAllArticles(2, $userId)->get();
     }
 
     public function getFileList($articleId){

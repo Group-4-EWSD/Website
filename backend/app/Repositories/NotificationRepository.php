@@ -26,27 +26,21 @@ class NotificationRepository extends BaseRepository
 
     public function getNotificationList()
     {
-        return $this->model()::where('user_id', Auth::id())->get();
+        $notificationList = Notification::join('articles', 'notifications.article_id', '=', 'articles.article_id')
+                ->where('articles.user_id', Auth::id())
+                ->select('notifications.*')
+                ->get();
+        return $notificationList;
     }
 
     public function setNotification($type, $articleId)
     {
-        $userName = User::where('id','=',Auth::id())->first()->user_name;
-        $articleTitle = Article::where('article_id','=',$articleId)->first()->article_title;
-        $message = "";
-
-        if($type == '1'){//Like
-            $message = $userName . " has reacted to your article " . $articleTitle;
-        }elseif ($type == '2') {//Comment
-            $message = $userName . " has commented to your article " . $articleTitle;
-        }
-        
         $this->model()::create([
             'notification_id' => Str::uuid(),
-            'message' => $message,
-            'user_id' => Auth::id(),
+            'notification_type' => $type, // 1: Like , 2: Comment
+            'user_id' => Auth::id(), // Audience user id
             'article_id' => $articleId,
-            'seen' => 0, // Unseen
+            'status' => 0, // Unseen
             'created_at' => now(),
             'updated_at' => now()
         ]);
@@ -56,7 +50,7 @@ class NotificationRepository extends BaseRepository
         $this->model()::where('user_id', Auth::id())
             ->where('notification_id', '=', $notificationId)
             ->update([
-                'seen' => 1
-            ]);
+                'status' => 1
+            ]); // seen
     }
 }

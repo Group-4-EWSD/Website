@@ -30,17 +30,25 @@ class UserService
                 'message' => 'Invalid email or password'
             ];
         }
+
         $token = $user->createToken('authToken')->plainTextToken;
-        // Insert into login history
+
+        // Get IP and User-Agent
+        $ipAddress = request()->ip();
+        $userAgent = request()->header('User-Agent');
+
+        // Detect browser (now directly returns browser_id)
+        $browser = $this->detectBrowser($userAgent);
+
+        // Insert login history with optimized browser_id retrieval
         DB::table('login_histories')->insert([
-            [
-                'id' => Str::uuid(),
-                'user_id' => $user->id, 
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->header('User-Agent'),
-                'logged_in_at' => now(),
-            ],
+            'id' => Str::uuid(),
+            'user_id' => $user->id,
+            'ip_address' => $ipAddress,
+            'browser_id' => $browser->browser_id, // Directly use browser_id
+            'login_datetime' => now(),
         ]);
+
         unset($user->user_password);
         return [
             'status' => 200,
@@ -50,21 +58,24 @@ class UserService
         ];
     }
 
+    private function detectBrowser($userAgent)
+    {
+        // Get all browsers from the database
+        $browsers = DB::table('browsers')->get(['browser_id', 'browser_name']);
+        // Check if any browser name exists in the User-Agent string
+        foreach ($browsers as $browser) {
+            if (stripos($userAgent, $browser->browser_name) !== false) {
+                return $browser; // Return the matched browser record
+            }
+        }
+        // If no match, get the "Others" browser record
+        return DB::table('browsers')->where('browser_name', 'Others')->first();
+    }
+
+
     public function getUserProfile($id)
     {
         return $this->userRepository->getUserById($id);
-    }
-
-    // public function updateUserProfile($id, array $data)
-    // {
-    //     return $this->userRepository->updateUser($id, $data);
-    // }
-
-    public function getTermsCondition()
-    {
-        $termsConditions = $this->userRepository->getTermsCondition();        
-        $termConditionsArray = array_map(fn($item) => $item->term_condition, $termsConditions);
-        return $termConditionsArray;
     }
 
     public function updateUserPhoto(string $id, $photo): string

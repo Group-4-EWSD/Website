@@ -19,7 +19,8 @@ class NotificationController extends Controller
         return response()->json($notificationData);
     }
 
-    public function notificationView($notificationId){
+    public function setNotificationView(Request $request){
+        $notificationId = $request->notificationId;
         $this->notificationService->viewNotification($notificationId);
         return response()->json(['message'=>'Notification has been set to seen.']);
     }

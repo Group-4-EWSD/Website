@@ -50,18 +50,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/update-photo', [UserController::class, 'updateUserPhoto']);
         Route::get('/get-photo', [UserController::class, 'getUserPhoto']);
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
-        Route::patch('/edit-detail', [UserController::class, 'updateProfile']);
+        Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
     Route::post('/logout', [UserController::class, 'logout']);
     // User routes
     Route::prefix('/notifications')->group(function () {
-        Route::get('/', [ActionController::class, 'getNotificationList']);
-        Route::post('/', [ActionController::class, 'setNotificationView']);
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/', [NotificationController::class, 'setNotificationView']);
     });
 
 });
-Route::get('/terms-condition', [UserController::class, 'termsCondition']);
 
 // Unnecessory, Just for testing
 Route::post('upload', [FileController::class, 'upload']);

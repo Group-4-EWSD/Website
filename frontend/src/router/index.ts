@@ -17,6 +17,10 @@ const CoordinatorNotification = () => import('@/views/Coordinator/Notification.v
 const CoordinatorSettings = () => import('@/views/Coordinator/Settings.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
 
+const AdminManagement = () => import('@/views/Admin/Management.vue')
+const AdminReports = () => import('@/views/Admin/Reports.vue')
+const AdminUsers = () => import('@/views/Admin/Users.vue')
+
 const studentRoutes = [
   {
     path: '/student/home',
@@ -103,6 +107,50 @@ const coordinatorRoutes = [
   },
 ]
 
+
+const adminRoutes = [
+  {
+    path: '/admin/management',
+    name: 'Management',
+    component: AdminManagement,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/admin/management',
+    name: 'Management',
+    component: AdminManagement,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/admin/reports',
+    name: 'Reports',
+    component: AdminReports,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/admin/users',
+    name: 'Users',
+    component: AdminUsers,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+  {
+    path: '/admin/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: {
+      // requiresAuth: true,
+    },
+  },
+]
+
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
   { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
@@ -115,7 +163,7 @@ const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...studentRoutes, ...coordinatorRoutes, ...authRoutes, wildcardRoute],
+  routes: [...studentRoutes, ...coordinatorRoutes, ...adminRoutes, ...authRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {

@@ -36,6 +36,8 @@ export interface Article {
 export interface ArticleDetail {
   article_title: string
   article_description: string
+  article_type_id: string
+  article_type_name: string
   created_at: string
   updated_at: string
   creator_name: string
@@ -69,14 +71,20 @@ export interface ArticleData {
   article_details: File[]
 }
 
+export interface UpdateArcitleData extends ArticleData {
+  article_id: string
+  article_remaining_files: string[]
+}
+
 export interface MyArticlesResponse {
   preUploadDeadline: string;
   actualUploadDeadline: string;
-  latestArticles: Articles[];
-  myArticles: Articles[];
+  latestArticles: Article[];
+  myArticles: Article[];
 }
 
 export interface DraftArticle {
+  article_id: string
   article_title: string
   article_description: string
 }

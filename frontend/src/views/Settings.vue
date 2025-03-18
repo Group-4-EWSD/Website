@@ -9,14 +9,16 @@ import SettingsRow from '@/components/pagespecific/settings/SettingsRow.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import ConfirmationDialog from '@/components/shared/ConfirmDialog.vue'
 import Layout from '@/components/ui/Layout.vue'
 import { useUserStore } from '@/stores/user'
 import { GenderOptions } from '@/types/user'
 
 const showEditDialog = ref(false)
+const showRemoveDialog = ref(false)
 
-const userStore = useUserStore();
-const user = userStore.currentUser!;
+const userStore = useUserStore()
+const user = userStore.currentUser!
 
 const getAvatarFallBack = (name: string): string => {
   return name
@@ -25,6 +27,12 @@ const getAvatarFallBack = (name: string): string => {
     .join('')
     .slice(0, 2)
 }
+
+const handleRemovePhoto = () => {
+  userStore.removeProfilePhoto()
+  showRemoveDialog.value = false
+}
+
 </script>
 <template>
   <Layout>
@@ -42,11 +50,11 @@ const getAvatarFallBack = (name: string): string => {
                 }}</AvatarFallback>
               </Avatar>
               <div class="flex flex-row flex-wrap gap-2">
-                <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white"
-                  >Remove</Button
-                >
-                <!-- <Button variant="secondary">Change</Button> -->
-                 <ChangeProfileImageDialog />
+                <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white" @click="showRemoveDialog = true">
+                  Remove
+                </Button>
+
+                <ChangeProfileImageDialog />
               </div>
             </div>
           </CardContent>
@@ -84,5 +92,15 @@ const getAvatarFallBack = (name: string): string => {
         </Card>
       </div>
     </div>
+
+    <ConfirmationDialog
+      v-model="showRemoveDialog"
+      title="Confirmation"
+      confirmButtonText="Confirm"
+      cancelButtonText="Cancel"
+      :confirmAction="handleRemovePhoto"
+    >
+      Are you sure to remove your profile picture?
+    </ConfirmationDialog>
   </Layout>
 </template>

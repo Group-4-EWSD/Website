@@ -14,15 +14,17 @@ import {
 import { useMyArticlesStore } from '@/stores/my-articles'
 import StatusIndicator from '@/components/shared/StatusIndicator.vue'
 import UploadArticle from './UploadArticle.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { ref } from 'vue'
+import { ArticleStatus } from '@/api/articles'
 
 const myArticlesStore = useMyArticlesStore()
 const showDialog = ref(false)
-const selectedArticle = ref(null)
+const selectedArticleId = ref<string>('')
 
 // Function to handle edit button click
-const handleEditClick = (article) => {
-  selectedArticle.value = article
+const handleEditClick = (id: string) => {
+  selectedArticleId.value = id
   showDialog.value = true
 }
 </script>
@@ -30,7 +32,10 @@ const handleEditClick = (article) => {
 <template>
   <Card class="p-4">
     <Skeleton v-if="myArticlesStore.isLoading && !myArticlesStore.hasLoaded" class="w-full h-14" />
-    <div v-else-if="myArticlesStore.hasLoaded && myArticlesStore.latestArticles.length === 0" class="flex items-center justify-center h-12">
+    <div
+      v-else-if="myArticlesStore.hasLoaded && myArticlesStore.latestArticles.length === 0"
+      class="flex items-center justify-center h-12"
+    >
       <p>No articles found</p>
     </div>
     <Table v-if="myArticlesStore.latestArticles.length > 0">
@@ -55,9 +60,11 @@ const handleEditClick = (article) => {
           <TableCell>{{ article.last_feedback }}</TableCell>
           <TableCell>
             <div class="flex gap-2">
-              <Button variant="ghost" size="sm" @click="handleEditClick(article)">
-                <PencilIcon class="h-4 w-4" />
-              </Button>
+              <TooltipWrapper text="Edit">
+                <Button variant="ghost" size="sm" @click="handleEditClick(article.article_id)" :disabled="![ArticleStatus.DRAFT, ArticleStatus.PENDING].includes(article.status)">
+                  <PencilIcon class="h-4 w-4" />
+                </Button>
+              </TooltipWrapper>
             </div>
           </TableCell>
         </TableRow>
@@ -65,11 +72,7 @@ const handleEditClick = (article) => {
     </Table>
   </Card>
 
-  <!-- Single UploadArticle component outside the table -->
-  <UploadArticle 
-    :article="selectedArticle" 
-    v-model="showDialog"
-  >
+  <UploadArticle v-if="selectedArticleId" :article_id="selectedArticleId" v-model="showDialog">
     <template #trigger>
       <span></span>
     </template>

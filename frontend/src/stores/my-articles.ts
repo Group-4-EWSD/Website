@@ -2,12 +2,12 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { getMyArticles } from '@/api/articles'
-import type { ArticleParams, Articles, CountData, MyArticlesResponse } from '@/types/article'
+import type { ArticleParams, Article, CountData, MyArticlesResponse } from '@/types/article'
 
 export const useMyArticlesStore = defineStore('myArticles', () => {
   // State
-  const articles = ref<Articles[]>([])
-  const latestArticles = ref<Articles[]>([])
+  const articles = ref<Article[]>([])
+  const latestArticles = ref<Article[]>([])
   const preUploadDeadline = ref('')
   const actualUploadDeadline = ref('')
   const countData = ref<CountData | null>(null)

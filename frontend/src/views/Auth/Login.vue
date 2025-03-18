@@ -49,12 +49,12 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       } else {
         setCookie('token', response.data.token)
 
-        const user = response.data.user as User
-
         const userStore = useUserStore()
+
+        const user = response.data.user as User;
         userStore.setUser(user)
 
-        const userRole = user.user_type_name
+        let userRole = user.user_type_name
 
         // Role-based redirection
         switch (userRole) {

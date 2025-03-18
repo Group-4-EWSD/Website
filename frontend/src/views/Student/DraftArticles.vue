@@ -18,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { DraftArticle } from '@/types/article'
+import { Button } from '@/components/ui/button'
 
 const isLoading = ref(false)
 const articles = ref<DraftArticle[]>([])
@@ -37,6 +38,15 @@ const fetchDraftArticles = async () => {
 onMounted(() => {
   fetchDraftArticles()
 })
+
+const showDialog = ref(false)
+const selectedArticleId = ref<string>('')
+
+// Function to handle edit button click
+const handleEditClick = (id: string) => {
+  selectedArticleId.value = id
+  showDialog.value = true
+}
 </script>
 
 <template>
@@ -50,7 +60,10 @@ onMounted(() => {
         <Skeleton class="h-10 space-y-2" />
       </div>
 
-      <div class="flex flex-col justify-center items-center gap-4 h-40" v-if="!isLoading && !articles.length">
+      <div
+        class="flex flex-col justify-center items-center gap-4 h-40"
+        v-if="!isLoading && !articles.length"
+      >
         <p>No draft articles found. Start by uploading a new article.</p>
         <div>
           <UploadArticle />
@@ -68,7 +81,7 @@ onMounted(() => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="article in articles" :key="article.article_title">
+          <TableRow v-for="article in articles" :key="article.article_id">
             <TableCell> {{ article.article_title }} </TableCell>
             <TableCell> {{ article.article_description }} </TableCell>
             <!-- <TableCell> {{ article.category }} </TableCell>
@@ -78,7 +91,9 @@ onMounted(() => {
             <TableCell>
               <div class="flex gap-3">
                 <TooltipWrapper text="Edit">
-                  <PencilIcon class="h-4 w-4 cursor-pointer" />
+                  <Button variant="ghost" @click="handleEditClick(article.article_id)">
+                    <PencilIcon class="h-4 w-4 cursor-pointer" />
+                  </Button>
                 </TooltipWrapper>
                 <TooltipWrapper text="Delete">
                   <TrashIcon class="h-4 w-4 text-destructive cursor-pointer" />
@@ -89,5 +104,11 @@ onMounted(() => {
         </TableBody>
       </Table>
     </Card>
+
+    <UploadArticle v-if="selectedArticleId" :article_id="selectedArticleId" v-model="showDialog">
+      <template #trigger>
+        <span></span>
+      </template>
+    </UploadArticle>
   </Layout>
 </template>

@@ -12,6 +12,7 @@ import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUserStore } from '@/stores/user'
+import { toast } from 'vue-sonner'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -70,12 +71,13 @@ const addComment = () => {
 
     try {
       params.value = {
-        actionId: 'test',
+        actionId: '',
         actionType: 2,
       }
       createComment(params.value)
     } catch (error) {
       console.error('Error updating notification:', error)
+      toast.error('Failed to comment')
     }
     newComment.value = ''
   }

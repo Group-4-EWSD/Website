@@ -11,8 +11,8 @@ const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: false, // Allows sending cookies with requests
   headers: {
-    'Content-Type': 'multipart/form-data'
-  }
+    'Content-Type': 'multipart/form-data',
+  },
 })
 
 // Request interceptor to attach token automatically
@@ -20,7 +20,6 @@ api.interceptors.request.use(
   (config) => {
     const { cookies } = useCookies()
     const token = cookies.get('token')
-    console.log(token)
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -36,11 +35,11 @@ api.interceptors.response.use(
   (error) => {
     // Check if error is 401 Unauthorized
     if (error.response && error.response.status === 401) {
-      forceSignOut(false);
+      forceSignOut(false)
     }
-    
+
     return Promise.reject(error)
-  }
+  },
 )
 
 export default api

@@ -81,7 +81,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
     })
     .catch((error) => {
       loading.value = false
-      toast.error(`An error occurred: ${error.message}`)
+      toast.error(error.response.data.message)
     })
 })
 </script>

@@ -1,33 +1,42 @@
 import { defineStore } from 'pinia'
-import type { NotificationList } from '@/types/notification'
+import type { Notification } from '@/types/notification'
 import { getNotifications } from '@/api/notification'
+import { ref } from 'vue'
+import { toast } from 'vue-sonner'
 
-export const useNotificationsStore = defineStore('notifications', {
-  state: () => ({
-    notifications: [] as NotificationList,
-  }),
-  actions: {
-    setNotifications(newNotifications: NotificationList) {
-      this.notifications = newNotifications
-    },
-    async fetchNotification() {
-      try {
-        const response = await getNotifications()
+export const useNotificationsStore = defineStore('notifications', () => {
+  const notifications = ref<Notification[]>([])
+  const isLoading = ref(false)
+
+  const fetchNotification = async () => {
+    isLoading.value = true
+    await getNotifications()
+      .then((response) => {
         console.log(response.data)
-        this.notifications = response.data
-      } catch (error) {
+        notifications.value = response.data
+        isLoading.value = false
+      })
+      .catch((error) => {
+        isLoading.value = false
+        toast.error(error)
         console.error('Error fetching articles:', error)
-      }
-    },
-    changeNotiSeen(action_id: string) {
-      const noti = this.notifications.find((n) => n.action_id === action_id)
-      if (noti) {
-        noti.seen = 1
+      })
+  }
+  const changeNotiSeen = (action_id: string) => {
+    const noti = notifications.value.find((n) => n.action_id === action_id)
+    if (noti) {
+      noti.seen = 1
 
-        this.notifications = [...this.notifications]
+      notifications.value = [...notifications.value]
 
-        // this.saveNotiSeenToDB(notificationId);
-      }
-    },
-  },
+      // this.saveNotiSeenToDB(notificationId);
+    }
+  }
+
+  return {
+    notifications,
+    isLoading,
+    fetchNotification,
+    changeNotiSeen,
+  }
 })

@@ -77,10 +77,10 @@ export interface UpdateArcitleData extends ArticleData {
 }
 
 export interface MyArticlesResponse {
-  preUploadDeadline: string;
-  actualUploadDeadline: string;
-  latestArticles: Article[];
-  myArticles: Article[];
+  preUploadDeadline: string
+  actualUploadDeadline: string
+  latestArticles: Article[]
+  myArticles: Article[]
 }
 
 export interface DraftArticle {
@@ -90,6 +90,6 @@ export interface DraftArticle {
 }
 
 export interface Category {
-  article_type_id: string,
+  article_type_id: string
   article_type_name: string
 }

@@ -49,7 +49,7 @@ class ArticleRepository
             'activity_id' => Str::uuid(),
             'article_id' => $articleId,
             'user_id' => $userId,
-            'status' => $request->status,
+            'article_status' => $request->status,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -60,7 +60,7 @@ class ArticleRepository
         $systemId = DB::select("
                     SELECT sd.*
                     FROM system_datas AS sd
-                    JOIN academic_years AS ay ON ay.academic_year = CONCAT(YEAR(CURDATE()), '-', YEAR(CURDATE()) + 1)
+                    JOIN academic_years AS ay ON ay.academic_year_start = YEAR(CURDATE())
                     JOIN users AS u ON u.faculty_id = sd.faculty_id
                     WHERE u.id = ?
                     LIMIT 1
@@ -109,8 +109,7 @@ class ArticleRepository
                     'u.gender',
                     'art.created_at',
                     'art.updated_at',
-                    DB::raw("(SELECT ad.file_path FROM article_details ad WHERE ad.article_id = art.article_id AND ad.file_type = 'WORD' LIMIT 1) AS file_path"),
-                    DB::raw("(SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
+                    DB::raw("(SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
                     DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = '') AS view_count"),
                     DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1) AS like_count"),
                     DB::raw("(SELECT COUNT(*) FROM comments cmmt WHERE cmmt.article_id = art.article_id ) AS comment_count")
@@ -162,7 +161,7 @@ class ArticleRepository
         if($state == 3){ // All Articles for Coordinator
             $articles->addSelect(DB::raw("
                 CASE 
-                    WHEN (SELECT act.status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
+                    WHEN (SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
                     THEN (SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) 
                     ELSE NULL 
                 END AS reject_reason
@@ -272,7 +271,7 @@ class ArticleRepository
             '1' => ['article_types', ['article_type_id', 'article_type_name']],
             '2' => ['user_types', ['user_type_id', 'user_type_name']],
             '3' => ['faculties', ['faculty_id', 'faculty_name']],
-            '4' => ['academic_years', ['academic_year_id', 'academic_year']]
+            '4' => ['academic_years', ['academic_year_id', 'academic_year_description','academic_year_start','academic_year_end']]
         ];
 
         if (!isset($tables[$item])) {

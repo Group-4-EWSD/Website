@@ -96,18 +96,13 @@ class ActionController extends Controller
         return response()->json(['message' => 'Comment deleted successfully']);
     }
 
-    public function getNotificationList(){
-        $userId = Auth::id();
-        return $this->actionService->getNotificationList($userId);
-    }
+    // public function getNotificationList(){
+    //     $userId = Auth::id();
+    //     return $this->actionService->getNotificationList($userId);
+    // }
 
-    public function setNotificationView(Request $request){
-        $success = $this->actionService->setNotificationView($request);
-        return $success;
-        // if ($success) {
-        //     return response()->json(['message' => 'Notification seen'], 201);
-        // } else {
-        //     return response()->json(['message' => 'Notification view failed.'], 500);
-        // }
-    }
+    // public function setNotificationView(Request $request){
+    //     $success = $this->actionService->setNotificationView($request);
+    //     return $success;
+    // }
 }

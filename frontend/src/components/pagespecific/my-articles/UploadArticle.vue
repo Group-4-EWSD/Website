@@ -61,17 +61,17 @@ const isLoading = ref(false)
 // })
 
 // Watch for changes in isOpen and emit events
-watch(isOpen, (value) => {
-  emit('update:modelValue', value)
-})
+// watch(isOpen, (value) => {
+//   emit('update:modelValue', value)
+// })
 
 // Watch for changes in props.modelValue
-watch(
-  () => props.modelValue,
-  (value) => {
-    isOpen.value = value || false
-  },
-)
+// watch(
+//   () => props.modelValue,
+//   (value) => {
+//     isOpen.value = value || false
+//   },
+// )
 
 // Watch for changes in props.article
 watch(
@@ -117,7 +117,11 @@ const validationSchema = yup.object({
   files: yup
     .array()
     .of(yup.mixed<File>())
-    .test('required', 'At least one file is required', (files) => files && files.length > 0)
+    .test('required', 'At least one file is required', (files) => {
+      // Skip validation if in edit mode and there are existing files
+      if (isEditMode.value && existingFiles.value.length > 0) return true
+      return files && files.length > 0
+    })
     .test('fileSize', 'File size is too large', (files) => {
       if (!files) return true
       return files.every((file) => file && file.size <= 5 * 1024 * 1024) // 5MB limit
@@ -148,10 +152,10 @@ const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
       article_description: formValues.description,
       article_type_id: formValues.category,
       status: ArticleStatus.PENDING,
-      article_details: formValues.files,
+      article_details: formValues.files || [],
     }
 
-    if (!isEditMode.value) {
+    if (isEditMode.value) {
       const data = {
         ...articleData,
         article_remaining_files: [...existingFiles.value],
@@ -193,10 +197,10 @@ const saveAsDraft = async () => {
       article_description: values.description,
       article_type_id: values.category,
       status: ArticleStatus.DRAFT,
-      article_details: values.files,
+      article_details: values.files || [],
     }
 
-    if (!isEditMode.value) {
+    if (isEditMode.value) {
       const data = {
         ...articleData,
         article_remaining_files: [...existingFiles.value],
@@ -269,7 +273,9 @@ onMounted(async () => {
       const contentKeys = Object.keys(resp.articleContent)
       existingFiles.value = [...photoKeys, ...contentKeys]
 
-      isEditableState.value = resp.articleDetail?.article_status === ArticleStatus.DRAFT || resp.articleDetail?.article_status === ArticleStatus.PENDING
+      isEditableState.value =
+        resp.articleDetail?.article_status === ArticleStatus.DRAFT ||
+        resp.articleDetail?.article_status === ArticleStatus.PENDING
       isAlreadySubmitted.value = resp.articleDetail?.article_status !== ArticleStatus.DRAFT
     }
   } catch (error) {
@@ -385,7 +391,7 @@ onMounted(async () => {
         </Button>
 
         <Button type="submit" @click="onSubmit" :disabled="isSubmitting">
-          {{ isSubmitting ? 'Submitting...' : isEditMode ? 'Update' : 'Submit' }}
+          {{ isSubmitting ? 'Submitting...' : 'Submit' }}
         </Button>
       </DialogFooter>
     </DialogContent>

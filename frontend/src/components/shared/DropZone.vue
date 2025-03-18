@@ -44,26 +44,6 @@ watch(
   { deep: true },
 )
 
-// Watch for changes in props.value to update local files
-watch(
-  () => props.value,
-  (newValue) => {
-    if (newValue) {
-      files.value = newValue;
-    }
-  }
-)
-
-// Watch for changes in props.existingFiles
-watch(
-  () => props.existingFiles,
-  (newValue) => {
-    if (newValue) {
-      existingFilesList.value = newValue;
-    }
-  }
-)
-
 const onDragOver = () => {
   isDragging.value = true
 }

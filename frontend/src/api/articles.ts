@@ -38,7 +38,7 @@ export const uploadArticle = async (article: ArticleData) => {
 }
 
 export const updateArticle = async (article: UpdateArcitleData) => {
-  return await api.put(`articles/update`, article)
+  return await api.post(`articles/update`, article)
 }
 
 export const getCategories = async (): Promise<Category[]> => {

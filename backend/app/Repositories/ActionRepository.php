@@ -45,7 +45,7 @@ class actionRepository extends BaseRepository
                 'articles.updated_at',
                 'users.user_name as creator_name',
                 'users.gender as creator_gender',
-                DB::raw("(SELECT status FROM activities WHERE article_id = '$articleId' ORDER BY created_at DESC LIMIT 1) AS article_status"),
+                DB::raw("(SELECT article_status FROM activities WHERE article_id = '$articleId' ORDER BY created_at DESC LIMIT 1) AS article_status"),
                 DB::raw("(SELECT COUNT(*) FROM actions WHERE article_id = '$articleId') AS view_count"),
                 DB::raw("(SELECT COUNT(*) FROM actions WHERE article_id = '$articleId' AND react = 1) AS like_count"),
                 DB::raw("(SELECT EXISTS (SELECT 1 FROM actions WHERE article_id = '$articleId' AND react = 1 AND user_id = '$userId')) AS current_user_react"),
@@ -66,6 +66,7 @@ class actionRepository extends BaseRepository
     public function getCommentList($articleId){
         // SELECT c.message, c.created_at, c.user_id, u.user_photo_path, u.gender, u.user_name FROM comments c JOIN users u ON u.user_id = c.user_id;
         $comments = Comment::select([
+                    'comments.comment_id',
                     'comments.message',
                     'comments.created_at',
                     'comments.user_id',
@@ -113,7 +114,7 @@ class actionRepository extends BaseRepository
         $this->model()::where('article_id', $request->articleId)
                 ->where('user_id', Auth::id())  // Get authenticated user's ID
                 ->update(['react' => $reaction]);
-        $reactionCount = $this->model()::where('article_id', $request->articleId)->count();
+        $reactionCount = $this->model()::where('article_id', $request->articleId)->where('react','=','1')->count();
         return $reactionCount;
     }
 

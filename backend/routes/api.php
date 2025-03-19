@@ -57,12 +57,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
     // User routes
     Route::prefix('/notifications')->group(function () {
-        Route::get('/', [ActionController::class, 'getNotificationList']);
-        Route::post('/', [ActionController::class, 'setNotificationView']);
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::post('/', [NotificationController::class, 'setNotificationView']);
     });
 
 });
-Route::get('/terms-condition', [UserController::class, 'termsCondition']);
 
 // Unnecessory, Just for testing
 Route::post('upload', [FileController::class, 'upload']);

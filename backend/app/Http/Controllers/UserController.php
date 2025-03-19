@@ -88,11 +88,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function termsCondition(){
-        return response()->json($this->userService->getTermsCondition());
-    }
-
-
     public function show()
     {
         $userId = Auth::id(); // Get logged-in user ID

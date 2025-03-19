@@ -55,12 +55,6 @@ class UserRepository extends BaseRepository
         return $user;
     }
 
-    public function getTermsCondition()
-    {
-        $termsConditions = DB::table("terms_conditions")->get()->toArray();
-        return $termsConditions;
-    }
-
     public function findById(string $id): ?User
     {
         return $this->model->find($id);

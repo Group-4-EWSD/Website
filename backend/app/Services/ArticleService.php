@@ -125,8 +125,9 @@ class ArticleService
                     }
                 }
             }
-                       
-            $this->articleRepository->createActivity($articleId, $userId, $request);
+            if (empty($request->article_id)) {
+                $this->articleRepository->createActivity($articleId, $userId, $request);
+            }
 
             DB::commit();
             return ['success' => true];

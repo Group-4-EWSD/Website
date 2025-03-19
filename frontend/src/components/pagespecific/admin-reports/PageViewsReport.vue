@@ -214,8 +214,5 @@ export default defineComponent({
         </TableBody>
       </Table>
     </CardContent>
-    <CardFooter>
-      <Button variant="outline" size="sm">Export Data</Button>
-    </CardFooter>
   </Card>
 </template>

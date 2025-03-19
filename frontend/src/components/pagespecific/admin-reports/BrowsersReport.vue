@@ -209,18 +209,11 @@ export default defineComponent({
               <div class="flex items-center gap-2">
                 <span class="text-lg">{{ browser.icon }}</span>
                 <span class="font-medium">{{ browser.name }}</span>
-                <Badge variant="outline" class="ml-2">v{{ browser.version }}</Badge>
+                <!-- <Badge variant="outline" class="ml-2">v{{ browser.version }}</Badge> -->
               </div>
               <div class="flex items-center gap-2">
-                <span class="font-semibold">{{ browser.percentage.toFixed(1) }}%</span>
-                <span :class="getTrendColor(browser.trend)">
-                  {{ getTrendIcon(browser.trend) }} {{ browser.change.toFixed(1) }}%
-                </span>
+                <span class="font-semibold">{{ browser.count.toLocaleString() }} users</span>
               </div>
-            </div>
-            <Progress :value="browser.percentage" class="h-2" />
-            <div class="text-xs text-muted-foreground">
-              {{ browser.count.toLocaleString() }} users
             </div>
             <Separator v-if="browser.id !== browsers.length" class="mt-4" />
           </div>
@@ -238,8 +231,5 @@ export default defineComponent({
         </div>
       </div>
     </CardContent>
-    <CardFooter>
-      <Button variant="outline" size="sm">Export Data</Button>
-    </CardFooter>
   </Card>
 </template>

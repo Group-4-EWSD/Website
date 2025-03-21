@@ -36,10 +36,10 @@ class ArticleService
             'allArticles' => $this->articleRepository->getAllArticles(0, $userId, $request)->get()
         ];
     }
-    public function getCoordinatorHomePageData($userId){
+    public function getCoordinatorHomePageData($userId, $request){
         return [
             'countData' => $this->articleRepository->getCoordinatorHomeCountData($userId),
-            'allArticles' => $this->articleRepository->getAllArticles(3)->get(),
+            'allArticles' => $this->articleRepository->getAllArticles(3, $request)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'guestList' => $this->userRepository->getGuestList()
         ];
@@ -63,6 +63,19 @@ class ArticleService
             'countData' => $countData,
             'latestArticles' => $latestArticles,
             'myArticles' => $myArticles->get()
+        ];
+    }
+
+    public function getCoordinatorArticles($facultyId, $request)
+    {
+        $countData = $this->articleRepository->getCoordinatorCountData($facultyId);
+        $articles = $this->articleRepository->getAllArticles(3, $facultyId, $request)->orderBy('created_at', 'desc')->get();
+        return [
+            'totalSubmissions' => $countData['totalSubmissions'], // Correct array access
+            'pendingReview' => $countData['pendingReview'],
+            'approvedArticles' => $countData['approvedArticles'],
+            'rejectedArticles' => $countData['rejectedArticles'],
+            'articles' => $articles
         ];
     }
 

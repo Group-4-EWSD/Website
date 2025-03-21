@@ -6,6 +6,7 @@ use App\Models\Action;
 use App\Models\Article;
 use App\Models\ArticleDetail;
 use App\Models\Comment;
+use App\Models\Feedback;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
@@ -132,6 +133,23 @@ class actionRepository extends BaseRepository
 
     public function deleteComment($request){
         $deleted = Comment::where('comment_id', $request->commentId)->delete();
+        return $deleted > 0;
+    }
+
+    public function createFeedback($request){
+        return Feedback::create([
+            'feedback_id' => Str::uuid(),
+            'article_id' => $request->articleId,
+            'user_id' => Auth::id(), // Get authenticated user's ID
+            'message' => $request->message,
+            'delete_flag' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function deleteFeedback($request){
+        $deleted = Feedback::where('feedback_id', $request->feedbackId)->delete();
         return $deleted > 0;
     }
 

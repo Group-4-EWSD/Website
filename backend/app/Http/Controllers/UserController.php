@@ -177,7 +177,7 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserList(){
-        return $updatedUser = $this->userService->getUserList();
+    public function getUserList(Request $request){
+        return $this->userService->getUserList($request);
     }
 }

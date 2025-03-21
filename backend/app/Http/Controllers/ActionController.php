@@ -98,7 +98,7 @@ class ActionController extends Controller
     
     public function articleFeedback(Request $request) {
         $success = $this->actionService->feedbackArticle($request);
-        $this->notificationService->setNotification('2', $request->articleId);
+        $this->notificationService->setNotification('3', $request->articleId);
         if ($success) {
             return response()->json(['message' => 'Comment added successfully'], 201);
         } else {

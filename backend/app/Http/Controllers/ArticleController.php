@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * @OA\Tag(
@@ -74,8 +76,8 @@ class ArticleController extends Controller
             // $mailSent = Mail::to(Auth::user()->user_email)->send(new UserCreatedMail(Auth::user()));
             // if ($mailSent) {
             // } else {
-                //  return response()->json($homePageData);
-                // return response()->json(['message' => 'Failed to send email.'], 201);
+            //      return response()->json($homePageData);
+            //     return response()->json(['message' => 'Failed to send email.'], 201);
             // }
         }else if($userType == '2'){ // Marketing Coordinator
             $homePageData = [];// $this->articleService->getCoordinatorHomePageData($userId, $request);
@@ -121,7 +123,25 @@ class ArticleController extends Controller
 
         if ($result['success']) {
             if (empty($request->article_id)) {
-                return response()->json(['message' => 'Article created successfully'], 201);
+                $coordinatorEmail = DB::table('users')
+                    ->where('faculty_id', Auth::user()->faculty_id)
+                    ->where('user_type_id', 2)
+                    ->value('user_email');
+
+                $mailSent = Mail::to($coordinatorEmail)->send(new ArticleCreateMail(
+                    Auth::user(),
+                    $request->article_id ?: Str::uuid(), 
+                    $request->article_title,
+                    Auth::user()->user_name,
+                    Auth::user()->nickname,
+                    Auth::user()->user_email
+                ));
+
+                if ($mailSent) {
+                    return response()->json(['message1' => 'Article created successfully.', 'message2' => 'Successfully send email.'], 201);
+                } else {
+                    return response()->json(['message' => 'Failed to send email.'], 201);
+                }
             } else {
                 return response()->json(['message' => 'Article updated successfully'], 201);
             }

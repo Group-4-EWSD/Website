@@ -7,9 +7,9 @@ import BrowsersReport from '@/components/pagespecific/admin-reports/BrowsersRepo
 
 <template>
   <Layout>
-    <div class="p-6 space-y-6">
-      <header class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
+    <div class="space-y-6">
+      <header class="mb-8 flex flex-col gap-2">
+        <h1 class="text-2xl font-bold tracking-tight">Analytics Dashboard</h1>
         <p class="text-muted-foreground">Track the website performance and user engagement</p>
       </header>
 

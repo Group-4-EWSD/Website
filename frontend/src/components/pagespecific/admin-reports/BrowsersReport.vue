@@ -181,7 +181,7 @@ export default defineComponent({
   <Card class="w-full">
     <CardHeader>
       <div class="flex items-center justify-between">
-        <div>
+        <div class="flex flex-col gap-2">
           <CardTitle>Browser Usage</CardTitle>
           <CardDescription>Distribution of browsers used to access your site</CardDescription>
         </div>

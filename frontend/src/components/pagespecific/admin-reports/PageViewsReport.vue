@@ -165,7 +165,7 @@ export default defineComponent({
   <Card class="w-full">
     <CardHeader>
       <div class="flex items-center justify-between">
-        <div>
+        <div class="flex flex-col gap-2">
           <CardTitle>Most Viewed Pages</CardTitle>
           <CardDescription>See which pages are attracting the most traffic</CardDescription>
         </div>
@@ -184,14 +184,11 @@ export default defineComponent({
     </CardHeader>
     <CardContent>
       <Table>
-        <TableCaption>Page views data for the selected time period.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Page</TableHead>
             <TableHead>Path</TableHead>
             <TableHead class="text-right">Views</TableHead>
-            <TableHead class="text-right">Unique Visitors</TableHead>
-            <TableHead class="text-right">Avg. Time on Page</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody v-if="!isLoading">
@@ -199,14 +196,10 @@ export default defineComponent({
             <TableCell class="font-medium">{{ page.title }}</TableCell>
             <TableCell>{{ page.path }}</TableCell>
             <TableCell class="text-right">{{ page.views.toLocaleString() }}</TableCell>
-            <TableCell class="text-right">{{ page.uniqueVisitors.toLocaleString() }}</TableCell>
-            <TableCell class="text-right">{{ page.avgTimeOnPage }}</TableCell>
           </TableRow>
         </TableBody>
         <TableBody v-else>
           <TableRow v-for="i in 5" :key="i">
-            <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
-            <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
             <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
             <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
             <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>

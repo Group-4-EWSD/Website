@@ -37,12 +37,12 @@ class UserRepository extends BaseRepository
             'users.phone_number',
             DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', users.user_photo_path) AS user_photo_path"),
         ])
-        ->where('users.user_email', $email)
-        ->join('user_types as ut', 'ut.user_type_id', '=', 'users.user_type_id')
-        ->join('faculties as f', 'f.faculty_id', '=', 'users.faculty_id')
-        ->first();
+            ->where('users.user_email', $email)
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'users.user_type_id')
+            ->join('faculties as f', 'f.faculty_id', '=', 'users.faculty_id')
+            ->first();
     }
-    
+
     public function getUserById($id)
     {
         return User::findOrFail($id);
@@ -53,12 +53,6 @@ class UserRepository extends BaseRepository
         $user = User::findOrFail($id);
         $user->update($data);
         return $user;
-    }
-
-    public function getTermsCondition()
-    {
-        $termsConditions = DB::table("terms_conditions")->get()->toArray();
-        return $termsConditions;
     }
 
     public function findById(string $id): ?User
@@ -77,22 +71,71 @@ class UserRepository extends BaseRepository
         return $user->save();
     }
 
-    public function getGuestList(){
+    public function getGuestList()
+    {
         return DB::table('users as u')
-        ->select([
-            'u.user_name',
-            'u.user_email',
-            'f.faculty_name',
-            'u.date_of_birth',
-            'u.gender',
-            'u.phone_number'
-        ])
-        ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
-        ->where('u.user_type_id','=','0');
+            ->select([
+                'u.user_name',
+                'u.user_email',
+                'f.faculty_name',
+                'u.date_of_birth',
+                'u.gender',
+                'u.phone_number'
+            ])
+            ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
+            ->where('u.user_type_id', '=', '0');
     }
-    public function getUserList(){
-        $userList = "
-            
-        ";
+
+    public function getUserList($request)
+    {
+        return DB::table('users as u')
+            ->leftJoin('articles as a', 'a.user_id', '=', 'u.id')
+            ->leftJoin('actions as act', function ($join) {
+                $join->on('act.user_id', '=', 'u.id')
+                    ->where('act.react', '=', '1');
+            })
+            ->leftJoin('comments as c', 'c.user_id', '=', 'u.id')
+            ->leftJoin('system_datas as sd', 'sd.system_id', '=', 'a.system_id')
+            ->leftJoin('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
+            ->selectRaw('
+        u.id,
+        u.user_name,
+        u.nickname,
+        u.user_email,
+        u.gender,
+        u.user_type_id,
+        ut.user_type_name,
+        u.faculty_id,
+        f.faculty_name,
+        u.phone_number,
+        CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/", u.user_photo_path) AS user_photo_path,
+        u.date_of_birth,
+        COUNT(DISTINCT a.article_id) as article_count, 
+        COUNT(DISTINCT act.action_id) as action_count, 
+        COUNT(DISTINCT c.comment_id) as comment_count, 
+        ((COUNT(DISTINCT a.article_id) * 20) + 
+         (COUNT(DISTINCT act.action_id) * 1) + 
+         (COUNT(DISTINCT c.comment_id) * 1)) as total_score
+    ')
+            // ->where('u.user_type_id', '1') // Only Student List
+            ->when(
+                $request->has('userId') && $request->userId,
+                fn($query) =>
+                $query->where('u.user_id', $request->userId)
+            )
+            ->when(
+                $request->has('userName') && $request->userName,
+                fn($query) =>
+                $query->where('u.user_name', 'LIKE', "%{$request->userName}%")
+            )
+            ->when(
+                $request->has('academicYear') && $request->academicYear,
+                fn($query) =>
+                $query->where('ay.academic_year_start', $request->academicYear)
+            )
+            ->groupBy('u.id')
+            ->get();
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
 //use Your Model
@@ -27,9 +28,23 @@ class NotificationRepository extends BaseRepository
     public function getNotificationList()
     {
         $notificationList = Notification::join('articles', 'notifications.article_id', '=', 'articles.article_id')
+                ->join('users', 'users.id', '=', 'notifications.user_id')
+                ->join('user_types', 'user_types.user_type_id', '=', 'users.user_type_id')
+                ->join('faculties', 'faculties.faculty_id', '=', 'users.faculty_id')
                 ->where('articles.user_id', Auth::id())
-                ->select('notifications.*')
-                ->get();
+                ->select([
+                    'notifications.notification_id',
+                    'notifications.article_id',
+                    'users.user_name',
+                    'user_types.user_type_name',
+                    'users.gender',
+                    'faculties.faculty_name',
+                    'notifications.notification_type',
+                    'notifications.status as seen',
+                    DB::raw('CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/", users.user_photo_path) AS user_photo_path'),
+                    'notifications.created_at'
+                ])
+                ->get();// notification_type = 1 (react), 2 (comment)
         return $notificationList;
     }
 

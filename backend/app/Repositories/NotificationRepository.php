@@ -42,6 +42,7 @@ class NotificationRepository extends BaseRepository
                     'notifications.notification_type',
                     'notifications.status as seen',
                     DB::raw('CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/", users.user_photo_path) AS user_photo_path'),
+                    'articles.article_title',
                     'notifications.created_at'
                 ])
                 ->get();// notification_type = 1 (react), 2 (comment)

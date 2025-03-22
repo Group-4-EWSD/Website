@@ -37,7 +37,7 @@ class NotificationRepository extends BaseRepository
     {
         $this->model()::create([
             'notification_id' => Str::uuid(),
-            'notification_type' => $type, // 1: Like , 2: Comment
+            'notification_type' => $type, // 1: Like , 2: Comment, 3: Feedback
             'user_id' => Auth::id(), // Audience user id
             'article_id' => $articleId,
             'status' => 0, // Unseen

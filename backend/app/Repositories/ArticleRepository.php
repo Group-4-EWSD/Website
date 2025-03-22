@@ -94,6 +94,45 @@ class ArticleRepository
         current_in_time_rate";
     }
 
+    public function getCoordinatorCountData($facultyId){
+        $currentYear = date('Y');
+
+        // Get Total Submission Count
+        $totalSubmissions = DB::table('articles as a')
+            ->join('system_datas as sd', 'sd.system_id', '=', 'a.system_id')
+            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->where('ay.academic_year_start', $currentYear)
+            ->where('sd.faculty_id', $facultyId)
+            ->count();
+
+        // Function to get count by article status
+        $getStatusCount = function ($status) use ($currentYear, $facultyId) {
+            return DB::table('articles as a')
+                ->join('system_datas as sd', 'sd.system_id', '=', 'a.system_id')
+                ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+                ->join('activities as avt', function ($join) {
+                    $join->on('avt.article_id', '=', 'a.article_id')
+                        ->whereRaw('avt.created_at = (SELECT MAX(avt2.created_at) FROM activities avt2 WHERE avt2.article_id = a.article_id)');
+                })
+                ->where('ay.academic_year_start', $currentYear)
+                ->where('sd.faculty_id', $facultyId)
+                ->where('avt.article_status', $status)
+                ->count();
+        };
+
+        // Get counts for different statuses
+        $pendingReview = $getStatusCount(1);
+        $approvedArticles = $getStatusCount(2);
+        $rejectedArticles = $getStatusCount(3);
+
+        return [
+            'totalSubmissions' => $totalSubmissions,
+            'pendingReview' => $pendingReview,
+            'approvedArticles' => $approvedArticles,
+            'rejectedArticles' => $rejectedArticles,
+        ];
+    }
+
     public function getAllArticles($state, $primaryKey = null, $request = null)
     {
         $articles = DB::table('articles as art')
@@ -110,7 +149,7 @@ class ArticleRepository
                     'art.created_at',
                     'art.updated_at',
                     DB::raw("(SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
-                    DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = '') AS view_count"),
+                    DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id) AS view_count"),
                     DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1) AS like_count"),
                     DB::raw("(SELECT COUNT(*) FROM comments cmmt WHERE cmmt.article_id = art.article_id ) AS comment_count")
                 ])
@@ -158,7 +197,7 @@ class ArticleRepository
                 }
             }
         }
-        if($state == 3){ // All Articles for Coordinator
+        if($state == 3){ // All Articles for Coordinator (facultyId)
             $articles->addSelect(DB::raw("
                 CASE 
                     WHEN (SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
@@ -166,7 +205,7 @@ class ArticleRepository
                     ELSE NULL 
                 END AS reject_reason
             "));
-            $articles->where('art.faculty_id','=',$primaryKey);
+            $articles->where('sd.faculty_id','=',$primaryKey);
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([
@@ -180,7 +219,7 @@ class ArticleRepository
             'art.updated_at'
         ]);
 
-        // 1: create_at ASC, 2: created_at DESC, 3: title ASC, 4: title DESC
+        // 1: created_at ASC, 2: created_at DESC, 3: title ASC, 4: title DESC
         if (!empty($request->sorting)) {
             switch ($request->sorting) {
                 case '1':

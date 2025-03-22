@@ -78,7 +78,7 @@ class ArticleController extends Controller
                 // return response()->json(['message' => 'Failed to send email.'], 201);
             // }
         }else if($userType == '2'){ // Marketing Coordinator
-            $homePageData = $this->articleService->getCoordinatorHomePageData($userId, $request);
+            $homePageData = [];// $this->articleService->getCoordinatorHomePageData($userId, $request);
         }else if($userType == '3'){ // Marketing Manager
             $homePageData = $this->articleService->getManagerHomePageData($userId, $request);
         }else if($userType == '4'){ // Marketing Manager
@@ -97,6 +97,13 @@ class ArticleController extends Controller
         return response()->json($myArticleData);
     }
 
+    public function coordinatorArticles(Request $request)
+    {
+        $userId = Auth::id();
+        $facultyId = Auth::user()->faculty_id;
+        $myArticleData = $this->articleService->getCoordinatorArticles($facultyId, $request);
+        return response()->json($myArticleData);
+    }
     
     public function articleList(Request $request)
     {

@@ -88,11 +88,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function termsCondition(){
-        return response()->json($this->userService->getTermsCondition());
-    }
-
-
     public function show()
     {
         $userId = Auth::id(); // Get logged-in user ID
@@ -181,7 +176,7 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserList(){
-        return $updatedUser = $this->userService->getUserList();
+    public function getUserList(Request $request){
+        return $this->userService->getUserList($request);
     }
 }

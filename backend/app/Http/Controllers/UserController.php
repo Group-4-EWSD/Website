@@ -94,23 +94,6 @@ class UserController extends Controller
         return response()->json($this->userService->getUserProfile($userId));
     }
 
-    public function update(Request $request)
-    {
-        $userId = Auth::id();
-        
-        $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $userId,
-            'password' => 'sometimes|string|min:8|confirmed',
-        ]);
-
-        if (isset($data['password'])) {
-            $data['password'] = bcrypt($data['password']); // Hash password before storing
-        }
-
-        return response()->json($this->userService->updateUserProfile($userId, $data));
-    }
-
     public function dashboard(){
 
     }
@@ -161,18 +144,34 @@ class UserController extends Controller
         $data = $request->validate([
             'user_name' => 'sometimes|string|max:255',
             'nickname' => 'sometimes|string|max:255',
-            'user_password' => 'sometimes|string|min:8|confirmed',
-            'gender' => 'sometimes|in:male,female,other',
+            'gender' => 'sometimes|in:1,2',
+            'date_of_birth' => 'sometimes|date',   
+            'phone_number' => 'sometimes|string|max:20', 
         ]);
 
-        if (isset($data['user_password'])) {
-            $data['user_password'] = bcrypt($data['user_password']);
-        }
+        // echo string($data);
 
         $updatedUser = $this->userService->updateUserProfile($userId, $data);
 
         return response()->json([
             'message' => 'Profile updated successfully',
+            'user' => $data
+        ], 200);
+    }
+
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $userId = Auth::id();
+
+        $data = $request->validate([
+            'user_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $data['user_password'] = bcrypt($data['user_password']);
+        $updatedUser = $this->userService->updateUserProfile($userId, $data);
+
+        return response()->json([
+            'message' => 'Password updated successfully',
             'user' => $updatedUser
         ], 200);
     }

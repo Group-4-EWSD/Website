@@ -1,26 +1,29 @@
 <script setup lang="ts">
+import { Loader } from 'lucide-vue-next'
 import { Primitive, type PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
 
 import { cn } from '@/lib/utils'
 
 import { type ButtonVariants, buttonVariants } from '.'
-import { Loader } from 'lucide-vue-next'
 
 interface Props extends PrimitiveProps {
   variant?: ButtonVariants['variant']
   size?: ButtonVariants['size']
   class?: HTMLAttributes['class']
   processing?: boolean
+  type?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   as: 'button',
+  type: 'button',
 })
 </script>
 
 <template>
   <Primitive
+    :type="props.type"
     :as="as"
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"

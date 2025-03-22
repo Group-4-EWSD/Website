@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import { Eye, EyeOff } from 'lucide-vue-next'
 import { ErrorMessage, Field } from 'vee-validate'
 import { ref, useAttrs } from 'vue'
 
 import { cn } from '@/lib/utils'
-import { Eye, EyeOff } from 'lucide-vue-next'
 
 interface Props {
   type?: string
   name: string
   class?: string
-  errors?: Record<string, string | string[] | null>
+  errors?: Record<string, string | string[] | null | undefined>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'text',
 })
 
-const attrs = useAttrs() // Get rest props
+const attrs = useAttrs() as Record<string, unknown> // Get rest props
 
 const isPassword = props.type === 'password'
 const type = ref(props.type)

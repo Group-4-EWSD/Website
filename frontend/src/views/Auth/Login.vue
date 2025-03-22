@@ -3,7 +3,6 @@ import { useForm } from 'vee-validate'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { useCookies } from 'vue3-cookies'
 import * as yup from 'yup'
 
 import { login } from '@/api/auth'
@@ -13,7 +12,10 @@ import FormElement from '@/components/shared/FormElement.vue'
 import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { setCookie } from '@/lib/utils'
 import type { Credentials } from '@/types/auth'
+import { useUserStore } from '@/stores/user'
+import type { User } from '@/types/user'
 
 const router = useRouter()
 const loading = ref(false)
@@ -40,18 +42,46 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
 
   login(values as Credentials)
     .then((response) => {
+      console.log(response)
+
       if (!response.data) {
         toast.error('Invalid credentials')
       } else {
-        const { cookies } = useCookies()
-        cookies.set('token', response.data.token)
-        router.push('/')
+        setCookie('token', response.data.token)
+
+        const userStore = useUserStore()
+
+        const user = response.data.user as User;
+        userStore.setUser(user)
+
+        let userRole = user.user_type_name
+
+        // Role-based redirection
+        switch (userRole) {
+          case 'Student':
+            router.push('/student/home')
+            break
+          case 'Guest':
+            router.push('/guest/home')
+            break
+          case 'Marketing Coordinator':
+            router.push('/coordinator/dashboard')
+            break
+          case 'Admin':
+            router.push('/admin/dashboard')
+            break
+          case 'Marketing Manager':
+            router.push('/manager/dashboard')
+            break
+          default:
+            router.push('/')
+        }
       }
       loading.value = false
     })
     .catch((error) => {
       loading.value = false
-      toast.error(`An error occurred: ${error.message}`)
+      toast.error(error.response.data.message)
     })
 })
 </script>
@@ -90,9 +120,10 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         {{ loading ? 'Logging in...' : 'Login' }}
       </Button>
     </form>
-    <div class="flex justify-between text-sm">
-      <router-link to="/auth/forgot-password" class="text-primary hover:underline">Forgot password?</router-link>
-      <router-link to="/auth/register" class="text-primary hover:underline">Register</router-link>
+    <div class="flex justify-end text-sm">
+      <router-link to="/auth/forgot-password" class="text-primary hover:underline"
+        >Forgot password?</router-link
+      >
     </div>
   </AuthBaseLayout>
 </template>

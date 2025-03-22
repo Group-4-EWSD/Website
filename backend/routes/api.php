@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
         Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getUserList']);
+        Route::patch('/update-password', [UserController::class, 'updatePassword']);
     });
     Route::post('/logout', [UserController::class, 'logout']);
     // User routes

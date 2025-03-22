@@ -12,10 +12,7 @@ const props = defineProps<{
   <li
     data-sidebar="menu-item"
     :class="
-      cn(
-        'group/menu-item relative p-[10px] hover:bg-primary hover:text-white hover:rounded-lg',
-        props.class,
-      )
+      cn('group/menu-item relative hover:bg-primary hover:text-white hover:rounded-lg', props.class)
     "
   >
     <slot />

@@ -3,12 +3,10 @@ import dayjs from 'dayjs'
 import {
   ArrowDown,
   ArrowUp,
-  ChevronLeft,
-  ChevronRight,
   Edit,
-  Loader2,
+  KeyRound,
+  Plus,
   Search,
-  Trash,
 } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 
@@ -23,7 +21,18 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import Layout from '@/components/ui/Layout.vue'
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+} from '@/components/ui/pagination'
 import {
   Select,
   SelectContent,
@@ -31,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -78,10 +88,21 @@ const faculties = ref<Faculty[]>([])
 const isLoading = ref(true)
 const currentPage = ref(1)
 const pageSize = ref(10)
+const totalItems = ref(0)
 const sortColumn = ref('id')
 const sortDirection = ref<SortDirection>('asc')
-const showDeleteDialog = ref(false)
-const userToDelete = ref<User | null>(null)
+const showUserDialog = ref(false)
+const showForcePasswordDialog = ref(false)
+const userToEdit = ref<User | null>(null)
+const userToForcePasswordChange = ref<User | null>(null)
+
+// Form data for add/edit user
+const formData = ref({
+  name: '',
+  email: '',
+  userType: '',
+  faculty: '',
+})
 
 const columns: Column[] = [
   { key: 'id', label: 'ID' },
@@ -92,12 +113,44 @@ const columns: Column[] = [
   { key: 'createdAt', label: 'Created At' },
 ]
 
+// Fetch users with pagination
+async function fetchUsers(page: number = 1) {
+  try {
+    isLoading.value = true
+    // Simulate API call with pagination
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    // In a real application, you would make an API call here with the following parameters:
+    // - page
+    // - pageSize
+    // - searchQuery
+    // - selectedUserType
+    // - selectedFaculty
+    // - sortColumn
+    // - sortDirection
+
+    // For demo purposes, we'll simulate the API response
+    const start = (page - 1) * pageSize.value
+    const end = start + pageSize.value
+    const filteredData = users.value.slice(start, end)
+    totalItems.value = users.value.length // In real app, this would come from API
+
+    return filteredData
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    return []
+  } finally {
+    isLoading.value = false
+  }
+}
+
 // Sample data - replace with actual API call
 onMounted(async () => {
   try {
-    // Simulate API call
+    // Simulate API call for initial data
     await new Promise((resolve) => setTimeout(resolve, 500))
 
+    // Sample data
     users.value = [
       {
         id: 1,
@@ -204,81 +257,31 @@ onMounted(async () => {
       { id: '4', name: 'Arts' },
     ]
 
-    isLoading.value = false
+    // Fetch first page of users
+    await fetchUsers(1)
   } catch (error) {
-    console.error('Error fetching users:', error)
-    isLoading.value = false
+    console.error('Error initializing data:', error)
   }
-})
-
-const filteredUsers = computed(() => {
-  let result = [...users.value]
-
-  // Apply user type filter
-  if (selectedUserType.value) {
-    if (selectedUserType.value !== '5') {
-      result = result.filter((user) => user.userType === selectedUserType.value)
-    }
-  }
-
-  // Apply faculty filter (only if applicable)
-  if (selectedFaculty.value && !['3', '4'].includes(selectedUserType.value)) {
-    result = result.filter((user) => user.faculty && user.faculty.id === selectedFaculty.value)
-  }
-
-  // Apply search filter
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    result = result.filter(
-      (user) => user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query),
-    )
-  }
-
-  // Apply sorting
-  result.sort((a, b) => {
-    let valueA: string | number
-    let valueB: string | number
-
-    if (sortColumn.value === 'faculty') {
-      valueA = a.faculty ? a.faculty.name.toLowerCase() : ''
-      valueB = b.faculty ? b.faculty.name.toLowerCase() : ''
-    } else if (sortColumn.value === 'id') {
-      valueA = a.id
-      valueB = b.id
-    } else {
-      valueA =
-        typeof a[sortColumn.value as keyof User] === 'string'
-          ? (a[sortColumn.value as keyof User] as string).toLowerCase()
-          : (a[sortColumn.value as keyof User] as number)
-      valueB =
-        typeof b[sortColumn.value as keyof User] === 'string'
-          ? (b[sortColumn.value as keyof User] as string).toLowerCase()
-          : (b[sortColumn.value as keyof User] as number)
-    }
-
-    if (valueA < valueB) return sortDirection.value === 'asc' ? -1 : 1
-    if (valueA > valueB) return sortDirection.value === 'asc' ? 1 : -1
-    return 0
-  })
-
-  return result
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(filteredUsers.value.length / pageSize.value)
+  return Math.ceil(totalItems.value / pageSize.value)
 })
 
-const startIndex = computed(() => {
-  return (currentPage.value - 1) * pageSize.value
-})
+function handlePageChange(page: number) {
+  currentPage.value = page
+  fetchUsers(page)
+}
 
-const endIndex = computed(() => {
-  return startIndex.value + pageSize.value
-})
+function handleSearch(): void {
+  currentPage.value = 1
+  fetchUsers(1)
+}
 
-const paginatedUsers = computed(() => {
-  return filteredUsers.value.slice(startIndex.value, endIndex.value)
-})
+function handleFilters(): void {
+  currentPage.value = 1
+  fetchUsers(1)
+}
 
 function getUserTypeName(type: string): string {
   const types: Record<string, string> = {
@@ -306,14 +309,6 @@ function formatDate(dateString: string): string {
   return dayjs(dateString).format('MMM d, yyyy')
 }
 
-function handleSearch(): void {
-  currentPage.value = 1
-}
-
-function handleFilters(): void {
-  currentPage.value = 1
-}
-
 function updateUserType(value: string): void {
   selectedUserType.value = value
   // Reset faculty if user type is manager or admin
@@ -338,23 +333,72 @@ function sortBy(column: string): void {
 }
 
 function editUser(user: User): void {
-  // Implement your edit logic here
-  console.log('Edit user:', user)
-}
-
-function confirmDeleteUser(user: User): void {
-  userToDelete.value = user
-  showDeleteDialog.value = true
-}
-
-function deleteUser(): void {
-  if (userToDelete.value) {
-    // Implement your delete logic here
-    console.log('Delete user:', userToDelete.value)
-    users.value = users.value.filter((u) => u.id !== userToDelete.value!.id)
-    showDeleteDialog.value = false
-    userToDelete.value = null
+  userToEdit.value = user
+  formData.value = {
+    name: user.name,
+    email: user.email,
+    userType: user.userType,
+    faculty: user.faculty?.id || '',
   }
+  showUserDialog.value = true
+}
+
+function addUser(): void {
+  userToEdit.value = null
+  formData.value = {
+    name: '',
+    email: '',
+    userType: '',
+    faculty: '',
+  }
+  showUserDialog.value = true
+}
+
+function confirmForcePasswordChange(user: User): void {
+  userToForcePasswordChange.value = user
+  showForcePasswordDialog.value = true
+}
+
+function forcePasswordChange(): void {
+  if (userToForcePasswordChange.value) {
+    // Implement your force password change logic here
+    console.log('Force password change for user:', userToForcePasswordChange.value)
+    showForcePasswordDialog.value = false
+    userToForcePasswordChange.value = null
+  }
+}
+
+function saveUser(): void {
+  if (userToEdit.value) {
+    // Update existing user
+    const index = users.value.findIndex((u) => u.id === userToEdit.value!.id)
+    if (index !== -1) {
+      users.value[index] = {
+        ...users.value[index],
+        name: formData.value.name,
+        email: formData.value.email,
+        userType: formData.value.userType,
+        faculty: formData.value.faculty
+          ? faculties.value.find((f) => f.id === formData.value.faculty) || null
+          : null,
+      }
+    }
+  } else {
+    // Add new user
+    const newUser: User = {
+      id: users.value.length + 1,
+      name: formData.value.name,
+      email: formData.value.email,
+      userType: formData.value.userType,
+      faculty: formData.value.faculty
+        ? faculties.value.find((f) => f.id === formData.value.faculty) || null
+        : null,
+      createdAt: new Date().toISOString(),
+    }
+    users.value.push(newUser)
+  }
+  showUserDialog.value = false
+  userToEdit.value = null
 }
 </script>
 
@@ -409,6 +453,12 @@ function deleteUser(): void {
               </SelectItem>
             </SelectContent>
           </Select>
+
+          <!-- Add User Button -->
+          <Button @click="addUser">
+            <Plus class="h-4 w-4 mr-2" />
+            Add User
+          </Button>
         </div>
       </div>
 
@@ -438,62 +488,163 @@ function deleteUser(): void {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-if="isLoading">
-              <TableCell :colspan="columns.length + 1" class="text-center">
-                <div class="flex justify-center items-center">
-                  <Loader2 class="h-4 w-4 mr-2 animate-spin" />
-                  <span>Loading...</span>
-                </div>
-              </TableCell>
-            </TableRow>
-            <TableRow v-else-if="filteredUsers.length === 0">
-              <TableCell :colspan="columns.length + 1" class="text-center">
-                No users found
-              </TableCell>
-            </TableRow>
-            <TableRow v-for="user in paginatedUsers" :key="user.id">
-              <TableCell class="pl-6">{{ user.id }}</TableCell>
-              <TableCell>{{ user.name }}</TableCell>
-              <TableCell>{{ user.email }}</TableCell>
-              <TableCell>{{ getUserTypeName(user.userType) }}</TableCell>
-              <TableCell>{{ user.faculty ? user.faculty.name : '-' }}</TableCell>
-              <TableCell>{{ formatDate(user.createdAt) }}</TableCell>
-              <TableCell>
-                <div class="flex space-x-2">
-                  <Button variant="ghost" size="icon" @click="editUser(user)">
-                    <Edit class="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" @click="confirmDeleteUser(user)">
-                    <Trash class="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
+            <template v-if="isLoading">
+              <TableRow v-for="n in pageSize" :key="n">
+                <TableCell class="pl-6">
+                  <Skeleton class="h-4 w-8" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton class="h-4 w-32" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton class="h-4 w-48" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton class="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton class="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton class="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <div class="flex space-x-2">
+                    <Skeleton class="h-8 w-8" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            </template>
+            <template v-else>
+              <TableRow v-if="users.length === 0">
+                <TableCell :colspan="columns.length + 1" class="text-center">
+                  No users found
+                </TableCell>
+              </TableRow>
+              <TableRow v-for="user in users" :key="user.id">
+                <TableCell class="pl-6">{{ user.id }}</TableCell>
+                <TableCell>{{ user.name }}</TableCell>
+                <TableCell>{{ user.email }}</TableCell>
+                <TableCell>{{ getUserTypeName(user.userType) }}</TableCell>
+                <TableCell>{{ user.faculty ? user.faculty.name : '-' }}</TableCell>
+                <TableCell>{{ formatDate(user.createdAt) }}</TableCell>
+                <TableCell>
+                  <div class="flex space-x-2">
+                    <Button variant="ghost" size="icon" @click="editUser(user)">
+                      <Edit class="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" @click="confirmForcePasswordChange(user)">
+                      <KeyRound class="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </template>
           </TableBody>
         </Table>
 
-        <!-- Pagination using Shadcn -->
+        <!-- Pagination -->
         <div class="flex items-center justify-between px-6 py-4 border-t">
           <div class="text-sm text-muted-foreground">
-            Showing {{ paginatedUsers.length > 0 ? startIndex + 1 : 0 }} to
-            {{ Math.min(endIndex, filteredUsers.length) }} of {{ filteredUsers.length }} users
+            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} users
           </div>
-
+          <Pagination
+            :items-per-page="pageSize"
+            :total="totalItems"
+            :sibling-count="1"
+            show-edges
+            :default-page="currentPage"
+            @update:page="handlePageChange"
+          >
+            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+              <PaginationFirst />
+              <PaginationPrev />
+              <template v-for="(item, index) in items" :key="index">
+                <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+                  <Button
+                    class="w-10 h-10 p-0"
+                    :variant="item.value === currentPage ? 'default' : 'outline'"
+                    @click="handlePageChange(item.value)"
+                  >
+                    {{ item.value }}
+                  </Button>
+                </PaginationListItem>
+                <PaginationEllipsis v-else />
+              </template>
+              <PaginationNext />
+              <PaginationLast />
+            </PaginationList>
+          </Pagination>
         </div>
       </Card>
 
-      <!-- Delete Confirmation Dialog -->
-      <Dialog v-model:open="showDeleteDialog">
+      <!-- Add/Edit User Dialog -->
+      <Dialog v-model:open="showUserDialog">
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>{{ userToEdit ? 'Edit User' : 'Add User' }}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be undone.
+              {{ userToEdit ? 'Update user information below.' : 'Fill in the user information below.' }}
+            </DialogDescription>
+          </DialogHeader>
+          <div class="grid gap-4 py-4">
+            <div class="grid gap-2">
+              <Label for="name">Name</Label>
+              <Input id="name" v-model="formData.name" placeholder="Enter name" />
+            </div>
+            <div class="grid gap-2">
+              <Label for="email">Email</Label>
+              <Input id="email" v-model="formData.email" type="email" placeholder="Enter email" />
+            </div>
+            <div class="grid gap-2">
+              <Label for="userType">User Type</Label>
+              <Select v-model="formData.userType">
+                <SelectTrigger>
+                  <SelectValue :placeholder="getUserTypeLabel(formData.userType)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Guest</SelectItem>
+                  <SelectItem value="1">Student</SelectItem>
+                  <SelectItem value="2">Marketing Coordinator</SelectItem>
+                  <SelectItem value="3">Marketing Manager</SelectItem>
+                  <SelectItem value="4">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div v-if="!['3', '4'].includes(formData.userType)" class="grid gap-2">
+              <Label for="faculty">Faculty</Label>
+              <Select v-model="formData.faculty">
+                <SelectTrigger>
+                  <SelectValue :placeholder="getFacultyLabel(formData.faculty)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="faculty in faculties" :key="faculty.id" :value="faculty.id">
+                    {{ faculty.name }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" @click="showUserDialog = false">Cancel</Button>
+            <Button @click="saveUser">{{ userToEdit ? 'Update' : 'Add' }}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <!-- Force Password Change Dialog -->
+      <Dialog v-model:open="showForcePasswordDialog">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Force Password Change</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to set this user's password to temporary password?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" @click="showDeleteDialog = false">Cancel</Button>
-            <Button variant="destructive" @click="deleteUser">Delete</Button>
+            <Button variant="outline" @click="showForcePasswordDialog = false">Cancel</Button>
+            <Button @click="forcePasswordChange">Confirm</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

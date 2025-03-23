@@ -6,6 +6,7 @@ import { toast } from 'vue-sonner'
 import { getDraftArticles } from '@/api/articles'
 import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
@@ -18,7 +19,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { DraftArticle } from '@/types/article'
-import { Button } from '@/components/ui/button'
 
 const isLoading = ref(false)
 const articles = ref<DraftArticle[]>([])

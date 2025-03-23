@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
-import PageViewsReport from '@/components/pagespecific/admin-reports/PageViewsReport.vue'
 import ActiveUsersReport from '@/components/pagespecific/admin-reports/ActiveUsersReport.vue'
 import BrowsersReport from '@/components/pagespecific/admin-reports/BrowsersReport.vue'
+import PageViewsReport from '@/components/pagespecific/admin-reports/PageViewsReport.vue'
+import Layout from '@/components/ui/Layout.vue'
 </script>
 
 <template>

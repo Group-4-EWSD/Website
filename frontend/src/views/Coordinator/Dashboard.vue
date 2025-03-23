@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import Badge from '@/components/ui/badge/Badge.vue'
-import { ArrowUp, ArrowDown } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp } from 'lucide-vue-next'
 import { ref } from 'vue'
+
+import Badge from '@/components/ui/badge/Badge.vue'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Layout from '@/components/ui/Layout.vue'
 
 const daysLeft = ref(4)
 </script>

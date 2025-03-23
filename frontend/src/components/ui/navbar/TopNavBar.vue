@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
+
 import { useUserStore } from '@/stores/user'
 
 import Input from '../input/Input.vue'

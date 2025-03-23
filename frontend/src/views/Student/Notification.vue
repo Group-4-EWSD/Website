@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { onMounted, ref } from 'vue'
 
 import Layout from '@/components/ui/Layout.vue'
-import { onMounted, ref } from 'vue'
-import { useNotificationsStore } from '@/stores/notification'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
+import { useNotificationsStore } from '@/stores/notification'
 
 dayjs.extend(relativeTime)
 

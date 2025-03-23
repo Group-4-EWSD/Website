@@ -1,6 +1,8 @@
 <!-- PageViewsReport.vue -->
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
+
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -10,6 +12,13 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Table,
   TableBody,
   TableCaption,
@@ -18,14 +27,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 interface PageView {
   id: number

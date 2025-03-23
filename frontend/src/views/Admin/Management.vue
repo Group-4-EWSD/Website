@@ -1,11 +1,28 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
 import dayjs from 'dayjs'
-import { PlusIcon, PencilIcon, TrashIcon, ChevronDownIcon } from 'lucide-vue-next'
+import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
+import { computed, onMounted, reactive, ref } from 'vue'
 
-import Layout from '@/components/ui/Layout.vue'
+import AcademicYears from '@/components/pagespecific/admin-management/AcademicYears.vue'
+import Faculties from '@/components/pagespecific/admin-management/Faculties.vue'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +33,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Select,
   SelectContent,
@@ -31,26 +49,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
 
 // Import child components
-import AcademicYears from '@/components/pagespecific/admin-management/AcademicYears.vue'
-import Faculties from '@/components/pagespecific/admin-management/Faculties.vue'
 
 // Type definitions
 interface AcademicYear {

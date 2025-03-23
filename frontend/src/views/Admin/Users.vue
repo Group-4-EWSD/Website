@@ -1,38 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
 import dayjs from 'dayjs'
 import {
-  Search,
-  Edit,
-  Trash,
-  ArrowUp,
   ArrowDown,
+  ArrowUp,
   ChevronLeft,
   ChevronRight,
+  Edit,
   Loader2,
+  Search,
+  Trash,
 } from 'lucide-vue-next'
-import Layout from '@/components/ui/Layout.vue'
+import { computed, onMounted, ref } from 'vue'
+
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectValue,
-  SelectItem,
-} from '@/components/ui/select'
-
 import { Card } from '@/components/ui/card'
-
 import {
   Dialog,
   DialogContent,
@@ -41,6 +22,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import Layout from '@/components/ui/Layout.vue'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 // import {
 //   Pagination,
 //   PaginationContent,

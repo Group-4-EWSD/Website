@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { PencilIcon } from 'lucide-vue-next'
-import { Card } from '@/components/ui/card'
+import { ref } from 'vue'
+
+import { ArticleStatus } from '@/api/articles'
+import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import {
   Table,
@@ -12,11 +17,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useMyArticlesStore } from '@/stores/my-articles'
-import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+
 import UploadArticle from './UploadArticle.vue'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import { ref } from 'vue'
-import { ArticleStatus } from '@/api/articles'
+
+
+
 
 const myArticlesStore = useMyArticlesStore()
 const showDialog = ref(false)

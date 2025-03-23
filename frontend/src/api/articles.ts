@@ -1,8 +1,8 @@
 import api from '@/api/axios'
 import type {
+  Article,
   ArticleData,
   ArticleParams,
-  Article,
   Category,
   CountData,
   DraftArticle,

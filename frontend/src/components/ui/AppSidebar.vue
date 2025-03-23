@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { BadgeHelp, Bell, CalendarIcon, CircleGauge, FileText, Home, LogOut, Settings, UserIcon } from 'lucide-vue-next'
+import { ref } from 'vue'
 
 import {
   Sidebar,
@@ -8,12 +9,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import Button from './button/Button.vue'
 import { forceSignOut } from '@/lib/utils'
-
-import Separator from './separator/Separator.vue'
 import { useUserStore } from '@/stores/user'
-import { ref } from 'vue'
+
+import Button from './button/Button.vue'
+import Separator from './separator/Separator.vue'
+
 
 const loading = ref(false)
 
@@ -21,7 +22,7 @@ const userStore = useUserStore()
 // const userType = userStore.user?.user_type_name
 let items = []
 
-let userType = "Admin" // just for development purpose
+const userType = "Admin" // just for development purpose
 
 switch (userType) {
   case 'Student':

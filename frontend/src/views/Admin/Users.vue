@@ -405,11 +405,12 @@ function saveUser(): void {
 <template>
   <Layout>
     <div class="p-6 space-y-6">
+      <!-- Header and Filters - Make responsive -->
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 class="text-2xl font-bold">Users Management</h1>
         <div class="flex flex-col gap-4 md:flex-row">
           <!-- Search Input -->
-          <div class="relative">
+          <div class="relative w-full md:w-auto">
             <Input
               v-model="searchQuery"
               placeholder="Search users..."
@@ -424,7 +425,7 @@ function saveUser(): void {
 
           <!-- User Type Filter -->
           <Select :modelValue="selectedUserType" @update:modelValue="updateUserType">
-            <SelectTrigger class="w-[180px]">
+            <SelectTrigger class="w-full md:w-[180px]">
               <SelectValue :placeholder="getUserTypeLabel(selectedUserType)" />
             </SelectTrigger>
             <SelectContent>
@@ -443,7 +444,7 @@ function saveUser(): void {
             :modelValue="selectedFaculty"
             @update:modelValue="updateFaculty"
           >
-            <SelectTrigger class="w-[180px]">
+            <SelectTrigger class="w-full md:w-[180px]">
               <SelectValue :placeholder="getFacultyLabel(selectedFaculty)" />
             </SelectTrigger>
             <SelectContent>
@@ -455,15 +456,15 @@ function saveUser(): void {
           </Select>
 
           <!-- Add User Button -->
-          <Button @click="addUser">
+          <Button @click="addUser" class="w-full md:w-auto">
             <Plus class="h-4 w-4 mr-2" />
             Add User
           </Button>
         </div>
       </div>
 
-      <!-- Users Table -->
-      <Card>
+      <!-- Desktop Table View -->
+      <Card class="hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -543,7 +544,7 @@ function saveUser(): void {
           </TableBody>
         </Table>
 
-        <!-- Pagination -->
+        <!-- Desktop Pagination -->
         <div class="flex items-center justify-between px-6 py-4 border-t">
           <div class="text-sm text-muted-foreground">
             Showing {{ (currentPage - 1) * pageSize + 1 }} to
@@ -578,6 +579,92 @@ function saveUser(): void {
           </Pagination>
         </div>
       </Card>
+
+      <!-- Mobile Card View -->
+      <div class="grid gap-4 md:hidden">
+        <template v-if="isLoading">
+          <Card v-for="n in pageSize" :key="n" class="p-4">
+            <div class="space-y-3">
+              <Skeleton class="h-4 w-1/4" />
+              <Skeleton class="h-4 w-3/4" />
+              <Skeleton class="h-4 w-1/2" />
+              <div class="flex justify-between items-center pt-2">
+                <Skeleton class="h-8 w-8" />
+                <Skeleton class="h-8 w-8" />
+              </div>
+            </div>
+          </Card>
+        </template>
+        <template v-else>
+          <Card v-for="user in users" :key="user.id" class="p-4">
+            <div class="space-y-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="font-medium">{{ user.name }}</h3>
+                  <p class="text-sm text-muted-foreground">{{ user.email }}</p>
+                </div>
+                <div class="flex gap-2">
+                  <Button variant="ghost" size="icon" @click="editUser(user)">
+                    <Edit class="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" @click="confirmForcePasswordChange(user)">
+                    <KeyRound class="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span class="text-muted-foreground">User Type:</span>
+                  <p>{{ getUserTypeName(user.userType) }}</p>
+                </div>
+                <div>
+                  <span class="text-muted-foreground">Faculty:</span>
+                  <p>{{ user.faculty ? user.faculty.name : '-' }}</p>
+                </div>
+                <div class="col-span-2">
+                  <span class="text-muted-foreground">Created:</span>
+                  <p>{{ formatDate(user.createdAt) }}</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </template>
+
+        <!-- Mobile Pagination -->
+        <div class="flex flex-col gap-4 items-center">
+          <div class="text-sm text-muted-foreground text-center">
+            Showing {{ (currentPage - 1) * pageSize + 1 }} to
+            {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} users
+          </div>
+          <Pagination
+            :items-per-page="pageSize"
+            :total="totalItems"
+            :sibling-count="1"
+            show-edges
+            :default-page="currentPage"
+            @update:page="handlePageChange"
+          >
+            <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+              <PaginationFirst />
+              <PaginationPrev />
+              <template v-for="(item, index) in items" :key="index">
+                <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+                  <Button
+                    class="w-8 h-8 p-0"
+                    :variant="item.value === currentPage ? 'default' : 'outline'"
+                    @click="handlePageChange(item.value)"
+                  >
+                    {{ item.value }}
+                  </Button>
+                </PaginationListItem>
+                <PaginationEllipsis v-else />
+              </template>
+              <PaginationNext />
+              <PaginationLast />
+            </PaginationList>
+          </Pagination>
+        </div>
+      </div>
 
       <!-- Add/Edit User Dialog -->
       <Dialog v-model:open="showUserDialog">

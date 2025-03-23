@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, computed } from 'vue'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,6 @@ interface Browser {
   id: number
   name: string
   version: string
-  icon: string
   percentage: number
   count: number
   trend: 'up' | 'down' | 'stable'
@@ -55,6 +54,12 @@ export default defineComponent({
     const isLoading = ref<boolean>(true)
     const timeRange = ref<string>('7d')
     const totalUsers = ref<number>(0)
+    const isMobile = ref<boolean>(false)
+
+    // Check if mobile view
+    const checkMobile = () => {
+      isMobile.value = window.innerWidth < 640
+    }
 
     const fetchBrowserData = async (range: string) => {
       isLoading.value = true
@@ -72,7 +77,6 @@ export default defineComponent({
             id: 1,
             name: 'Chrome',
             version: '119.0',
-            icon: '🌐',
             percentage: 64.5,
             count: 32250,
             trend: 'up',
@@ -82,7 +86,6 @@ export default defineComponent({
             id: 2,
             name: 'Safari',
             version: '16.0',
-            icon: '🧭',
             percentage: 18.2,
             count: 9100,
             trend: 'down',
@@ -92,7 +95,6 @@ export default defineComponent({
             id: 3,
             name: 'Firefox',
             version: '115.0',
-            icon: '🦊',
             percentage: 7.8,
             count: 3900,
             trend: 'stable',
@@ -102,7 +104,6 @@ export default defineComponent({
             id: 4,
             name: 'Edge',
             version: '118.0',
-            icon: '🔷',
             percentage: 5.3,
             count: 2650,
             trend: 'up',
@@ -112,7 +113,6 @@ export default defineComponent({
             id: 5,
             name: 'Opera',
             version: '103.0',
-            icon: '🔴',
             percentage: 2.1,
             count: 1050,
             trend: 'down',
@@ -122,7 +122,6 @@ export default defineComponent({
             id: 6,
             name: 'Samsung Internet',
             version: '21.0',
-            icon: '📱',
             percentage: 1.6,
             count: 800,
             trend: 'up',
@@ -132,7 +131,6 @@ export default defineComponent({
             id: 7,
             name: 'Others',
             version: '-',
-            icon: '🔍',
             percentage: 0.5,
             count: 250,
             trend: 'stable',
@@ -163,6 +161,8 @@ export default defineComponent({
 
     onMounted(() => {
       fetchBrowserData(timeRange.value)
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
     })
 
     return {
@@ -170,6 +170,7 @@ export default defineComponent({
       isLoading,
       timeRange,
       totalUsers,
+      isMobile,
       handleRangeChange,
       getTrendColor,
       getTrendIcon,
@@ -204,13 +205,13 @@ export default defineComponent({
         <div class="text-sm text-muted-foreground mb-4">
           Total users: {{ totalUsers.toLocaleString() }}
         </div>
-        <div class="space-y-4">
+        
+        <!-- Desktop View -->
+        <div v-if="!isMobile" class="space-y-4">
           <div v-for="browser in browsers" :key="browser.id" class="space-y-2">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="text-lg">{{ browser.icon }}</span>
                 <span class="font-medium">{{ browser.name }}</span>
-                <!-- <Badge variant="outline" class="ml-2">v{{ browser.version }}</Badge> -->
               </div>
               <div class="flex items-center gap-2">
                 <span class="font-semibold">{{ browser.count.toLocaleString() }} users</span>
@@ -219,7 +220,20 @@ export default defineComponent({
             <Separator v-if="browser.id !== browsers.length" class="mt-4" />
           </div>
         </div>
+        
+        <!-- Mobile View -->
+        <div v-else class="space-y-4">
+          <div v-for="browser in browsers" :key="browser.id" class="space-y-2">
+            <div class="flex flex-col">
+              <span class="font-medium">{{ browser.name }}</span>
+              <span class="font-semibold">{{ browser.count.toLocaleString() }} users</span>
+            </div>
+            <Separator v-if="browser.id !== browsers.length" class="mt-4" />
+          </div>
+        </div>
       </div>
+      
+      <!-- Loading skeleton -->
       <div v-else class="space-y-4">
         <div v-for="i in 5" :key="i" class="space-y-2">
           <div class="flex justify-between">

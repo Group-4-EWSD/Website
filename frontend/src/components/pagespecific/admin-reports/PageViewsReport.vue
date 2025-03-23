@@ -1,6 +1,6 @@
 <!-- PageViewsReport.vue -->
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onMounted, ref, computed } from 'vue'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -63,6 +63,12 @@ export default defineComponent({
     const pageViews = ref<PageView[]>([])
     const isLoading = ref<boolean>(true)
     const timeRange = ref<string>('7d')
+    const isMobileView = ref<boolean>(false)
+
+    // Check if the screen is mobile size
+    const checkMobileView = () => {
+      isMobileView.value = window.innerWidth < 640
+    }
 
     const fetchPageViews = async (range: string) => {
       isLoading.value = true
@@ -150,6 +156,8 @@ export default defineComponent({
 
     onMounted(() => {
       fetchPageViews(timeRange.value)
+      checkMobileView()
+      window.addEventListener('resize', checkMobileView)
     })
 
     return {
@@ -157,6 +165,7 @@ export default defineComponent({
       isLoading,
       timeRange,
       handleRangeChange,
+      isMobileView,
     }
   },
 })
@@ -165,7 +174,7 @@ export default defineComponent({
 <template>
   <Card class="w-full">
     <CardHeader>
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div class="flex flex-col gap-2">
           <CardTitle>Most Viewed Pages</CardTitle>
           <CardDescription>See which pages are attracting the most traffic</CardDescription>
@@ -184,29 +193,60 @@ export default defineComponent({
       </div>
     </CardHeader>
     <CardContent>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Page</TableHead>
-            <TableHead>Path</TableHead>
-            <TableHead class="text-right">Views</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody v-if="!isLoading">
-          <TableRow v-for="page in pageViews" :key="page.id">
-            <TableCell class="font-medium">{{ page.title }}</TableCell>
-            <TableCell>{{ page.path }}</TableCell>
-            <TableCell class="text-right">{{ page.views.toLocaleString() }}</TableCell>
-          </TableRow>
-        </TableBody>
-        <TableBody v-else>
-          <TableRow v-for="i in 5" :key="i">
-            <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
-            <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
-            <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <!-- Desktop Table View (Hidden on Mobile) -->
+      <div class="hidden sm:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead class="whitespace-nowrap">Page</TableHead>
+              <TableHead class="whitespace-nowrap">Path</TableHead>
+              <TableHead class="text-right whitespace-nowrap">Views</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody v-if="!isLoading">
+            <TableRow v-for="page in pageViews" :key="page.id">
+              <TableCell class="font-medium">{{ page.title }}</TableCell>
+              <TableCell>{{ page.path }}</TableCell>
+              <TableCell class="text-right">{{ page.views.toLocaleString() }}</TableCell>
+            </TableRow>
+          </TableBody>
+          <TableBody v-else>
+            <TableRow v-for="i in 5" :key="i">
+              <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
+              <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
+              <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+
+      <!-- Mobile Card View (Visible only on Mobile) -->
+      <div class="block sm:hidden">
+        <div v-if="!isLoading" class="space-y-2">
+          <div
+            v-for="page in pageViews"
+            :key="page.id"
+            class="border rounded-lg p-3 flex items-center justify-between"
+          >
+            <div class="min-w-0 flex-1">
+              <h3 class="font-medium text-sm truncate">{{ page.title }}</h3>
+              <p class="text-xs text-gray-500 truncate">{{ page.path }}</p>
+            </div>
+            <span class="text-sm font-medium text-gray-900 ml-2 whitespace-nowrap">
+              {{ page.views.toLocaleString() }}
+            </span>
+          </div>
+        </div>
+        <div v-else class="space-y-2">
+          <div v-for="i in 5" :key="i" class="border rounded-lg p-3 flex items-center">
+            <div class="flex-1">
+              <div class="h-4 bg-gray-200 rounded animate-pulse mb-1 w-2/3"></div>
+              <div class="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
+            </div>
+            <div class="h-4 bg-gray-200 rounded animate-pulse w-12 ml-2"></div>
+          </div>
+        </div>
+      </div>
     </CardContent>
   </Card>
 </template>

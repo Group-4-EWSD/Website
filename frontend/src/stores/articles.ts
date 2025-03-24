@@ -9,13 +9,17 @@ export const useArticleStore = defineStore('article', () => {
   const articles = ref<Article[]>([])
   const currentPage = ref<number>(1)
   const displayNumber = 5
-  const isLoading = ref(false)
-  const isFetched = ref(false)
   const totalPages = ref(1)
   const sortOption = ref<string>('')
 
+  const isLoading = ref(false)
+  const isFetched = ref(false)
+  const error = ref<string | null>(null)
+
   const fetchArticles = async (page: number) => {
     isLoading.value = true
+    error.value = null
+
     await getArticles({
       displayNumber,
       pageNumber: page,
@@ -30,6 +34,8 @@ export const useArticleStore = defineStore('article', () => {
       .catch((error) => {
         isLoading.value = false
         toast.error(error.response.data.message)
+        console.error('Error fetching articles:', error)
+        error.value = 'Failed to load articles. Please try again.'
       })
   }
 
@@ -42,6 +48,8 @@ export const useArticleStore = defineStore('article', () => {
     isFetched,
     totalPages,
     sortOption,
+    error,
+
     fetchArticles,
   }
 })

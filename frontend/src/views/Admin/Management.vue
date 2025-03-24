@@ -146,6 +146,9 @@ const submissionForm = reactive<SubmissionForm>({
   actualSubmissionDate: '',
 })
 
+// Screen size state
+const isMobileView = ref(false)
+
 // Helper functions
 const getAcademicYearName = (id: number): string => {
   const year = academicYears.value.find((y) => y.id === id)
@@ -298,14 +301,25 @@ const deleteFaculty = (facultyId: number): void => {
   submissionDates.value = submissionDates.value.filter((d) => d.facultyId !== facultyId)
 }
 
+// Check if we're in mobile view
+const checkMobileView = () => {
+  isMobileView.value = window.innerWidth < 768
+}
+
 onMounted(() => {
   // You would typically fetch data from an API here
   console.log('Component mounted')
+  
+  // Set initial screen size
+  checkMobileView()
+  
+  // Listen for window resize events
+  window.addEventListener('resize', checkMobileView)
 })
 </script>
 <template>
   <Layout>
-    <h1 class="text-2xl font-bold mb-4">Academic Management Dashboard</h1>
+    <h1 class="text-2xl font-bold mb-4">Academic Management</h1>
 
     <!-- Accordion for switching between different sections -->
     <div class="mb-8">
@@ -313,24 +327,21 @@ onMounted(() => {
         <!-- Submission Dates Accordion (Open by default) -->
 
         <AccordionItem value="submission-dates">
-          <AccordionTrigger>
-            <div class="flex flex-col gap-2 items-start">
-              <h3 class="text-xl font-semibold">Submission Dates</h3>
-              <p>Manage pre-submission and actual submission dates for each academic year and faculty </p>
+          <AccordionTrigger class="[&[data-state=open]]:text-secondary">
+            <div class="flex flex-col gap-2 items-start justify-start">
+              <h3 class="text-lg font-semibold">Submission Dates</h3>
+              <p class="text-sm text-left">Manage pre-submission and actual submission dates for each academic year and faculty</p>
             </div>
           </AccordionTrigger>
           <AccordionContent>
             <Card class="mt-4">
-              <CardHeader>
-                <CardTitle class="text-2xl">Submission Dates</CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent class="pt-6">
                 <div class="flex flex-col sm:flex-row sm:justify-between mb-4 gap-4">
                   <div class="flex items-center gap-3">
-                    <Label for="academicYearFilter" class="font-medium whitespace-nowrap"
+                    <Label for="academicYearFilter" class="font-medium whitespace-nowrap text-sm md:text-base"
                       >Academic Year:</Label
                     >
-                    <Select v-model="selectedAcademicYearFilter" class="w-40">
+                    <Select v-model="selectedAcademicYearFilter" class="w-32 md:w-40">
                       <SelectTrigger id="academicYearFilter">
                         <SelectValue placeholder="Select year" />
                       </SelectTrigger>
@@ -342,13 +353,13 @@ onMounted(() => {
                     </Select>
                   </div>
 
-                  <Button @click="openSubmissionModal(null)" :disabled="!isCurrentAcademicYear">
+                  <Button @click="openSubmissionModal(null)" :disabled="!isCurrentAcademicYear" class="w-full sm:w-auto">
                     <PlusIcon class="mr-2 h-4 w-4" /> Add New Date
                   </Button>
                 </div>
 
-                <!-- Submission Dates Table -->
-                <div class="rounded-md border">
+                <!-- Submission Dates Table for larger screens -->
+                <div class="rounded-md border hidden md:block">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -394,6 +405,51 @@ onMounted(() => {
                     </TableBody>
                   </Table>
                 </div>
+
+                <!-- Mobile Card List View -->
+                <div class="md:hidden space-y-4">
+                  <div v-for="date in filteredSubmissionDates" :key="date.id" 
+                       class="p-4 border rounded-md shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="font-medium">{{ getFacultyName(date.facultyId) }}</div>
+                      <div class="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          @click="openSubmissionModal(date)"
+                          :disabled="date.academicYearId !== getCurrentAcademicYearId()"
+                          class="h-8 w-8"
+                        >
+                          <PencilIcon class="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          @click="confirmDeleteSubmission(date)"
+                          :disabled="date.academicYearId !== getCurrentAcademicYearId()"
+                          class="h-8 w-8"
+                        >
+                          <TrashIcon class="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div class="text-sm text-gray-500">{{ getAcademicYearName(date.academicYearId) }}</div>
+                    <div class="grid grid-cols-2 gap-2 mt-3 text-sm">
+                      <div>
+                        <div class="font-medium">Pre-Submission:</div>
+                        <div>{{ formatDate(date.preSubmissionDate) }}</div>
+                      </div>
+                      <div>
+                        <div class="font-medium">Actual Submission:</div>
+                        <div>{{ formatDate(date.actualSubmissionDate) }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="filteredSubmissionDates.length === 0" 
+                       class="text-center py-6 text-gray-500 border rounded-md">
+                    No submission dates found for the selected academic year.
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </AccordionContent>
@@ -401,10 +457,10 @@ onMounted(() => {
 
         <!-- Academic Years Accordion -->
         <AccordionItem value="academic-years">
-          <AccordionTrigger>
+          <AccordionTrigger class="[&[data-state=open]]:text-secondary">
             <div class="flex flex-col gap-2 items-start">
-              <h3 class="text-xl font-semibold">Academic Years</h3>
-              <p>Manage academic years in the system</p>
+              <h3 class="text-lg font-semibold">Academic Years</h3>
+              <p class="text-sm">Manage academic years in the system</p>
             </div>
           </AccordionTrigger>
           <AccordionContent>
@@ -421,10 +477,10 @@ onMounted(() => {
 
         <!-- Faculties Accordion -->
         <AccordionItem value="faculties">
-          <AccordionTrigger>
+          <AccordionTrigger class="[&[data-state=open]]:text-secondary">
             <div class="flex flex-col gap-2 items-start">
-              <h3 class="text-xl font-semibold">Faculties</h3>
-              <p>Manage faculties in the system</p>
+              <h3 class="text-lg font-semibold">Faculties</h3>
+              <p class="text-sm">Manage faculties in the system</p>
             </div>
           </AccordionTrigger>
           <AccordionContent>
@@ -443,7 +499,7 @@ onMounted(() => {
 
     <!-- Submission Date Modal -->
     <Dialog :open="isSubmissionModalOpen" @update:open="isSubmissionModalOpen = $event">
-      <DialogContent class="sm:max-w-[500px]">
+      <DialogContent class="sm:max-w-[500px] w-[95vw] mx-auto">
         <DialogHeader>
           <DialogTitle>{{ editingSubmission ? 'Edit' : 'Add' }} Submission Date</DialogTitle>
           <DialogDescription>
@@ -495,25 +551,25 @@ onMounted(() => {
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" @click="isSubmissionModalOpen = false">Cancel</Button>
-          <Button @click="saveSubmissionDate">Save</Button>
+        <DialogFooter class="flex-col sm:flex-row gap-2">
+          <Button variant="outline" @click="isSubmissionModalOpen = false" class="w-full sm:w-auto">Cancel</Button>
+          <Button @click="saveSubmissionDate" class="w-full sm:w-auto">Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
 
     <!-- Delete Confirmation Modal -->
     <AlertDialog :open="isDeleteDialogOpen" @update:open="isDeleteDialogOpen = $event">
-      <AlertDialogContent>
+      <AlertDialogContent class="w-[95vw] mx-auto sm:w-auto">
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete this item from the database.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
-          <AlertDialogAction @click="confirmDelete">Delete</AlertDialogAction>
+        <AlertDialogFooter class="flex-col sm:flex-row gap-2">
+          <AlertDialogCancel class="w-full sm:w-auto" @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
+          <AlertDialogAction class="w-full sm:w-auto" @click="confirmDelete">Delete</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

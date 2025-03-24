@@ -404,7 +404,7 @@ function saveUser(): void {
 
 <template>
   <Layout>
-    <div class="p-6 space-y-6">
+    <div class="space-y-6">
       <!-- Header and Filters - Make responsive -->
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 class="text-2xl font-bold">Users Management</h1>
@@ -668,7 +668,7 @@ function saveUser(): void {
 
       <!-- Add/Edit User Dialog -->
       <Dialog v-model:open="showUserDialog">
-        <DialogContent>
+        <DialogContent class="w-[90vw]">
           <DialogHeader>
             <DialogTitle>{{ userToEdit ? 'Edit User' : 'Add User' }}</DialogTitle>
             <DialogDescription>
@@ -713,7 +713,7 @@ function saveUser(): void {
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
             <Button variant="outline" @click="showUserDialog = false">Cancel</Button>
             <Button @click="saveUser">{{ userToEdit ? 'Update' : 'Add' }}</Button>
           </DialogFooter>

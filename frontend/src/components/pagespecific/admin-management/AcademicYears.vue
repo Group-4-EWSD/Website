@@ -86,40 +86,40 @@ const deleteAcademicYear = (): void => {
 <template>
   <Card>
     <CardContent class="pt-6">
-      <div class="flex justify-between mb-4">
-        <h3 class="text-lg font-medium">Current Academic Years</h3>
-        <Button @click="openModal(null)">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <h3 class="text-lg font-medium hidden md:block">Current Academic Years</h3>
+        <Button @click="openModal(null)" class="w-full sm:w-auto">
           <PlusIcon class="mr-2 h-4 w-4" /> Add Academic Year
         </Button>
       </div>
 
       <!-- Academic Years Table -->
-      <div class="rounded-md border">
+      <div class="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              <TableHead class="w-16">ID</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead class="text-right">Actions</TableHead>
+              <TableHead class="w-24 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow v-for="year in academicYears" :key="year.id">
-              <TableCell>{{ year.id }}</TableCell>
+              <TableCell class="font-medium">{{ year.id }}</TableCell>
               <TableCell>{{ year.name }}</TableCell>
               <TableCell class="text-right">
-                <div class="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon" @click="openModal(year)">
+                <div class="flex justify-end gap-1 md:gap-2">
+                  <Button variant="ghost" size="icon" @click="openModal(year)" class="h-8 w-8">
                     <PencilIcon class="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" @click="confirmDelete(year)">
+                  <Button variant="ghost" size="icon" @click="confirmDelete(year)" class="h-8 w-8">
                     <TrashIcon class="h-4 w-4" />
                   </Button>
                 </div>
               </TableCell>
             </TableRow>
             <TableRow v-if="academicYears.length === 0">
-              <TableCell colspan="3" class="text-center py-6 text-gray-500">
+              <TableCell colspan="3" class="text-center py-4 md:py-6 text-gray-500">
                 No academic years found. Add one to get started.
               </TableCell>
             </TableRow>
@@ -131,7 +131,7 @@ const deleteAcademicYear = (): void => {
 
   <!-- Academic Year Modal -->
   <Dialog :open="isModalOpen" @update:open="isModalOpen = $event">
-    <DialogContent class="sm:max-w-[425px]">
+    <DialogContent class="w-[90vw] max-w-[425px]">
       <DialogHeader>
         <DialogTitle>{{ editing ? 'Edit' : 'Add' }} Academic Year</DialogTitle>
         <DialogDescription> Enter the details for the academic year </DialogDescription>
@@ -144,16 +144,16 @@ const deleteAcademicYear = (): void => {
         </div>
       </div>
 
-      <DialogFooter>
-        <Button variant="outline" @click="isModalOpen = false">Cancel</Button>
-        <Button @click="saveAcademicYear">Save</Button>
+      <DialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
+        <Button variant="outline" @click="isModalOpen = false" class="w-full sm:w-auto">Cancel</Button>
+        <Button @click="saveAcademicYear" class="w-full sm:w-auto">Save</Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 
   <!-- Delete Confirmation Modal -->
   <AlertDialog :open="isDeleteDialogOpen" @update:open="isDeleteDialogOpen = $event">
-    <AlertDialogContent>
+    <AlertDialogContent class="w-[90vw]max-w-[425px]">
       <AlertDialogHeader>
         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
         <AlertDialogDescription>
@@ -161,9 +161,9 @@ const deleteAcademicYear = (): void => {
           associated submission dates.
         </AlertDialogDescription>
       </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
-        <AlertDialogAction @click="deleteAcademicYear">Delete</AlertDialogAction>
+      <AlertDialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
+        <AlertDialogCancel @click="isDeleteDialogOpen = false" class="w-full sm:w-auto">Cancel</AlertDialogCancel>
+        <AlertDialogAction @click="deleteAcademicYear" class="w-full sm:w-auto">Delete</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

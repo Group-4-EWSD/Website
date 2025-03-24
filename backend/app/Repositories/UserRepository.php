@@ -131,6 +131,11 @@ class UserRepository extends BaseRepository
                 $query->where('u.user_name', 'LIKE', "%{$request->userName}%")
             )
             ->when(
+                $request->has('facultyId') && $request->facultyId,
+                fn($query) =>
+                $query->where('u.faculty_id', $request->facultyId)
+            )
+            ->when(
                 $request->has('academicYear') && $request->academicYear,
                 fn($query) =>
                 $query->where('ay.academic_year_start', $request->academicYear)

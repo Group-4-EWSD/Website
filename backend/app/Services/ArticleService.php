@@ -36,9 +36,13 @@ class ArticleService
             'allArticles' => $this->articleRepository->getAllArticles(0, $userId, $request)->get()
         ];
     }
-    public function getCoordinatorHomePageData($userId, $request){
+    public function getCoordinatorHomePageData($userId, $facultyId, $request){
         return [
-            'countData' => $this->articleRepository->getCoordinatorHomeCountData($userId),
+            'prev_login' => $this->articleRepository->getPreviousLogin($userId),
+            'submission_status' => $this->articleRepository->getSubmissionStatus($facultyId),
+            'remaining_final_publish' => $this->articleRepository->getRemainingFinalPublish($facultyId),
+            'current_system_data' => $this->articleRepository->getCurrentSystemData($facultyId),
+            'countData' => $this->articleRepository->getCoordinatorHomeCountData($facultyId),
             'allArticles' => $this->articleRepository->getAllArticles(3, $request)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'guestList' => $this->userRepository->getGuestList()

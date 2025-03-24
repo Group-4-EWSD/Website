@@ -68,6 +68,7 @@ class ArticleController extends Controller
         $user = Auth::user();
         $userId = $user->id;
         $userType = $user->user_type_id;
+        $facultyId = $user->faculty_id;
         if($userType == '0'){ // Guest
             $homePageData = $this->articleService->getGuestHomePageData($userId, $request);
         }else if($userType == '1'){ // Student
@@ -80,11 +81,11 @@ class ArticleController extends Controller
             //     return response()->json(['message' => 'Failed to send email.'], 201);
             // }
         }else if($userType == '2'){ // Marketing Coordinator
-            $homePageData = [];// $this->articleService->getCoordinatorHomePageData($userId, $request);
+            $homePageData = $this->articleService->getCoordinatorHomePageData($userId, $facultyId, $request);
         }else if($userType == '3'){ // Marketing Manager
             $homePageData = $this->articleService->getManagerHomePageData($userId, $request);
         }else if($userType == '4'){ // Marketing Manager
-            $homePageData = $this->articleService->getGuestHomePageData($userId, $request);
+            $homePageData = $this->articleService->getAdminHomePageData($userId, $request);
         }else{
             return response()->json(['message'=> "User Role Missing"], 201);
         }

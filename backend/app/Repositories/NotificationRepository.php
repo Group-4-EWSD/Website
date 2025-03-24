@@ -45,7 +45,7 @@ class NotificationRepository extends BaseRepository
                     'articles.article_title',
                     'notifications.created_at'
                 ])
-                ->get();// notification_type = 1 (react), 2 (comment)
+                ->get();// notification_type = 1 (react- student), 2 (comment- student), 3 (article create- coordiantor), 4 (article update- coordinator) , 5 (article Published- manager)
         return $notificationList;
     }
 

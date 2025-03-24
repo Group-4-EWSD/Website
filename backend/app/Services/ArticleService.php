@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\ArticleRepository;
 use App\Repositories\ActionRepository;
+use App\Repositories\FacultyRepository;
 use App\Repositories\FileRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
@@ -14,21 +15,31 @@ class ArticleService
     protected $articleRepository;
     protected $actionRepository;
     protected $userRepository;
+    protected $facultyRepository;
     protected $fileRepository;
     protected $fileService;
 
-    public function __construct(ArticleRepository $articleRepository, ActionRepository $actionRepository, UserRepository $userRepository, FileRepository $fileRepository, FileService $fileService)
+    public function __construct(ArticleRepository $articleRepository, ActionRepository $actionRepository, UserRepository $userRepository, FileRepository $fileRepository, FileService $fileService, FacultyRepository $facultyRepository)
     {
         $this->articleRepository = $articleRepository;
         $this->actionRepository = $actionRepository;
         $this->userRepository = $userRepository;
+        $this->facultyRepository = $facultyRepository;
         $this->fileRepository = $fileRepository;
         $this->fileService = $fileService;
     }
 
-    public function getGuestHomePageData(){
-        
+    public function getGuestHomePageData($userId){
+        return [
+            'prev_login' => $this->articleRepository->getPreviousLogin($userId),
+            'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
+            'allArticles' => $this->articleRepository->getAllArticles(4)->get(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'facultyList' => $this->facultyRepository->getfacultyList(),
+            'publishedList' => $this->articleRepository->getPublishedList()
+        ];
     }
+
     public function getStudentHomePageData($userId, $request)
     {
         return [
@@ -42,17 +53,29 @@ class ArticleService
             'submission_status' => $this->articleRepository->getSubmissionStatus($facultyId),
             'remaining_final_publish' => $this->articleRepository->getRemainingFinalPublish($facultyId),
             'current_system_data' => $this->articleRepository->getCurrentSystemData($facultyId),
-            'countData' => $this->articleRepository->getCoordinatorHomeCountData($facultyId),
+            'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData($facultyId),
             'allArticles' => $this->articleRepository->getAllArticles(3, $request)->get(),
-            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear($facultyId),
             'guestList' => $this->userRepository->getGuestList()
         ];
     }
-    public function getManagerHomePageData(){
-        
+    public function getManagerHomePageData($userId){
+        return [
+            'prev_login' => $this->articleRepository->getPreviousLogin($userId),
+            'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'memberList' => $this->userRepository->getMemberList(),
+            'guestList' => $this->userRepository->getGuestList()
+        ];
     }
-    public function getAdminHomePageData(){
-        
+    public function getAdminReports(){
+        return [
+            'allArticles' => $this->articleRepository->getAllArticles(4)->get(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'mostViewedPages' => $this->userRepository->getMostViewedPageList(),
+            'activeUserList' => $this->userRepository->getActiveUserList(null),
+            'browserList' => $this->userRepository->getMostUsedBrowserList()
+        ];
     }
 
     public function getMyArticles($userId, $facultyId, $request)
@@ -81,6 +104,11 @@ class ArticleService
             'rejectedArticles' => $countData['rejectedArticles'],
             'articles' => $articles
         ];
+    }
+
+    public function getManagerArticles($request)
+    {
+        return $this->articleRepository->getAllArticles(4, $request)->orderBy('created_at', 'desc')->get();
     }
 
     public function getArticleList($user_id, $faculty_id, $request){

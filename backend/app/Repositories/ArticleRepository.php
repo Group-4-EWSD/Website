@@ -93,13 +93,22 @@ class ArticleRepository
             ->first();
     }
 
-    public function getCoordinatorHomeCountData($facultyId)
+    public function getCoordinatorManagerHomeCountData($facultyId = null)
     {
         $currentYear = date('Y');
         $lastYear = $currentYear - 1;
 
-        $lastYearRequest = new Request(['academicYear' => $lastYear, 'facultyId' => $facultyId]);
-        $currentYearRequest = new Request(['academicYear' => $currentYear, 'facultyId' => $facultyId]);
+        $lastYearData = ['academicYear' => $lastYear];
+        $currentYearData = ['academicYear' => $currentYear];
+
+        if ($facultyId !== null) {
+            $lastYearData['facultyId'] = $facultyId;
+            $currentYearData['facultyId'] = $facultyId;
+        }
+
+        // Create request objects
+        $lastYearRequest = new Request($lastYearData);
+        $currentYearRequest = new Request($currentYearData);
 
         $lastYearUserActivePoint = $this->userRepository->getUserList($lastYearRequest)->sum('total_score');
         $currentYearUserActivePoint = $this->userRepository->getUserList($currentYearRequest)->sum('total_score');
@@ -124,7 +133,6 @@ class ArticleRepository
                 $join->on('act.article_id', '=', 'la.article_id')
                     ->on('act.created_at', '=', 'la.latest_created_at');
             })
-            ->where('u.faculty_id', '=', $facultyId)
             ->selectRaw("
                 COUNT(CASE WHEN ay.academic_year_start = ? AND act.article_status != '0' THEN 1 END) AS total_articles,
                 COUNT(CASE WHEN ay.academic_year_start = ? AND act.article_status != '0' THEN 1 END) AS total_previous_articles,
@@ -137,6 +145,10 @@ class ArticleRepository
                 NULLIF(COUNT(CASE WHEN ay.academic_year_start = ? AND act.article_status != '0' THEN 1 END), 0)) 
                 AS deri_participate_rate
             ", [$currentYear, $lastYear, $currentYear, $currentYear, $currentYear, $currentYear, $currentYear, $currentYear, $lastYear]);
+
+        if ($facultyId !== null) {
+            $query->where('u.faculty_id', '=', $facultyId);
+        }
 
         $results = $query->first();
 
@@ -196,13 +208,14 @@ class ArticleRepository
                 'art.article_title',
                 'art.article_description',
                 'art.user_id',
+                'u.user_name',
                 'at.article_type_id',
                 'at.article_type_name',
-                'u.user_name',
                 DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                 'u.gender',
                 'art.created_at',
                 'art.updated_at',
+                DB::raw("(SELECT MIN(avt.created_at) FROM activities avt WHERE avt.article_id = art.article_id AND avt.article_status != 0) AS submission_date"),
                 DB::raw("(SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
                 DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id) AS view_count"),
                 DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1) AS like_count"),
@@ -251,7 +264,7 @@ class ArticleRepository
                 }
             }
         }
-        if ($state == 3) { // All Articles for Coordinator (facultyId)
+        if ($state == 3 || $state == 4) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4
             $articles->addSelect(DB::raw("
                 CASE 
                     WHEN (SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
@@ -259,7 +272,12 @@ class ArticleRepository
                     ELSE NULL 
                 END AS reject_reason
             "));
-            $articles->where('sd.faculty_id', '=', $primaryKey);
+            if($state == 3){ // Only for coordinator 3
+                $articles->where('sd.faculty_id', '=', $primaryKey);
+            }else{
+                $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
+                $articles->havingRaw("status = 4");
+            }
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([
@@ -310,7 +328,7 @@ class ArticleRepository
         return $articles;
     }
 
-    public function getArticlePerYear()
+    public function getArticlePerYear($facultyId = null)
     {
         $articlePerYear = DB::table('articles as a')
             ->select([
@@ -321,8 +339,12 @@ class ArticleRepository
             ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
             ->join('system_datas as sd', 'sd.system_id', '=', 'a.system_id') // Assuming correct join
             ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
-            ->groupBy('ay.academic_year_start', 'ay.academic_year_end') 
-            ->get();
+            ->groupBy('ay.academic_year_start', 'ay.academic_year_end') ;
+        
+        if ($facultyId !== null) {
+            $articlePerYear->where('u.faculty_id', '=', $facultyId);
+        }
+        $articlePerYear->get();
 
         return $articlePerYear;
     }
@@ -416,8 +438,6 @@ class ArticleRepository
     public function getSubmissionStatus($facultyId){
         // Get the system data
         $systemData = $this->getCurrentSystemData($facultyId);
-        // dd($systemData);
-    
         // Get today's date
         $today = Carbon::today(); // Carbon instance of today's date
     
@@ -447,6 +467,19 @@ class ArticleRepository
         }
     
         return '0'; // Return '0' if the final submission date has passed
+    }
+
+    public function getPublishedList(){
+        $publishedList = DB::table('articles')
+            ->join('activities', 'articles.article_id', '=', 'activities.article_id')
+            ->join('system_datas', 'articles.system_id', '=', 'system_datas.system_id')
+            ->join('academic_years', 'system_datas.academic_year_id', '=', 'academic_years.academic_year_id')
+            ->select('academic_years.academic_year_start')
+            ->where('activities.article_status', 4)
+            ->groupBy('academic_years.academic_year_start', 'academic_years.academic_year_end')
+            ->get();
+
+        return $publishedList;
     }
 
 }

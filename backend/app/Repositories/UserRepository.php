@@ -85,8 +85,27 @@ class UserRepository extends BaseRepository
             ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
             ->where('u.user_type_id', '=', '0');
     }
+    
+    public function getMemberList()
+    {
+        return DB::table('users as u')
+            ->select([
+                'u.user_name',
+                'u.nickname',
+                'u.user_email',
+                'f.faculty_name',
+                'ut.user_type_name',
+                'u.date_of_birth',
+                'u.gender',
+                'u.phone_number'
+            ])
+            ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
+            ->join('user_types as ut', 'ut.user_type_id', 'u.user_type_id')
+            ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
+            ->where('u.user_type_id', '!=', '0');
+    }
 
-    public function getUserList($request)
+    public function getActiveUserList($request)
     {
         return DB::table('users as u')
             ->leftJoin('articles as a', 'a.user_id', '=', 'u.id')
@@ -142,5 +161,26 @@ class UserRepository extends BaseRepository
             )
             ->groupBy('u.id')
             ->get();
+    }
+
+    public function getMostViewedPageList(){
+        return DB::table('viewedPages as vp')
+            ->join('pages as p', 'vp.page_id', '=', 'p.page_id')
+            ->select('vp.page_id', DB::raw('COUNT(vp.page_id) as view_count'))
+            ->groupBy('vp.page_id')
+            ->get();
+    }
+
+    public function getMostUsedBrowserList(){
+        $browserFreq = DB::table('loginHistories as lh')
+            ->join('browsers as b', 'b.browser_id', '=', 'lh.browser_id')
+            ->select([
+                'b.browser_id',
+                'b.browser_name',
+                DB::raw('COUNT(lh.id) as login_count')
+            ])
+            ->groupBy('lh.browser_id')
+            ->get();
+        return $browserFreq;
     }
 }

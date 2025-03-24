@@ -31,6 +31,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ArticleController::class, 'homePageInitial']); // Get all articles
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
         Route::get('/coordinator', [ArticleController::class, 'coordinatorArticles']); // Get all articles
+        Route::get('/manager', [ArticleController::class, 'managerArticles']); // Get all articles
         Route::get('/artilcle-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
@@ -54,7 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/get-photo', [UserController::class, 'getUserPhoto']);
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
         Route::post('/edit-detail', [UserController::class, 'updateProfile']);
-        Route::get('/active-user-list', [UserController::class, 'getUserList']);
+        Route::get('/active-user-list', [UserController::class, 'getActiveUserList']);
         Route::patch('/update-password', [UserController::class, 'updatePassword']);
     });
     Route::post('/logout', [UserController::class, 'logout']);

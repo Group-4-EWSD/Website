@@ -51,7 +51,7 @@ class NotificationRepository extends BaseRepository
             $notificationList->where('articles.user_id', $user->id)
                 ->whereIn('notifications.notification_type', [1, 2, 3]);
         } elseif ($user->user_type_id == 2) { // Coordinator  
-            $notificationList->where('sysetm_datas.faculty_id', $user->faculty_id)
+            $notificationList->where('system_datas.faculty_id', $user->faculty_id)
                 ->whereIn('notifications.notification_type', [4, 5]);
         } elseif ($user->user_type_id == 3) { // Manager
             $notificationList->where('notifications.notification_type', 6);

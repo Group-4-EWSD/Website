@@ -130,7 +130,7 @@ class UserService
         return $this->userRepository->updateUser($id, $data);
     }
 
-    public function getUserList($request){
-        return $this->userRepository->getUserList($request);
+    public function getActiveUserList($request){
+        return $this->userRepository->getActiveUserList($request);
     }
 }

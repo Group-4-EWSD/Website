@@ -85,7 +85,7 @@ class ArticleController extends Controller
         }else if($userType == '3'){ // Marketing Manager
             $homePageData = $this->articleService->getManagerHomePageData($userId, $request);
         }else if($userType == '4'){ // Marketing Manager
-            $homePageData = $this->articleService->getAdminHomePageData($userId, $request);
+            // $homePageData = $this->articleService->getAdminHomePageData($userId, $request);
         }else{
             return response()->json(['message'=> "User Role Missing"], 201);
         }
@@ -106,6 +106,12 @@ class ArticleController extends Controller
         $facultyId = Auth::user()->faculty_id;
         $myArticleData = $this->articleService->getCoordinatorArticles($facultyId, $request);
         return response()->json($myArticleData);
+    }
+
+    public function managerArticles(Request $request)
+    {
+        $articles = $this->articleService->getManagerArticles($request);
+        return response()->json($articles);
     }
     
     public function articleList(Request $request)
@@ -129,7 +135,7 @@ class ArticleController extends Controller
                     ->where('user_type_id', 2)
                     ->value('user_email');
 
-                $mailSent = Mail::to($coordinatorEmail)->send(new ArticleCreateMail(
+                $mailSent = Mail::to($coordinatorEmail)->send(new UserCreatedMail(
                     Auth::user(),
                     $request->article_id ?: Str::uuid(), 
                     $request->article_title,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -15,7 +16,8 @@ class NotificationController extends Controller
     }
 
     public function index(){
-        $notificationData = $this->notificationService->getNotificationList();
+        $user = Auth::user();
+        $notificationData = $this->notificationService->getNotificationList($user);
         return response()->json($notificationData);
     }
 

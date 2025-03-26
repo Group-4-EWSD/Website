@@ -135,7 +135,7 @@ class ArticleController extends Controller
                     ->where('user_type_id', 2)
                     ->value('user_email');
 
-                $mailSent = Mail::to($coordinatorEmail)->send(new ArticleCreateMail(
+                $mailSent = Mail::to($coordinatorEmail)->send(new UserCreatedMail(
                     Auth::user(),
                     $request->article_id ?: Str::uuid(), 
                     $request->article_title,

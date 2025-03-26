@@ -110,8 +110,8 @@ class ArticleRepository
         $lastYearRequest = new Request($lastYearData);
         $currentYearRequest = new Request($currentYearData);
 
-        $lastYearUserActivePoint = $this->userRepository->getUserList($lastYearRequest)->sum('total_score');
-        $currentYearUserActivePoint = $this->userRepository->getUserList($currentYearRequest)->sum('total_score');
+        $lastYearUserActivePoint = $this->userRepository->getActiveUserList($lastYearRequest)->sum('total_score');
+        $currentYearUserActivePoint = $this->userRepository->getActiveUserList($currentYearRequest)->sum('total_score');
 
         // Avoid division by zero
         $deriActiveUser = ($lastYearUserActivePoint > 0)

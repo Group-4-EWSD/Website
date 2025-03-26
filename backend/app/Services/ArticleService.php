@@ -6,6 +6,7 @@ use App\Repositories\ArticleRepository;
 use App\Repositories\ActionRepository;
 use App\Repositories\FacultyRepository;
 use App\Repositories\FileRepository;
+use App\Repositories\NotificationRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,9 +18,10 @@ class ArticleService
     protected $userRepository;
     protected $facultyRepository;
     protected $fileRepository;
+    protected $notificationRepository;
     protected $fileService;
 
-    public function __construct(ArticleRepository $articleRepository, ActionRepository $actionRepository, UserRepository $userRepository, FileRepository $fileRepository, FileService $fileService, FacultyRepository $facultyRepository)
+    public function __construct(ArticleRepository $articleRepository, ActionRepository $actionRepository, UserRepository $userRepository, FileRepository $fileRepository, FileService $fileService, FacultyRepository $facultyRepository, NotificationRepository $notificationRepository)
     {
         $this->articleRepository = $articleRepository;
         $this->actionRepository = $actionRepository;
@@ -27,6 +29,7 @@ class ArticleService
         $this->facultyRepository = $facultyRepository;
         $this->fileRepository = $fileRepository;
         $this->fileService = $fileService;
+        $this->notificationRepository = $notificationRepository;
     }
 
     public function getGuestHomePageData($userId){
@@ -167,11 +170,13 @@ class ArticleService
                         }
                         // Save article details
                         $this->articleRepository->createArticleDetail($articleId, $filePath, $fileName, $file->getClientOriginalExtension());
+                        $this->notificationRepository->setNotification('4', $request->articleId);
                     }
                 }
             }
             if (empty($request->article_id)) {
                 $this->articleRepository->createActivity($articleId, $userId, $request);
+                $this->notificationRepository->setNotification('5', $request->articleId);
             }
 
             DB::commit();
@@ -184,6 +189,7 @@ class ArticleService
     }
 
     public function changeArticleStatus($userId, $articleId, $request){
+        $this->notificationRepository->setNotification('6', $request->articleId);
         return $this->articleRepository->createActivity( $articleId, $userId,$request);
     }
 

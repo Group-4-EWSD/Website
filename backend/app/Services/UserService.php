@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordResetMail;
 
 class UserService
 {
@@ -133,4 +135,28 @@ class UserService
     public function getUserList(){
         return $this->userRepository->getUserList();
     }
+
+    public function getUserListByType($userTypeId)
+    {
+        return $this->userRepository->getUserListByType($userTypeId);
+    }
+
+    public function resetPassword($userId)
+    {
+        $user = $this->userRepository->getUserById($userId);
+
+        if (!$user) {
+            return false;
+        }
+
+        $newPassword = 'password123';
+        $hashedPassword = Hash::make($newPassword);
+
+        $this->userRepository->updatePassword($userId, $hashedPassword);
+
+        Mail::to($user->user_email)->send(new PasswordResetMail($user, $newPassword));
+
+        return true;
+    }
+
 }

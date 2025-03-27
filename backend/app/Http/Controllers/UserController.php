@@ -177,7 +177,26 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserList(){
-        return $updatedUser = $this->userService->getUserList();
+    public function getUserList()
+    {
+        $users = $this->userService->getUserList();
+        return response()->json(['all user list' => $users]);
+    }
+
+    public function getUserListByType($userType)
+    {
+        $users = $this->userService->getUserListByType($userType);
+        return response()->json(['user by type' => $users]);
+    }
+
+    public function resetPassword($userId)
+    {
+        $result = $this->userService->resetPassword($userId);
+
+        if (!$result) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(['message' => 'Password reset successful. Email sent.']);
     }
 }

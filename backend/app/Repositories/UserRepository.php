@@ -183,4 +183,44 @@ class UserRepository extends BaseRepository
             ->get();
         return $browserFreq;
     }
+
+    public function getUserList()
+    {
+        return DB::table('users as u')
+            ->select([
+                'u.id',
+                'u.user_name',
+                'u.user_email',
+                'ut.user_type_name as user_type',
+                'f.faculty_name',
+                'u.created_at'
+            ])
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id') 
+            ->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id') 
+            ->get();
+    }
+
+    public function getUserListByType($userType)
+    {
+        return DB::table('users as u')
+            ->select([
+                'u.id',
+                'u.user_name',
+                'u.user_email',
+                'ut.user_type_name as user_type',
+                'f.faculty_name',
+                'u.created_at'
+            ])
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
+            ->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+            ->where('u.user_type_id', '=', $userType)
+            ->get();
+    }
+
+    public function updatePassword($userId, $hashedPassword)
+    {
+        return DB::table('users')
+            ->where('id', $userId)
+            ->update(['user_password' => $hashedPassword]);
+    }
 }

@@ -179,4 +179,27 @@ class UserController extends Controller
     public function getActiveUserList(Request $request){
         return $this->userService->getActiveUserList($request);
     }
+    
+    public function getUserList()
+    {
+        $users = $this->userService->getUserList();
+        return response()->json(['all user list' => $users]);
+    }
+
+    public function getUserListByType($userType)
+    {
+        $users = $this->userService->getUserListByType($userType);
+        return response()->json(['user by type' => $users]);
+    }
+
+    public function resetPassword($userId)
+    {
+        $result = $this->userService->resetPassword($userId);
+
+        if (!$result) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(['message' => 'Password reset successful. Email sent.']);
+    }
 }

@@ -12,6 +12,8 @@ use App\Http\Controllers\FacultyController;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AcademicYearController;
+use App\Http\Controllers\SystemDataController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -58,6 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getActiveUserList']);
         Route::patch('/update-password', [UserController::class, 'updatePassword']);
+        // Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
     Route::post('/logout', [UserController::class, 'logout']);
     // User routes
@@ -75,3 +78,29 @@ Route::get('/list-files', [FileController::class, 'listFiles']); // New route
 Route::post('/list-file', [FileController::class, 'listFiles']); // New route
 Route::get('/test-list-files', [FileController::class, 'listFiles']); 
 Route::get('/item-list', [ArticleController::class, 'getItemList']);
+
+Route::prefix('/faculty')->group(function(){
+    Route::get('/get-all-faculties', [FacultyController::class, 'listAllFaculties']);
+    Route::get('/get-faculty-byID/{faculty_id}', [FacultyController::class, 'selectFacultyByID']);
+    Route::post('/create', [FacultyController::class, 'createFaculty']);
+    Route::patch('/update', [FacultyController::class, 'updateFaculty']);
+});
+
+Route::get('/all-user-list', [UserController::class, 'getUserList']);
+Route::get('/get-user-bytype/{user_type}', [UserController::class, 'getUserListByType']);
+Route::get('/password-reset/{user_id}', [UserController::class, 'resetPassword']);
+
+Route::prefix('/academic-years')->group(function(){
+    Route::get('/get-all-academic-years', [AcademicYearController::class, 'getAllAcademicYears']);
+    Route::get('/get-byid-academic-years/{academicYearId}', [AcademicYearController::class, 'getAcademicYearById']);
+    Route::post('/create', [AcademicYearController::class, 'createAcademicYear']);
+    Route::patch('/update', [AcademicYearController::class, 'updateAcademicYear']);
+});
+
+Route::prefix('/system-data')->group(function(){
+    Route::get('/list-all-system-data', [SystemDataController::class, 'listAllSysData']);
+    Route::get('/byid-system-data/{system_data_id}', [SystemDataController::class, 'byidSysData']);
+    Route::get('/byfaculty_system-data/{faculty_id}', [SystemDataController::class, 'byFacSysData']);
+    Route::post('/create', [SystemDataController::class, 'createSysData']);
+    Route::patch('/update', [SystemDataController::class, 'updateSysData']);
+});

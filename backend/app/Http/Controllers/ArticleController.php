@@ -85,7 +85,7 @@ class ArticleController extends Controller
         }else if($userType == '3'){ // Marketing Manager
             $homePageData = $this->articleService->getManagerHomePageData($userId, $request);
         }else if($userType == '4'){ // Marketing Manager
-            // $homePageData = $this->articleService->getAdminHomePageData($userId, $request);
+            $homePageData = $this->articleService->getAdminReports($userId, $request);
         }else{
             return response()->json(['message'=> "User Role Missing"], 201);
         }

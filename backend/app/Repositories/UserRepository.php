@@ -163,14 +163,6 @@ class UserRepository extends BaseRepository
             ->get();
     }
 
-    public function getMostViewedPageList(){
-        return DB::table('viewedPages as vp')
-            ->join('pages as p', 'vp.page_id', '=', 'p.page_id')
-            ->select('vp.page_id', DB::raw('COUNT(vp.page_id) as view_count'))
-            ->groupBy('vp.page_id')
-            ->get();
-    }
-
     public function getMostUsedBrowserList(){
         $browserFreq = DB::table('loginHistories as lh')
             ->join('browsers as b', 'b.browser_id', '=', 'lh.browser_id')
@@ -182,5 +174,28 @@ class UserRepository extends BaseRepository
             ->groupBy('lh.browser_id')
             ->get();
         return $browserFreq;
+    }
+
+    public function isUserVisitExist($userId, $pageId){
+        return DB::table('view_pages')
+            ->where('user_id', $userId)
+            ->where('page_id', $pageId)
+            ->exists();
+    }
+
+    public function addUserVisit($userId, $pageId){
+        DB::table('view_pages')->insert([
+            'user_id' => $userId,
+            'page_id' => $pageId,
+            'visit_datetime' => now()
+        ]);
+    }
+
+    public function getMostViewedPageVisit(){
+        return DB::table('view_pages as vp')
+            ->join('app_pages as p', 'vp.page_id', '=', 'p.page_id')
+            ->select('vp.page_id', DB::raw('COUNT(vp.page_id) as view_count'))
+            ->groupBy('vp.page_id')
+            ->get();
     }
 }

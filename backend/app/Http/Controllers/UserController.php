@@ -179,4 +179,12 @@ class UserController extends Controller
     public function getActiveUserList(Request $request){
         return $this->userService->getActiveUserList($request);
     }
+
+    public function pageVisitInitial($pageId){
+        $user = Auth::user();
+        $this->userService->pageVisitInitial($user->id, $pageId);
+        return response()->json([
+            'message' => 'Page visit recorded successfully',
+        ], 200);
+    }
 }

@@ -133,4 +133,10 @@ class UserService
     public function getActiveUserList($request){
         return $this->userRepository->getActiveUserList($request);
     }
+
+    public function pageVisitInitial($userId, $pageId){
+        if($this->userRepository->isUserVisitExist($userId, $pageId)){
+            return $this->userRepository->addUserVisit($userId, $pageId);
+        }
+    }
 }

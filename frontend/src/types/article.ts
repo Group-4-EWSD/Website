@@ -87,6 +87,8 @@ export interface DraftArticle {
   article_id: string
   article_title: string
   article_description: string
+  article_type_name: string
+  updated_at: string
 }
 
 export interface Category {

@@ -60,6 +60,14 @@ class ActionService
         return $this->actionRepository->deleteComment($request);
     }
 
+    public function feedbackArticle($request){
+        return $this->actionRepository->createFeedback($request);
+    }
+
+    public function feedbackDeleteArticle($request){
+        return $this->actionRepository->deleteFeedback($request);
+    }
+
     public function getNotificationList($userId){
         return $this->actionRepository->getNotificationList($userId);
     }

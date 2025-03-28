@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/table'
 import type { DraftArticle } from '@/types/article'
 import { Button } from '@/components/ui/button'
+import dayjs from 'dayjs'
 
 const isLoading = ref(false)
 const articles = ref<DraftArticle[]>([])
@@ -47,6 +48,11 @@ const handleEditClick = (id: string) => {
   selectedArticleId.value = id
   showDialog.value = true
 }
+
+const handleDeleteClick = (article: DraftArticle) => {
+  console.log('Delete article', article)
+}
+
 </script>
 
 <template>
@@ -84,19 +90,19 @@ const handleEditClick = (id: string) => {
           <TableRow v-for="article in articles" :key="article.article_id">
             <TableCell> {{ article.article_title }} </TableCell>
             <TableCell> {{ article.article_description }} </TableCell>
-            <!-- <TableCell> {{ article.category }} </TableCell>
-            <TableCell> {{ article.lastEditedDate }} </TableCell> -->
-            <TableCell> </TableCell>
-            <TableCell> </TableCell>
+            <TableCell> {{ article.article_type_name }} </TableCell>
+            <TableCell> {{ dayjs(article.updated_at).format('MMM D, YYYY') }} </TableCell>
             <TableCell>
-              <div class="flex gap-3">
+              <div class="flex gap-1">
                 <TooltipWrapper text="Edit">
-                  <Button variant="ghost" @click="handleEditClick(article.article_id)">
+                  <Button variant="ghost" size="icon" @click="handleEditClick(article.article_id)">
                     <PencilIcon class="h-4 w-4 cursor-pointer" />
                   </Button>
                 </TooltipWrapper>
                 <TooltipWrapper text="Delete">
-                  <TrashIcon class="h-4 w-4 text-destructive cursor-pointer" />
+                  <Button variant="ghost" size="icon" @click="handleDeleteClick(article)">
+                    <TrashIcon class="h-4 w-4 text-destructive cursor-pointer" />
+                  </Button>
                 </TooltipWrapper>
               </div>
             </TableCell>

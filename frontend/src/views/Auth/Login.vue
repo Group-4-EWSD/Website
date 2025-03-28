@@ -68,7 +68,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
             router.push('/coordinator/dashboard')
             break
           case 'Admin':
-            router.push('/admin/dashboard')
+            router.push('/admin/management')
             break
           case 'Marketing Manager':
             router.push('/manager/dashboard')

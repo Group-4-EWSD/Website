@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BadgeHelp, Bell, CircleGauge, FileText, Home, LogOut, Settings } from 'lucide-vue-next'
+import { BadgeHelp, Bell, CalendarIcon, CircleGauge, FileText, Home, LogOut, Settings, UserIcon } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import {
@@ -20,7 +20,6 @@ const loading = ref(false)
 
 const userStore = useUserStore()
 const userType = userStore.user?.user_type_name
-// const userType = 'Marketing Coordinator'
 let items = []
 
 switch (userType) {
@@ -65,6 +64,27 @@ switch (userType) {
       {
         title: 'Settings',
         url: '/coordinator/settings',
+        icon: Settings,
+      },
+    ]
+    break
+
+  case 'Admin':
+    items = [
+      { title: 'Management', url: '/admin/management', icon: CalendarIcon },
+      {
+        title: 'Reports',
+        url: '/admin/reports',
+        icon: FileText,
+      },
+      {
+        title: 'Users',
+        url: '/admin/users',
+        icon: UserIcon,
+      },
+      {
+        title: 'Settings',
+        url: '/admin/settings',
         icon: Settings,
       },
     ]

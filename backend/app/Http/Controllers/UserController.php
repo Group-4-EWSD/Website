@@ -182,7 +182,7 @@ class UserController extends Controller
     
     public function getUserList()
     {
-        $users = $this->userService->getUserList();
+        $users = $this->userService->getActiveUserList();// Need to fix to get User List Function 
         return response()->json(['all user list' => $users]);
     }
 
@@ -201,5 +201,13 @@ class UserController extends Controller
         }
 
         return response()->json(['message' => 'Password reset successful. Email sent.']);
+    }
+
+    public function pageVisitInitial($pageId){
+        $user = Auth::user();
+        $this->userService->pageVisitInitial($user->id, $pageId);
+        return response()->json([
+            'message' => 'Page visit recorded successfully',
+        ], 200);
     }
 }

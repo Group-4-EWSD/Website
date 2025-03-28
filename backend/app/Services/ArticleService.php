@@ -75,7 +75,7 @@ class ArticleService
         return [
             'allArticles' => $this->articleRepository->getAllArticles(4)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
-            'mostViewedPages' => $this->userRepository->getMostViewedPageList(),
+            'mostViewedPages' => $this->userRepository->getMostViewedPageVisit(),
             'activeUserList' => $this->userRepository->getActiveUserList(null),
             'browserList' => $this->userRepository->getMostUsedBrowserList()
         ];

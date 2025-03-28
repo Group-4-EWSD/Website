@@ -132,7 +132,7 @@ class UserService
         return $this->userRepository->updateUser($id, $data);
     }
 
-    public function getActiveUserList($request){
+    public function getActiveUserList($request= null){
         return $this->userRepository->getActiveUserList($request);
     }
 
@@ -159,4 +159,10 @@ class UserService
         return true;
     }
 
+
+    public function pageVisitInitial($userId, $pageId){
+        if($this->userRepository->isUserVisitExist($userId, $pageId)){
+            return $this->userRepository->addUserVisit($userId, $pageId);
+        }
+    }
 }

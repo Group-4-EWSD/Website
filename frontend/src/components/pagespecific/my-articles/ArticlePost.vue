@@ -2,8 +2,8 @@
 import { EyeIcon, HeartIcon } from 'lucide-vue-next'
 import { defineProps } from 'vue'
 
-import { Card } from '@/components/ui/card'
 import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+import { Card } from '@/components/ui/card'
 
 interface Article {
   title: string

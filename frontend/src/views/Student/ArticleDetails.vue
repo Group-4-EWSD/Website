@@ -2,19 +2,18 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Download, Eye, Heart, Send } from 'lucide-vue-next'
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { toast } from 'vue-sonner'
 
 import { getArticleDetails } from '@/api/articles'
-import type { ArticleResponse } from '@/types/article'
-import { createComment, type actionParams } from '@/api/notification'
-import { useUserStore } from '@/stores/user'
-
+import { type actionParams, createComment } from '@/api/notification'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { toast } from 'vue-sonner'
+import { useUserStore } from '@/stores/user'
+import type { ArticleResponse } from '@/types/article'
 
 const route = useRoute()
 const userStore = useUserStore()

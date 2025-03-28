@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
+import Card from '@/components/ui/card/Card.vue'
 import Table from '@/components/ui/table/Table.vue'
 import TableBody from '@/components/ui/table/TableBody.vue'
 import TableCell from '@/components/ui/table/TableCell.vue'
 import TableHead from '@/components/ui/table/TableHead.vue'
 import TableHeader from '@/components/ui/table/TableHeader.vue'
 import TableRow from '@/components/ui/table/TableRow.vue'
-import Card from '@/components/ui/card/Card.vue'
-import { ref } from 'vue'
 
 const guests = ref([
   {

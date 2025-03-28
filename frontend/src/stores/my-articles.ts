@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { getMyArticles } from '@/api/articles'
-import type { ArticleParams, Article, CountData, MyArticlesResponse } from '@/types/article'
+import type { Article, ArticleParams, CountData, MyArticlesResponse } from '@/types/article'
 
 export const useMyArticlesStore = defineStore('myArticles', () => {
   // State

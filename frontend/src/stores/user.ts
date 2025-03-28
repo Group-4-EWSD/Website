@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
+import { toast } from 'vue-sonner'
 
+import { deleteProfilePhoto } from '@/api/user'
 import { setCookie } from '@/lib/utils'
 import type { User } from '@/types/user'
-import { deleteProfilePhoto } from '@/api/user'
-import { toast } from 'vue-sonner'
 
 interface UserState {
   user: User | null

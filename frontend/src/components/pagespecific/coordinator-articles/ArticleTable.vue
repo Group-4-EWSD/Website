@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import Button from '@/components/ui/button/Button.vue'
 import Card from '@/components/ui/card/Card.vue'
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  TableCell,
 } from '@/components/ui/table'
-import StatusIndicator from '@/components/shared/StatusIndicator.vue'
-import Button from '@/components/ui/button/Button.vue'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import type { CoordinatorArticle } from '@/types/article'
 import router from '@/router'
+import type { CoordinatorArticle } from '@/types/article'
 
 const articles: CoordinatorArticle[] = [
   {

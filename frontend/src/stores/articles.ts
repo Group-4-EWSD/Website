@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Article, CountData } from '@/types/article'
-import { getArticles } from '@/api/articles'
 import { toast } from 'vue-sonner'
+
+import { getArticles } from '@/api/articles'
+import type { Article, CountData } from '@/types/article'
 
 export const useArticleStore = defineStore('article', () => {
   const countData = ref<CountData | null>(null)

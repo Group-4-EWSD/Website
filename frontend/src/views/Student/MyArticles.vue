@@ -8,8 +8,6 @@ import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.v
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useMyArticlesStore } from '@/stores/my-articles'
 import {
   Pagination,
   PaginationEllipsis,
@@ -20,6 +18,8 @@ import {
   PaginationNext,
   PaginationPrev,
 } from '@/components/ui/pagination'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useMyArticlesStore } from '@/stores/my-articles'
 
 const myArticlesStore = useMyArticlesStore()
 

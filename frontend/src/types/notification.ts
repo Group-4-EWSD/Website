@@ -1,7 +1,7 @@
 export interface Notification {
-  action_id: string
-  action_type: string
+  notification_id: string
   article_id: string | undefined
+  article_title: string
   user_name: string
   user_type_name: string
   gender: string

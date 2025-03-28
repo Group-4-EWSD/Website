@@ -163,9 +163,18 @@ const goToPage = (page: number) => {
       </div>
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
         <div class="max-h-[400px] overflow-y-auto">
-          <div v-if="!articleStore.articles">
-            <p>No articles found.</p>
+          <div v-if="articleStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
+            {{ articleStore.error }}
+            <Button
+              variant="outline"
+              size="sm"
+              class="ml-2"
+              @click="articleStore.fetchArticles(articleStore.currentPage)"
+            >
+              Try Again
+            </Button>
           </div>
+
           <Table v-else class="w-full">
             <TableBody>
               <TableRow
@@ -184,12 +193,12 @@ const goToPage = (page: number) => {
                     <div class="flex-1">
                       <router-link
                         :to="`/articles/${article.article_id}`"
-                        class="text-blue-600 font-semibold hover:underline py-1"
+                        class="text-primary font-semibold py-1"
                       >
                         {{ article.article_title }}
                       </router-link>
                       <p class="text-sm text-gray-500 py-1">
-                        {{ article.article_title }}
+                        {{ article.article_description }}
                       </p>
                     </div>
                     <span class="text-gray-600 text-sm">

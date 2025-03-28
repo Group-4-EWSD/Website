@@ -5,16 +5,15 @@ import { useUserStore } from '@/stores/user'
 
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
+
 const StudentHome = () => import('@/views/Student/Home.vue')
 const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
-const Notification = () => import('@/views/Student/Notification.vue')
+const Notification = () => import('@/views/Shared/Notification.vue')
 const Settings = () => import('@/views/Shared/Settings.vue')
 
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
-const CoordinatorNotification = () => import('@/views/Coordinator/Notification.vue')
-const CoordinatorSettings = () => import('@/views/Coordinator/Settings.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
 
 const ManagerDashboard = () => import('@/views/Manager/Dashboard.vue')
@@ -76,7 +75,7 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
     },
   },
   {
@@ -84,23 +83,23 @@ const coordinatorRoutes = [
     name: 'Articles',
     component: CoordinatorArticles,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
     },
   },
   {
     path: '/coordinator/notifications',
     name: 'Coordinator Notification',
-    component: CoordinatorNotification,
+    component: Notification,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
     },
   },
   {
     path: '/coordinator/settings',
     name: 'Coordinator Settings',
-    component: CoordinatorSettings,
+    component: Settings,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
     },
   },
 ]
@@ -169,7 +168,7 @@ router.beforeEach((to, from, next) => {
       to.path === '/auth/register' ||
       to.path === '/auth/forgot-password')
   ) {
-    // cookies.remove('token')
+    console.log(token)
     // If user is already authenticated and tries to access login/register, redirect to home
     next({ path: '/student/home', replace: true })
   } else if (to.meta.requiresAuth && !token) {

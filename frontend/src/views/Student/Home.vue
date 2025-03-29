@@ -31,6 +31,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
 import { useRouter } from 'vue-router'
 
@@ -140,12 +141,14 @@ const goToPage = (page: number) => {
 
           <!-- Sorting -->
           <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <SlidersHorizontal
-                class="w-5 h-5 cursor-pointer hover:text-black transition-all"
-                aria-label="Sort items"
-              />
-            </DropdownMenuTrigger>
+            <TooltipWrapper text="Sort">
+              <DropdownMenuTrigger as-child>
+                <SlidersHorizontal
+                  class="w-5 h-5 cursor-pointer hover:text-black transition-all"
+                  aria-label="Sort items"
+                />
+              </DropdownMenuTrigger>
+            </TooltipWrapper>
 
             <DropdownMenuContent align="end" class="w-48 z-50">
               <DropdownMenuLabel>Sort By</DropdownMenuLabel>

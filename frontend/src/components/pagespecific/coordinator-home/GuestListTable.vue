@@ -82,14 +82,14 @@ const guests = ref([
   <Card class="p-4">
     <h2 class="text-lg font-bold">Guest List</h2>
 
-    <div class="max-h-[300px] overflow-y-auto">
+    <div class="max-h-[300px] overflow-auto">
       <Table>
-        <TableHeader class="bg-gray-100 text-gray-700">
+        <TableHeader class="bg-gray-100 text-gray-700 sticky top-0">
           <TableRow>
-            <TableHead class="border px-3 py-2">Guest Name</TableHead>
-            <TableHead class="border px-3 py-2">Email</TableHead>
-            <TableHead class="border px-3 py-2">Faculty</TableHead>
-            <TableHead class="border px-3 py-2">Phone Number</TableHead>
+            <TableHead class="px-3 py-2">Guest Name</TableHead>
+            <TableHead class="px-3 py-2">Email</TableHead>
+            <TableHead class="px-3 py-2">Faculty</TableHead>
+            <TableHead class="px-3 py-2">Phone Number</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

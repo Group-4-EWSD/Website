@@ -56,7 +56,7 @@ const articleStats = [
 
         <Card class="bg-primary text-white">
           <CardHeader>
-            <CardTitle class="font-primary">Articles (Final)</CardTitle>
+            <CardTitle class="font-primary">-</CardTitle>
           </CardHeader>
           <CardContent class="font-primary space-y-2">
             <p>Total Articles: <strong>132</strong></p>

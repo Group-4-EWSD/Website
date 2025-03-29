@@ -5,6 +5,7 @@ import { useUserStore } from '@/stores/user'
 
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
+const PasswordReset = () => import('@/views/Auth/PasswordReset.vue')
 
 const StudentHome = () => import('@/views/Student/Home.vue')
 const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
@@ -105,7 +106,7 @@ const coordinatorRoutes = [
 
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
-  { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
+  { path: '/auth/forgot-password', name: 'forgot-password', component: PasswordReset },
   { path: '/auth/register', name: 'register', component: Register },
   { path: '/auth/logout', name: 'logout', component: Login },
 ]
@@ -124,6 +125,7 @@ router.beforeEach((to, from, next) => {
 
   const userStore = useUserStore()
   userStore.setUser(userInfo)
+  const userType = userStore.user?.user_type_name
 
   if (
     token &&
@@ -132,9 +134,16 @@ router.beforeEach((to, from, next) => {
       to.path === '/auth/register' ||
       to.path === '/auth/forgot-password')
   ) {
-    console.log(token)
+    console.log(token + '' + userType)
     // If user is already authenticated and tries to access login/register, redirect to home
-    next({ path: '/student/home', replace: true })
+    switch (userType) {
+      case 'Student':
+        return next({ path: '/student/home', replace: true })
+      case 'Marketing Coordinator':
+        return next({ path: '/coordinator/dashboard', replace: true })
+      default:
+        break
+    }
   } else if (to.meta.requiresAuth && !token) {
     // If route requires auth and user is not authenticated, redirect to login
     next({ path: '/auth/login', replace: true })

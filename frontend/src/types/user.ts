@@ -1,18 +1,18 @@
 export interface User {
-  id: string;
-  user_name: string;
-  nickname: string;
-  user_email: string;
-  user_password: string;
-  user_type_id: string;
-  user_type_name: string;
-  faculty_id: string;
-  faculty_name: string;
-  gender: number;
-  date_of_birth: string | null;
-  phone_number: string | null;
-  user_photo_path: string;
-  user_profile_url: string;
+  id: string
+  user_name: string
+  nickname: string
+  user_email: string
+  user_password: string
+  user_type_id: string
+  user_type_name: string
+  faculty_id: string
+  faculty_name: string
+  gender: number
+  date_of_birth: string | null
+  phone_number: string | null
+  user_photo_path: string
+  user_profile_url: string
 }
 
 export interface UserDetailsParams {
@@ -34,4 +34,11 @@ export const GenderOptions = {
   0: 'Prefer not to say',
   1: 'Male',
   2: 'Female',
+}
+
+export interface Guest {
+  guest_name: string
+  email: string
+  faculty: string
+  phone_number: string
 }

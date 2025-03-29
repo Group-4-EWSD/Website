@@ -176,7 +176,38 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserList(Request $request){
-        return $this->userService->getUserList($request);
+    public function getActiveUserList(Request $request){
+        return $this->userService->getActiveUserList($request);
+    }
+    
+    public function getUserList()
+    {
+        $users = $this->userService->getActiveUserList();// Need to fix to get User List Function 
+        return response()->json(['all user list' => $users]);
+    }
+
+    public function getUserListByType($userType)
+    {
+        $users = $this->userService->getUserListByType($userType);
+        return response()->json(['user by type' => $users]);
+    }
+
+    public function resetPassword($userId)
+    {
+        $result = $this->userService->resetPassword($userId);
+
+        if (!$result) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(['message' => 'Password reset successful. Email sent.']);
+    }
+
+    public function pageVisitInitial($pageId){
+        $user = Auth::user();
+        $this->userService->pageVisitInitial($user->id, $pageId);
+        return response()->json([
+            'message' => 'Page visit recorded successfully',
+        ], 200);
     }
 }

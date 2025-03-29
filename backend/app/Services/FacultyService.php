@@ -12,4 +12,24 @@ class FacultyService
     {
         $this->facultyRepository = $facultyRepository;
     }
+
+    public function getAllFaculties()
+    {
+        return $listAllFaculties = $this->facultyRepository->getAllFaculties();
+    }
+
+    public function selectFacultyByID($data)
+    {
+        return $selectFacultyByID = $this->facultyRepository->selectFacultyByID($data);
+    }
+
+    public function createFaculty($data)
+    {
+        return $this->facultyRepository->createFaculty($data);
+    }
+
+    public function updateFaculty($data)
+    {
+        return $this->facultyRepository->update($data);
+    }
 }

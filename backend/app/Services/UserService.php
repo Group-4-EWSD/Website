@@ -136,6 +136,11 @@ class UserService
         return $this->userRepository->getActiveUserList($request);
     }
 
+    public function getAllUserList()
+    {
+        return $this->userRepository->getAllUserList();
+    }
+
     public function getUserListByType($userTypeId)
     {
         return $this->userRepository->getUserListByType($userTypeId);

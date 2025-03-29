@@ -199,14 +199,16 @@ class UserRepository extends BaseRepository
             ->get();
     }
 
-    public function getUserList()
+    public function getAllUserList()
     {
         return DB::table('users as u')
             ->select([
                 'u.id',
                 'u.user_name',
                 'u.user_email',
-                'ut.user_type_name as user_type',
+                'u.user_type_id',
+                'ut.user_type_name',
+                'u.faculty_id',
                 'f.faculty_name',
                 'u.created_at'
             ])
@@ -222,7 +224,9 @@ class UserRepository extends BaseRepository
                 'u.id',
                 'u.user_name',
                 'u.user_email',
-                'ut.user_type_name as user_type',
+                'u.user_type_id',
+                'ut.user_type_name',
+                'u.faculty_id',
                 'f.faculty_name',
                 'u.created_at'
             ])

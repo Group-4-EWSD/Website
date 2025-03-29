@@ -12,7 +12,9 @@ class SystemDataRepository
             ->select([
                 'sd.system_id',
                 'sd.system_title',
+                'sd.faculty_id',
                 'f.faculty_name',
+                'sd.academic_year_id',
                 'ay.academic_year_description',
                 'sd.pre_submission_date', 
                 'sd.actual_submission_date',
@@ -29,7 +31,9 @@ class SystemDataRepository
             ->select([
                 'sd.system_id',
                 'sd.system_title',
+                'sd.faculty_id',
                 'f.faculty_name',
+                'sd.academic_year_id',
                 'ay.academic_year_description',
                 'sd.pre_submission_date', 
                 'sd.actual_submission_date',
@@ -47,7 +51,9 @@ class SystemDataRepository
             ->select([
                 'sd.system_id',
                 'sd.system_title',
+                'sd.faculty_id',
                 'f.faculty_name',
+                'sd.academic_year_id',
                 'ay.academic_year_description',
                 'sd.pre_submission_date', 
                 'sd.actual_submission_date',

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
+use Illuminate\Support\Facades\Hash;
 //use Your Model
 
 /**
@@ -242,4 +243,54 @@ class UserRepository extends BaseRepository
             ->where('id', $userId)
             ->update(['user_password' => $hashedPassword]);
     }
+
+    function generateUserId()
+    {
+        $latestUser = DB::table('users')
+                        ->select('id')
+                        ->orderBy('id', 'desc')
+                        ->first();
+    
+        if ($latestUser) {
+            $latestIdNumber = (int) substr($latestUser->id, 1); 
+    
+            $newIdNumber = $latestIdNumber + 1;
+        } else {
+            $newIdNumber = 1;
+        }
+
+        $newUserId = 'U' . str_pad($newIdNumber, 4, '0', STR_PAD_LEFT);
+        return $newUserId;
+    }    
+    
+    public function userRegister($data)
+    {
+        DB::table('users')->insert([
+            'id' => $data['user_id'],
+            'user_name' => $data['user_name'],
+            'nickname' => $data['nickname'],
+            'user_email' => $data['user_email'],
+            'user_password' => Hash::make($data['user_password']),
+            'user_type_id' => $data['user_type_id'],
+            'faculty_id' => $data['faculty_id'],
+            'gender' => $data['gender'],
+            'date_of_birth' => $data['date_of_birth'],
+            'phone_number' => $data['phone_number'],
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return $data['user_id'];
+    }
+
+    public function userLastLogin($userId)
+    {
+        $lastLogin = DB::table('login_histories')
+            ->where('user_id', $userId)
+            ->select('login_datetime')
+            ->orderBy('login_datetime', 'desc')
+            ->first();
+    
+        return $lastLogin->login_datetime;
+    }       
 }

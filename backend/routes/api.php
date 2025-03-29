@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getActiveUserList']);
         Route::patch('/update-password', [UserController::class, 'updatePassword']);
+        Route::get('/user-last-login', [UserController::class, 'userLastLogin']);
         // Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
     Route::post('/logout', [UserController::class, 'logout']);
@@ -86,6 +87,7 @@ Route::prefix('/faculty')->group(function(){
     Route::patch('/update', [FacultyController::class, 'updateFaculty']);
 });
 
+Route::post('/user-create', [UserController::class, 'userRegister']);
 Route::get('/all-user-list', [UserController::class, 'getUserList']);
 Route::get('/get-user-bytype/{user_type}', [UserController::class, 'getUserListByType']);
 Route::get('/password-reset/{user_id}', [UserController::class, 'resetPassword']);

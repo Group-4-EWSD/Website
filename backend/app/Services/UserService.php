@@ -170,4 +170,14 @@ class UserService
             return $this->userRepository->addUserVisit($userId, $pageId);
         }
     }
+
+    public function userRegister($data){
+        $data['user_id']= $this->userRepository->generateUserId();
+
+        return $this->userRepository->userRegister($data);
+    }
+
+    public function userLastLogin($userId){
+        return $this->userRepository->userLastLogin($userId);
+    }
 }

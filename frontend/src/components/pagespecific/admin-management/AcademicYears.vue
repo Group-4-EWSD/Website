@@ -1,24 +1,36 @@
 <script setup lang="ts">
-import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
-import { reactive, ref } from 'vue'
-
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { PencilIcon, PlusIcon } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import * as yup from 'yup'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import Input from '@/components/shared/Input.vue'
 import { Label } from '@/components/ui/label'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-interface AcademicYear {
-  id: number
-  name: string
-}
-
-interface AcademicYearForm {
-  id: number | null
-  name: string
-}
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import type {
+  AcademicYear,
+  AcademicYearParams,
+  AcademicYearUpdateParams,
+} from '@/types/academic-years'
+import type { Update } from 'vite/types/hmrPayload.js'
+import { toast } from 'vue-sonner'
+import { createAcademicYear, updateAcademicYear } from '@/api/academic-years'
 
 // Props and emits
 const props = defineProps<{
@@ -26,62 +38,110 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'add', year: { name: string }): void
-  (e: 'update', year: AcademicYear): void
-  (e: 'delete', yearId: number): void
+  (e: 'refresh'): void
 }>()
 
 // Local state
 const isModalOpen = ref<boolean>(false)
-const isDeleteDialogOpen = ref<boolean>(false)
 const editing = ref<AcademicYear | null>(null)
-const yearToDelete = ref<AcademicYear | null>(null)
+const isSubmitting = ref<boolean>(false)
 
-const form = reactive<AcademicYearForm>({
-  id: null,
-  name: '',
+// Form validation schema
+const schema = yup.object({
+  academic_year_start: yup
+    .string()
+    .required('Start year is required')
+    .matches(/^\d{4}$/, 'Must be a 4-digit year')
+    .test('is-valid-year', 'Must be a valid year', (value) => {
+      const year = parseInt(value)
+      return year >= 2000 && year <= 2100
+    }),
+  academic_year_end: yup
+    .string()
+    .required('End year is required')
+    .matches(/^\d{4}$/, 'Must be a 4-digit year')
+    .test('is-valid-year', 'Must be a valid year', (value) => {
+      const year = parseInt(value)
+      return year >= 2000 && year <= 2100
+    })
+    .test('is-sequential', 'End year must follow start year', function (value) {
+      const startYear = parseInt(this.parent.academic_year_start)
+      const endYear = parseInt(value)
+      return !isNaN(startYear) && !isNaN(endYear) && endYear === startYear + 1
+    }),
 })
 
 // Methods
 const openModal = (year: AcademicYear | null): void => {
   if (year) {
     editing.value = year
-    form.id = year.id
-    form.name = year.name
+    const parts = year.academic_year_description.split('-')
+
+    setFieldValue('id', year.academic_year_id)
+    setFieldValue('academic_year_start', parts[0])
+    setFieldValue('academic_year_end', parts[1])
+
+    // resetForm({
+    //   id: year.academic_year_id,
+    //   academic_year_start: parts[0],
+    //   academic_year_end: parts[1],
+    // })
   } else {
     editing.value = null
-    form.id = null
-    form.name = ''
+    resetForm({
+      id: null,
+      academic_year_start: '',
+      academic_year_end: '',
+    })
   }
   isModalOpen.value = true
 }
 
-const saveAcademicYear = (): void => {
-  if (!form.name.trim()) {
-    // Handle validation
-    return
-  }
+const { handleSubmit, resetForm, values, setFieldValue, errors } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    id: null as string | null,
+    academic_year_start: '',
+    academic_year_end: '',
+  },
+})
 
-  if (editing.value && form.id !== null) {
-    emit('update', { id: form.id, name: form.name })
+const saveAcademicYear = handleSubmit(async (values) => {
+  if (editing.value && values.id !== null) {
+    isSubmitting.value = true
+    try {
+      const params: AcademicYearUpdateParams = {
+        academic_year_id: values.id,
+        academic_year_start: values.academic_year_start,
+        academic_year_end: values.academic_year_end,
+      }
+      await updateAcademicYear(params)
+      emit('refresh')
+      toast.success('Academic year updated successfully')
+      isModalOpen.value = false
+    } catch (error) {
+      toast.error('Failed to update academic year')
+    } finally {
+      isSubmitting.value = false
+    }
   } else {
-    emit('add', { name: form.name })
+    isSubmitting.value = true
+    const params: AcademicYearParams = {
+      academic_year_start: values.academic_year_start,
+      academic_year_end: values.academic_year_end,
+    }
+    try {
+      await createAcademicYear(params)
+      emit('refresh')
+      toast.success('Academic year added successfully')
+      isModalOpen.value = false
+    } catch (error) {
+      toast.error('Failed to add academic year')
+    } finally {
+      isSubmitting.value = false
+    }
   }
-
-  isModalOpen.value = false
-}
-
-const confirmDelete = (year: AcademicYear): void => {
-  yearToDelete.value = year
-  isDeleteDialogOpen.value = true
-}
-
-const deleteAcademicYear = (): void => {
-  if (yearToDelete.value) {
-    emit('delete', yearToDelete.value.id)
-  }
-  isDeleteDialogOpen.value = false
-}
+})
 </script>
 <template>
   <Card>
@@ -98,24 +158,22 @@ const deleteAcademicYear = (): void => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead class="w-16">ID</TableHead>
+              <TableHead class="w-16">No.</TableHead>
               <TableHead>Name</TableHead>
               <TableHead class="w-24 text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="year in academicYears" :key="year.id">
-              <TableCell class="font-medium">{{ year.id }}</TableCell>
-              <TableCell>{{ year.name }}</TableCell>
+            <TableRow v-for="(year, index) in academicYears" :key="year.academic_year_id">
+              <TableCell class="font-medium">{{ index + 1 }}</TableCell>
+              <TableCell>{{ year.academic_year_description }}</TableCell>
               <TableCell class="text-right">
-                <div class="flex justify-end gap-1 md:gap-2">
-                  <Button variant="ghost" size="icon" @click="openModal(year)" class="h-8 w-8">
-                    <PencilIcon class="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" @click="confirmDelete(year)" class="h-8 w-8">
+                <Button variant="ghost" size="icon" @click="openModal(year)" class="h-8 w-8">
+                  <PencilIcon class="h-4 w-4" />
+                </Button>
+                <!-- <Button variant="ghost" size="icon" @click="confirmDelete(year)" class="h-8 w-8">
                     <TrashIcon class="h-4 w-4" />
-                  </Button>
-                </div>
+                  </Button> -->
               </TableCell>
             </TableRow>
             <TableRow v-if="academicYears.length === 0">
@@ -134,37 +192,46 @@ const deleteAcademicYear = (): void => {
     <DialogContent class="w-[90vw] max-w-[425px]">
       <DialogHeader>
         <DialogTitle>{{ editing ? 'Edit' : 'Add' }} Academic Year</DialogTitle>
-        <DialogDescription> Enter the details for the academic year </DialogDescription>
+        <DialogDescription>Enter the details for the academic year</DialogDescription>
       </DialogHeader>
 
-      <div class="grid gap-4 py-4">
+      <form @submit.prevent="saveAcademicYear" class="grid gap-4 pt-4">
         <div class="grid gap-2">
-          <Label for="yearName">Academic Year Name</Label>
-          <Input id="yearName" v-model="form.name" placeholder="e.g. 2025-2026" />
+          <Label for="yearName">Academic Year</Label>
+          <div class="flex gap-2 flex-row">
+            <div>
+              <Input
+                name="academic_year_start"
+                id="academic_year_start"
+                placeholder="e.g. 2025"
+                :errors="errors"
+              />
+            </div>
+            <span class="text-gray-500 mt-2">-</span>
+            <div>
+              <Input
+                name="academic_year_end"
+                id="academic_year_end"
+                placeholder="e.g. 2025"
+                :errors="errors"
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <DialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
-        <Button variant="outline" @click="isModalOpen = false" class="w-full sm:w-auto">Cancel</Button>
-        <Button @click="saveAcademicYear" class="w-full sm:w-auto">Save</Button>
-      </DialogFooter>
+        <DialogFooter class="flex flex-col sm:flex-row gap-2 mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            @click="isModalOpen = false"
+            class="w-full sm:w-auto"
+            >Cancel</Button
+          >
+          <Button type="submit" class="w-full sm:w-auto" :processing="isSubmitting">
+            {{ isSubmitting ? 'Saving...' : 'Save' }}
+          </Button>
+        </DialogFooter>
+      </form>
     </DialogContent>
   </Dialog>
-
-  <!-- Delete Confirmation Modal -->
-  <AlertDialog :open="isDeleteDialogOpen" @update:open="isDeleteDialogOpen = $event">
-    <AlertDialogContent class="w-[90vw]max-w-[425px]">
-      <AlertDialogHeader>
-        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-        <AlertDialogDescription>
-          This action cannot be undone. This will permanently delete this academic year and all
-          associated submission dates.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
-        <AlertDialogCancel @click="isDeleteDialogOpen = false" class="w-full sm:w-auto">Cancel</AlertDialogCancel>
-        <AlertDialogAction @click="deleteAcademicYear" class="w-full sm:w-auto">Delete</AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
 </template>

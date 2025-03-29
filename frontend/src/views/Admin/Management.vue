@@ -49,19 +49,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { getAcademicYearList } from '@/api/academic-years'
+import type { AcademicYear, AcademicYearParams, AcademicYearUpdateParams } from '@/types/academic-years'
+import { toast } from 'vue-sonner'
+import type { Faculty } from '@/types/faculty'
+import { getFacultyList } from '@/api/faculties'
 
-// Import child components
-
-// Type definitions
-interface AcademicYear {
-  id: number
-  name: string
-}
-
-interface Faculty {
-  id: number
-  name: string
-}
 
 interface SubmissionDate {
   id: number
@@ -82,17 +75,10 @@ interface SubmissionForm {
 type DeleteType = 'submission' | 'academic-year' | 'faculty' | ''
 
 // Data for academic years
-const academicYears = ref<AcademicYear[]>([
-  { id: 1, name: '2023-2024' },
-  { id: 2, name: '2024-2025' },
-])
+let academicYears = ref<AcademicYear[]>([])
 
 // Data for faculties
-const faculties = ref<Faculty[]>([
-  { id: 1, name: 'Science' },
-  { id: 2, name: 'Arts' },
-  { id: 3, name: 'Engineering' },
-])
+const faculties = ref<Faculty[]>([])
 
 // Data for submission dates (now with facultyId)
 const submissionDates = ref<SubmissionDate[]>([
@@ -150,14 +136,14 @@ const submissionForm = reactive<SubmissionForm>({
 const isMobileView = ref(false)
 
 // Helper functions
-const getAcademicYearName = (id: number): string => {
-  const year = academicYears.value.find((y) => y.id === id)
-  return year ? year.name : 'Unknown'
+const getAcademicYearName = (id: string): string => {
+  const year = academicYears.value.find((y) => y.academic_year_id === id)
+  return year ? year.academic_year_description : 'Unknown'
 }
 
-const getFacultyName = (id: number): string => {
-  const faculty = faculties.value.find((f) => f.id === id)
-  return faculty ? faculty.name : 'Unknown'
+const getFacultyName = (id: string): string => {
+  const faculty = faculties.value.find((f) => f.faculty_id === id)
+  return faculty ? faculty.faculty_name : 'Unknown'
 }
 
 const formatDate = (dateString: string): string => {
@@ -263,42 +249,21 @@ const confirmDelete = (): void => {
   itemToDelete.value = null
 }
 
-// Academic years CRUD operations
-const addAcademicYear = (year: { name: string }): void => {
-  const newId = Math.max(0, ...academicYears.value.map((y) => y.id)) + 1
-  academicYears.value.push({ id: newId, name: year.name })
-}
-
-const updateAcademicYear = (year: AcademicYear): void => {
-  const index = academicYears.value.findIndex((y) => y.id === year.id)
-  if (index !== -1) {
-    academicYears.value[index] = { ...year }
+const refreshAcademicYears = async (): Promise<void> => {
+  try {
+    academicYears.value = await getAcademicYearList()
+  } catch (error) {
+    toast.error('Failed to refresh academic years')
   }
-}
-
-const deleteAcademicYear = (yearId: number): void => {
-  academicYears.value = academicYears.value.filter((y) => y.id !== yearId)
-  // Also delete associated submission dates
-  submissionDates.value = submissionDates.value.filter((d) => d.academicYearId !== yearId)
 }
 
 // Faculties CRUD operations
-const addFaculty = (faculty: { name: string }): void => {
-  const newId = Math.max(0, ...faculties.value.map((f) => f.id)) + 1
-  faculties.value.push({ id: newId, name: faculty.name })
-}
-
-const updateFaculty = (faculty: Faculty): void => {
-  const index = faculties.value.findIndex((f) => f.id === faculty.id)
-  if (index !== -1) {
-    faculties.value[index] = { ...faculty }
+const refreshFaculties = async (): Promise<void> => {
+  try {
+    faculties.value = await getFacultyList()
+  } catch (error) {
+    toast.error('Failed to refresh faculties')
   }
-}
-
-const deleteFaculty = (facultyId: number): void => {
-  faculties.value = faculties.value.filter((f) => f.id !== facultyId)
-  // Also delete associated submission dates
-  submissionDates.value = submissionDates.value.filter((d) => d.facultyId !== facultyId)
 }
 
 // Check if we're in mobile view
@@ -306,9 +271,21 @@ const checkMobileView = () => {
   isMobileView.value = window.innerWidth < 768
 }
 
-onMounted(() => {
-  // You would typically fetch data from an API here
-  console.log('Component mounted')
+onMounted(async () => {
+
+  try {
+    academicYears.value = await getAcademicYearList()
+
+    const promises: Promise<any>[] = [getAcademicYearList(), getFacultyList()]
+    const results = await Promise.all(promises)
+
+    academicYears.value = results[0]
+    faculties.value = results[1]
+
+  }
+  catch {
+    toast.error('Failed to fetch academic years')
+  }
   
   // Set initial screen size
   checkMobileView()
@@ -346,8 +323,8 @@ onMounted(() => {
                         <SelectValue placeholder="Select year" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem v-for="year in academicYears" :key="year.id" :value="year.id">
-                          {{ year.name }}
+                        <SelectItem v-for="year in academicYears" :key="year.academic_year_id" :value="year.academic_year_id">
+                          {{ year.academic_year_description }}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -372,8 +349,8 @@ onMounted(() => {
                     </TableHeader>
                     <TableBody>
                       <TableRow v-for="date in filteredSubmissionDates" :key="date.id">
-                        <TableCell>{{ getAcademicYearName(date.academicYearId) }}</TableCell>
-                        <TableCell>{{ getFacultyName(date.facultyId) }}</TableCell>
+                        <TableCell>{{ getAcademicYearName(date.academicYearId.toString()) }}</TableCell>
+                        <TableCell>{{ getFacultyName(date.facultyId.toString()) }}</TableCell>
                         <TableCell>{{ formatDate(date.preSubmissionDate) }}</TableCell>
                         <TableCell>{{ formatDate(date.actualSubmissionDate) }}</TableCell>
                         <TableCell class="text-right">
@@ -411,7 +388,7 @@ onMounted(() => {
                   <div v-for="date in filteredSubmissionDates" :key="date.id" 
                        class="p-4 border rounded-md shadow-sm">
                     <div class="flex justify-between items-start mb-2">
-                      <div class="font-medium">{{ getFacultyName(date.facultyId) }}</div>
+                      <div class="font-medium">{{ getFacultyName(date.facultyId.toString()) }}</div>
                       <div class="flex gap-1">
                         <Button
                           variant="ghost"
@@ -433,7 +410,7 @@ onMounted(() => {
                         </Button>
                       </div>
                     </div>
-                    <div class="text-sm text-gray-500">{{ getAcademicYearName(date.academicYearId) }}</div>
+                    <div class="text-sm text-gray-500">{{ getAcademicYearName(date.academicYearId.toString()) }}</div>
                     <div class="grid grid-cols-2 gap-2 mt-3 text-sm">
                       <div>
                         <div class="font-medium">Pre-Submission:</div>
@@ -467,9 +444,7 @@ onMounted(() => {
             <div class="mt-4">
               <AcademicYears
                 :academicYears="academicYears"
-                @add="addAcademicYear"
-                @update="updateAcademicYear"
-                @delete="deleteAcademicYear"
+                @success="refreshAcademicYears"
               />
             </div>
           </AccordionContent>
@@ -487,9 +462,7 @@ onMounted(() => {
             <div class="mt-4">
               <Faculties
                 :faculties="faculties"
-                @add="addFaculty"
-                @update="updateFaculty"
-                @delete="deleteFaculty"
+                @refresh="refreshFaculties"
               />
             </div>
           </AccordionContent>
@@ -515,8 +488,8 @@ onMounted(() => {
                 <SelectValue placeholder="Select academic year" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="year in academicYears" :key="year.id" :value="year.id">
-                  {{ year.name }}
+                <SelectItem v-for="year in academicYears" :key="year.academic_year_id" :value="year.academic_year_id">
+                  {{ year.academic_year_description }}
                 </SelectItem>
               </SelectContent>
             </Select>

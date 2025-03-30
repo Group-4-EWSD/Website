@@ -17,7 +17,7 @@ class FacultyController extends Controller
 
     public function listAllFaculties()
     {
-        return $listAllFaculties = $this->facultyService->getAllFaculties();
+        return response()->json($this->facultyService->getAllFaculties());
     }
 
     public function selectFacultyByID($request)

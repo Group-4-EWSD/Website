@@ -183,7 +183,7 @@ class UserController extends Controller
     public function getUserList()
     {
         $users = $this->userService->getAllUserList();// Need to fix to get User List Function 
-        return response()->json(['all user list' => $users]);
+        return response()->json($users);
     }
 
     public function getUserListByType($userType)

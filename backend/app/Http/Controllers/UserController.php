@@ -176,7 +176,68 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function getUserList(Request $request){
-        return $this->userService->getUserList($request);
+    public function getActiveUserList(Request $request){
+        return $this->userService->getActiveUserList($request);
+    }
+    
+    public function getUserList()
+    {
+        $users = $this->userService->getAllUserList();
+        return response()->json($users);
+    }
+
+    public function getUserListByType($userType)
+    {
+        $users = $this->userService->getUserListByType($userType);
+        return response()->json($users);
+    }
+
+    public function resetPassword($userId)
+    {
+        $result = $this->userService->resetPassword($userId);
+
+        if (!$result) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(['message' => 'Password reset successful. Email sent.']);
+    }
+
+    public function pageVisitInitial($pageId){
+        $user = Auth::user();
+        $this->userService->pageVisitInitial($user->id, $pageId);
+        return response()->json([
+            'message' => 'Page visit recorded successfully',
+        ], 200);
+    }
+
+    public function userRegister(Request $request){
+        try {
+            $validated = $request->validate([
+                'user_name'       => 'required|string|max:255',
+                'nickname'        => 'required|string|max:100',
+                'user_email'      => 'required|email|max:255|unique:users,user_email',
+                'user_type_id'    => 'required|exists:user_types,user_type_id',
+                'faculty_id'      => 'required|uuid|exists:faculties,faculty_id',
+                'gender'          => 'required|in:1,2', 
+                'date_of_birth'   => 'required|date|before:today',
+                'phone_number'    => 'required|string|max:20'
+            ]);
+
+            return response()->json(['new user id' => $this->userService->userRegister($validated)]);
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function userLastLogin()
+    {
+        $userId = Auth::id();
+        
+        return response()->json(['latest login time' => $this->userService->userLastLogin($userId)]);
     }
 }

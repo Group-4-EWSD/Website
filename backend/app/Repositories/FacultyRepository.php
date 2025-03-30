@@ -18,17 +18,13 @@ class FacultyRepository
     
     public function getAllFaculties()
     {
-        $faculties = DB::table('faculties as f')
+        return $faculties = DB::table('faculties as f')
         ->select([
             'f.faculty_id',
             'f.faculty_name',
             'f.updated_at'
         ])
         ->get();
-    
-        return response()->json([
-            'faculties' => $faculties
-        ]);
     }     
 
     public function selectFacultyByID($faculty_id)

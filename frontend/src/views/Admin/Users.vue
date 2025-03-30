@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { useForm } from 'vee-validate'
+import * as yup from 'yup'
 import {
   ArrowDown,
   ArrowUp,
@@ -8,7 +10,7 @@ import {
   Plus,
   Search,
 } from 'lucide-vue-next'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -40,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import CustomSelect from '@/components/shared/Select.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -49,42 +52,33 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-// import {
-//   Pagination,
-//   PaginationContent,
-//   PaginationEllipsis,
-//   PaginationItem,
-//   PaginationLink,
-//   PaginationNext,
-//   PaginationPrevious,
-// } from '@/components/ui/pagination'
-
-interface Faculty {
-  id: string
-  name: string
-}
-
-interface User {
-  id: number
-  name: string
-  email: string
-  userType: string
-  faculty: Faculty | null
-  createdAt: string
-}
+import FormElement from '@/components/shared/FormElement.vue'
+import { getAllUsers, createUser, updateUser } from '@/api/user'
+import { getFacultyList } from '@/api/faculties'
+import type { CreateUserParams, UpdateUserParams, User } from '@/types/user'
+import type { Faculty } from '@/types/faculty'
 
 interface Column {
-  key: string
-  label: string
+  key: string;
+  label: string;
 }
 
 type SortDirection = 'asc' | 'desc'
 
+// Component state
 const searchQuery = ref('')
-const selectedUserType = ref('5')
+const selectedUserType = ref('')
 const selectedFaculty = ref('')
-const users = ref<User[]>([])
+const allUsers = ref<User[]>([])
+const displayedUsers = ref<User[]>([])
 const faculties = ref<Faculty[]>([])
+const userTypes = ref<{ value: string; label: string }[]>([
+  { value: '0', label: 'Guest' },
+  { value: '1', label: 'Student' },
+  { value: '2', label: 'Marketing Coordinator' },
+  { value: '3', label: 'Marketing Manager' },
+  { value: '4', label: 'Admin' },
+])
 const isLoading = ref(true)
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -96,172 +90,141 @@ const showForcePasswordDialog = ref(false)
 const userToEdit = ref<User | null>(null)
 const userToForcePasswordChange = ref<User | null>(null)
 
-// Form data for add/edit user
-const formData = ref({
-  name: '',
-  email: '',
-  userType: '',
-  faculty: '',
+// Gender options mapping
+const genderOptions = [
+  { label: 'Male', value: 1 },
+  { label: 'Female', value: 2 },
+  { label: 'Prefer not to say', value: 0 },
+]
+
+
+// Validation schema for user form
+const validationSchema = yup.object({
+  user_name: yup.string().required('Name is required'),
+  nickname: yup.string().required('Nickname is required'),
+  user_email: yup.string().email('Must be a valid email').required('Email is required'),
+  user_type_id: yup.string().required('User type is required'),
+  faculty_id: yup.string().when('user_type_id', {
+    is: (val: string) => !['3', '4'].includes(val),
+    then: () => yup.string().required('Faculty is required'),
+    otherwise: () => yup.string().nullable(),
+  }),
+  gender: yup.number().required('Gender is required'),
+  date_of_birth: yup.string().nullable(),
+  phone_number: yup.string().nullable(),
+})
+
+// VeeValidate form setup
+const { handleSubmit, errors, values, resetForm, setValues } = useForm({
+  validationSchema,
+  initialValues: {
+    user_name: '',
+    nickname: '',
+    user_email: '',
+    user_type_id: '',
+    faculty_id: '',
+    gender: 0,
+    date_of_birth: null,
+    phone_number: null,
+  },
 })
 
 const columns: Column[] = [
   { key: 'id', label: 'ID' },
-  { key: 'name', label: 'Name' },
-  { key: 'email', label: 'Email' },
-  { key: 'userType', label: 'User Type' },
-  { key: 'faculty', label: 'Faculty' },
-  { key: 'createdAt', label: 'Created At' },
+  { key: 'user_name', label: 'Name' },
+  { key: 'user_email', label: 'Email' },
+  { key: 'user_type_name', label: 'User Type' },
+  { key: 'faculty_name', label: 'Faculty' },
+  { key: 'date_of_birth', label: 'Date of Birth' },
 ]
 
-// Fetch users with pagination
-async function fetchUsers(page: number = 1) {
+// Fetch all users
+async function fetchUsers() {
   try {
     isLoading.value = true
-    // Simulate API call with pagination
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // In a real application, you would make an API call here with the following parameters:
-    // - page
-    // - pageSize
-    // - searchQuery
-    // - selectedUserType
-    // - selectedFaculty
-    // - sortColumn
-    // - sortDirection
-
-    // For demo purposes, we'll simulate the API response
-    const start = (page - 1) * pageSize.value
-    const end = start + pageSize.value
-    const filteredData = users.value.slice(start, end)
-    totalItems.value = users.value.length // In real app, this would come from API
-
-    return filteredData
+    const data = await getAllUsers()
+    allUsers.value = data
+    totalItems.value = data.length
+    applyFiltersAndSort()
   } catch (error) {
     console.error('Error fetching users:', error)
-    return []
   } finally {
     isLoading.value = false
   }
 }
 
-// Sample data - replace with actual API call
+// Fetch all faculties
+async function fetchFaculties() {
+  try {
+    const data = await getFacultyList()
+    faculties.value = data
+  } catch (error) {
+    console.error('Error fetching faculties:', error)
+  }
+}
+
+// Apply filters, sorting, and pagination to the data
+function applyFiltersAndSort() {
+  let filteredData = [...allUsers.value]
+
+  // Apply search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filteredData = filteredData.filter(
+      (user) =>
+        user.user_name.toLowerCase().includes(query) ||
+        user.user_email.toLowerCase().includes(query) ||
+        user.nickname.toLowerCase().includes(query)
+    )
+  }
+
+  // Apply user type filter
+  if (selectedUserType.value) {
+    filteredData = filteredData.filter((user) => user.user_type_id === selectedUserType.value)
+  }
+
+  // Apply faculty filter
+  if (selectedFaculty.value) {
+    filteredData = filteredData.filter((user) => user.faculty_id === selectedFaculty.value)
+  }
+
+  // Apply sorting
+  filteredData.sort((a, b) => {
+    const aValue = a[sortColumn.value as keyof User]
+    const bValue = b[sortColumn.value as keyof User]
+
+    if (aValue < bValue) return sortDirection.value === 'asc' ? -1 : 1
+    if (aValue > bValue) return sortDirection.value === 'asc' ? 1 : -1
+    return 0
+  })
+
+  totalItems.value = filteredData.length
+
+  // Apply pagination
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  displayedUsers.value = filteredData.slice(start, end)
+}
+
+// Initialize data
 onMounted(async () => {
   try {
-    // Simulate API call for initial data
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    // Sample data
-    users.value = [
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'john@example.com',
-        userType: '1',
-        faculty: { id: '1', name: 'Engineering' },
-        createdAt: '2023-01-15T08:30:00Z',
-      },
-      {
-        id: 2,
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        userType: '2',
-        faculty: { id: '2', name: 'Business' },
-        createdAt: '2023-02-20T10:15:00Z',
-      },
-      {
-        id: 3,
-        name: 'Admin User',
-        email: 'admin@example.com',
-        userType: '4',
-        faculty: null,
-        createdAt: '2023-03-05T14:45:00Z',
-      },
-      {
-        id: 4,
-        name: 'Guest User',
-        email: 'guest@example.com',
-        userType: '0',
-        faculty: null,
-        createdAt: '2023-04-10T09:20:00Z',
-      },
-      {
-        id: 5,
-        name: 'Manager User',
-        email: 'manager@example.com',
-        userType: '3',
-        faculty: null,
-        createdAt: '2023-05-25T16:30:00Z',
-      },
-      {
-        id: 6,
-        name: 'Student A',
-        email: 'studenta@example.com',
-        userType: '1',
-        faculty: { id: '3', name: 'Science' },
-        createdAt: '2023-06-18T11:10:00Z',
-      },
-      {
-        id: 7,
-        name: 'Student B',
-        email: 'studentb@example.com',
-        userType: '1',
-        faculty: { id: '1', name: 'Engineering' },
-        createdAt: '2023-07-22T13:40:00Z',
-      },
-      {
-        id: 8,
-        name: 'Coordinator C',
-        email: 'coordinatorc@example.com',
-        userType: '2',
-        faculty: { id: '3', name: 'Science' },
-        createdAt: '2023-08-30T15:20:00Z',
-      },
-      {
-        id: 9,
-        name: 'Student D',
-        email: 'studentd@example.com',
-        userType: '1',
-        faculty: { id: '2', name: 'Business' },
-        createdAt: '2023-09-12T08:50:00Z',
-      },
-      {
-        id: 10,
-        name: 'Guest E',
-        email: 'gueste@example.com',
-        userType: '0',
-        faculty: null,
-        createdAt: '2023-10-05T12:15:00Z',
-      },
-      {
-        id: 11,
-        name: 'Admin F',
-        email: 'adminf@example.com',
-        userType: '4',
-        faculty: null,
-        createdAt: '2023-11-18T17:30:00Z',
-      },
-      {
-        id: 12,
-        name: 'Student G',
-        email: 'studentg@example.com',
-        userType: '1',
-        faculty: { id: '4', name: 'Arts' },
-        createdAt: '2023-12-01T09:45:00Z',
-      },
-    ]
-
-    faculties.value = [
-      { id: '1', name: 'Engineering' },
-      { id: '2', name: 'Business' },
-      { id: '3', name: 'Science' },
-      { id: '4', name: 'Arts' },
-    ]
-
-    // Fetch first page of users
-    await fetchUsers(1)
+    // Fetch both users and faculties in parallel
+    await Promise.all([fetchUsers(), fetchFaculties()])
   } catch (error) {
     console.error('Error initializing data:', error)
   }
+})
+
+// Watch for changes to filters and sort criteria
+watch([searchQuery, selectedUserType, selectedFaculty, sortColumn, sortDirection], () => {
+  currentPage.value = 1 // Reset to first page when filters change
+  applyFiltersAndSort()
+})
+
+// Watch for page changes
+watch(currentPage, () => {
+  applyFiltersAndSort()
 })
 
 const totalPages = computed(() => {
@@ -270,28 +233,111 @@ const totalPages = computed(() => {
 
 function handlePageChange(page: number) {
   currentPage.value = page
-  fetchUsers(page)
 }
 
-function handleSearch(): void {
-  currentPage.value = 1
-  fetchUsers(1)
+function handleSearch() {
+  applyFiltersAndSort()
 }
 
-function handleFilters(): void {
-  currentPage.value = 1
-  fetchUsers(1)
-}
-
-function getUserTypeName(type: string): string {
-  const types: Record<string, string> = {
-    '0': 'Guest',
-    '1': 'Student',
-    '2': 'Marketing Coordinator',
-    '3': 'Marketing Manager',
-    '4': 'Admin',
+function updateUserType(value: string) {
+  selectedUserType.value = value
+  // Reset faculty if user type is manager or admin
+  if (['3', '4'].includes(value)) {
+    selectedFaculty.value = ''
   }
-  return types[type] || type
+}
+
+function updateFaculty(value: string) {
+  selectedFaculty.value = value
+}
+
+function sortBy(column: string) {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+function editUser(user: User) {
+  userToEdit.value = user
+  setValues({
+    user_name: user.user_name,
+    nickname: user.nickname,
+    user_email: user.user_email,
+    user_type_id: user.user_type_id,
+    faculty_id: user.faculty_id,
+    gender: user.gender,
+    date_of_birth: user.date_of_birth,
+    phone_number: user.phone_number,
+  })
+  showUserDialog.value = true
+}
+
+function addUser() {
+  userToEdit.value = null
+  resetForm()
+  showUserDialog.value = true
+}
+
+function confirmForcePasswordChange(user: User) {
+  userToForcePasswordChange.value = user
+  showForcePasswordDialog.value = true
+}
+
+function forcePasswordChange() {
+  if (userToForcePasswordChange.value) {
+    // Implement your force password change logic here
+    console.log('Force password change for user:', userToForcePasswordChange.value)
+    showForcePasswordDialog.value = false
+    userToForcePasswordChange.value = null
+  }
+}
+
+const onSubmit = handleSubmit(async (formValues) => {
+  try {
+    if (userToEdit.value) {
+      // Update existing user
+      const updateParams: UpdateUserParams = {
+        ...formValues,
+        id: userToEdit.value.id,
+      }
+      await updateUser()
+      
+      // Update the local state after successful API call
+      const index = allUsers.value.findIndex((u) => u.id === userToEdit.value!.id)
+      if (index !== -1) {
+        allUsers.value[index] = {
+          ...allUsers.value[index],
+          ...updateParams,
+          user_type_name: getUserTypeName(updateParams.user_type_id),
+          faculty_name: getFacultyName(updateParams.faculty_id),
+        }
+      }
+    } else {
+      // Add new user
+      const createParams: CreateUserParams = formValues
+      await createUser(createParams)
+      
+      // Refresh the user list after successful user creation
+      fetchUsers()
+    }
+    showUserDialog.value = false
+    userToEdit.value = null
+  } catch (error) {
+    console.error('Error saving user:', error)
+  }
+})
+
+function getUserTypeName(typeId: string): string {
+  const userType = userTypes.value.find((t) => t.value === typeId)
+  return userType ? userType.label : ''
+}
+
+function getFacultyName(facultyId: string): string {
+  const faculty = faculties.value.find((f) => f.faculty_id === facultyId)
+  return faculty ? faculty.faculty_name : ''
 }
 
 function getUserTypeLabel(value: string): string {
@@ -301,104 +347,13 @@ function getUserTypeLabel(value: string): string {
 
 function getFacultyLabel(value: string): string {
   if (!value) return 'All Faculties'
-  const faculty = faculties.value.find((f) => f.id === value)
-  return faculty ? faculty.name : 'All Faculties'
+  const faculty = faculties.value.find((f) => f.faculty_id === value)
+  return faculty ? faculty.faculty_name : 'All Faculties'
 }
 
-function formatDate(dateString: string): string {
-  return dayjs(dateString).format('MMM d, yyyy')
-}
-
-function updateUserType(value: string): void {
-  selectedUserType.value = value
-  // Reset faculty if user type is manager or admin
-  if (['3', '4'].includes(value)) {
-    selectedFaculty.value = ''
-  }
-  handleFilters()
-}
-
-function updateFaculty(value: string): void {
-  selectedFaculty.value = value
-  handleFilters()
-}
-
-function sortBy(column: string): void {
-  if (sortColumn.value === column) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
-  } else {
-    sortColumn.value = column
-    sortDirection.value = 'asc'
-  }
-}
-
-function editUser(user: User): void {
-  userToEdit.value = user
-  formData.value = {
-    name: user.name,
-    email: user.email,
-    userType: user.userType,
-    faculty: user.faculty?.id || '',
-  }
-  showUserDialog.value = true
-}
-
-function addUser(): void {
-  userToEdit.value = null
-  formData.value = {
-    name: '',
-    email: '',
-    userType: '',
-    faculty: '',
-  }
-  showUserDialog.value = true
-}
-
-function confirmForcePasswordChange(user: User): void {
-  userToForcePasswordChange.value = user
-  showForcePasswordDialog.value = true
-}
-
-function forcePasswordChange(): void {
-  if (userToForcePasswordChange.value) {
-    // Implement your force password change logic here
-    console.log('Force password change for user:', userToForcePasswordChange.value)
-    showForcePasswordDialog.value = false
-    userToForcePasswordChange.value = null
-  }
-}
-
-function saveUser(): void {
-  if (userToEdit.value) {
-    // Update existing user
-    const index = users.value.findIndex((u) => u.id === userToEdit.value!.id)
-    if (index !== -1) {
-      users.value[index] = {
-        ...users.value[index],
-        name: formData.value.name,
-        email: formData.value.email,
-        userType: formData.value.userType,
-        faculty: formData.value.faculty
-          ? faculties.value.find((f) => f.id === formData.value.faculty) || null
-          : null,
-      }
-    }
-  } else {
-    // Add new user
-    const newUser: User = {
-      id: users.value.length + 1,
-      name: formData.value.name,
-      email: formData.value.email,
-      userType: formData.value.userType,
-      faculty: formData.value.faculty
-        ? faculties.value.find((f) => f.id === formData.value.faculty) || null
-        : null,
-      createdAt: new Date().toISOString(),
-    }
-    users.value.push(newUser)
-  }
-  showUserDialog.value = false
-  userToEdit.value = null
+function formatDate(dateString: string | null): string {
+  if (!dateString) return '-'
+  return dayjs(dateString).format('MMM D, YYYY')
 }
 </script>
 
@@ -425,16 +380,14 @@ function saveUser(): void {
 
           <!-- User Type Filter -->
           <Select :modelValue="selectedUserType" @update:modelValue="updateUserType">
-            <SelectTrigger class="w-full md:w-[180px]">
+            <SelectTrigger class="w-full md:w-40">
               <SelectValue :placeholder="getUserTypeLabel(selectedUserType)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="5">All User Types</SelectItem>
-              <SelectItem value="0">Guest</SelectItem>
-              <SelectItem value="1">Student</SelectItem>
-              <SelectItem value="2">Marketing Coordinator</SelectItem>
-              <SelectItem value="3">Marketing Manager</SelectItem>
-              <SelectItem value="4">Admin</SelectItem>
+              <SelectItem value="">All User Types</SelectItem>
+              <SelectItem v-for="type in userTypes" :key="type.value" :value="type.value">
+                {{ type.label }}
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -444,13 +397,13 @@ function saveUser(): void {
             :modelValue="selectedFaculty"
             @update:modelValue="updateFaculty"
           >
-            <SelectTrigger class="w-full md:w-[180px]">
+            <SelectTrigger class="w-full md:w-40">
               <SelectValue :placeholder="getFacultyLabel(selectedFaculty)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0">All Faculties</SelectItem>
-              <SelectItem v-for="faculty in faculties" :key="faculty.id" :value="faculty.id">
-                {{ faculty.name }}
+              <SelectItem value="">All Faculties</SelectItem>
+              <SelectItem v-for="faculty in faculties" :key="faculty.faculty_id" :value="faculty.faculty_id">
+                {{ faculty.faculty_name }}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -512,23 +465,24 @@ function saveUser(): void {
                 <TableCell>
                   <div class="flex space-x-2">
                     <Skeleton class="h-8 w-8" />
+                    <Skeleton class="h-8 w-8" />
                   </div>
                 </TableCell>
               </TableRow>
             </template>
             <template v-else>
-              <TableRow v-if="users.length === 0">
+              <TableRow v-if="displayedUsers.length === 0">
                 <TableCell :colspan="columns.length + 1" class="text-center">
                   No users found
                 </TableCell>
               </TableRow>
-              <TableRow v-for="user in users" :key="user.id">
+              <TableRow v-for="user in displayedUsers" :key="user.id">
                 <TableCell class="pl-6">{{ user.id }}</TableCell>
-                <TableCell>{{ user.name }}</TableCell>
-                <TableCell>{{ user.email }}</TableCell>
-                <TableCell>{{ getUserTypeName(user.userType) }}</TableCell>
-                <TableCell>{{ user.faculty ? user.faculty.name : '-' }}</TableCell>
-                <TableCell>{{ formatDate(user.createdAt) }}</TableCell>
+                <TableCell>{{ user.user_name }}</TableCell>
+                <TableCell>{{ user.user_email }}</TableCell>
+                <TableCell>{{ user.user_type_name }}</TableCell>
+                <TableCell>{{ user.faculty_name || '-' }}</TableCell>
+                <TableCell>{{ formatDate(user.date_of_birth) }}</TableCell>
                 <TableCell>
                   <div class="flex space-x-2">
                     <Button variant="ghost" size="icon" @click="editUser(user)">
@@ -566,7 +520,6 @@ function saveUser(): void {
                   <Button
                     class="w-10 h-10 p-0"
                     :variant="item.value === currentPage ? 'default' : 'outline'"
-                    @click="handlePageChange(item.value)"
                   >
                     {{ item.value }}
                   </Button>
@@ -596,12 +549,12 @@ function saveUser(): void {
           </Card>
         </template>
         <template v-else>
-          <Card v-for="user in users" :key="user.id" class="p-4">
+          <Card v-for="user in displayedUsers" :key="user.id" class="p-4">
             <div class="space-y-2">
               <div class="flex justify-between items-start">
                 <div>
-                  <h3 class="font-medium">{{ user.name }}</h3>
-                  <p class="text-sm text-muted-foreground">{{ user.email }}</p>
+                  <h3 class="font-medium">{{ user.user_name }}</h3>
+                  <p class="text-sm text-muted-foreground">{{ user.user_email }}</p>
                 </div>
                 <div class="flex gap-2">
                   <Button variant="ghost" size="icon" @click="editUser(user)">
@@ -615,15 +568,15 @@ function saveUser(): void {
               <div class="grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <span class="text-muted-foreground">User Type:</span>
-                  <p>{{ getUserTypeName(user.userType) }}</p>
+                  <p>{{ user.user_type_name }}</p>
                 </div>
                 <div>
                   <span class="text-muted-foreground">Faculty:</span>
-                  <p>{{ user.faculty ? user.faculty.name : '-' }}</p>
+                  <p>{{ user.faculty_name || '-' }}</p>
                 </div>
                 <div class="col-span-2">
-                  <span class="text-muted-foreground">Created:</span>
-                  <p>{{ formatDate(user.createdAt) }}</p>
+                  <span class="text-muted-foreground">Date of Birth:</span>
+                  <p>{{ formatDate(user.date_of_birth) }}</p>
                 </div>
               </div>
             </div>
@@ -652,7 +605,6 @@ function saveUser(): void {
                   <Button
                     class="w-8 h-8 p-0"
                     :variant="item.value === currentPage ? 'default' : 'outline'"
-                    @click="handlePageChange(item.value)"
                   >
                     {{ item.value }}
                   </Button>
@@ -668,55 +620,135 @@ function saveUser(): void {
 
       <!-- Add/Edit User Dialog -->
       <Dialog v-model:open="showUserDialog">
-        <DialogContent class="w-[90vw]">
+        <DialogContent class="w-[90vw] max-w-lg">
           <DialogHeader>
             <DialogTitle>{{ userToEdit ? 'Edit User' : 'Add User' }}</DialogTitle>
             <DialogDescription>
               {{ userToEdit ? 'Update user information below.' : 'Fill in the user information below.' }}
             </DialogDescription>
           </DialogHeader>
-          <div class="grid gap-4 py-4">
-            <div class="grid gap-2">
-              <Label for="name">Name</Label>
-              <Input id="name" v-model="formData.name" placeholder="Enter name" />
-            </div>
-            <div class="grid gap-2">
-              <Label for="email">Email</Label>
-              <Input id="email" v-model="formData.email" type="email" placeholder="Enter email" />
-            </div>
-            <div class="grid gap-2">
-              <Label for="userType">User Type</Label>
-              <Select v-model="formData.userType">
-                <SelectTrigger>
-                  <SelectValue :placeholder="getUserTypeLabel(formData.userType)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Guest</SelectItem>
-                  <SelectItem value="1">Student</SelectItem>
-                  <SelectItem value="2">Marketing Coordinator</SelectItem>
-                  <SelectItem value="3">Marketing Manager</SelectItem>
-                  <SelectItem value="4">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div v-if="!['3', '4'].includes(formData.userType)" class="grid gap-2">
-              <Label for="faculty">Faculty</Label>
-              <Select v-model="formData.faculty">
-                <SelectTrigger>
-                  <SelectValue :placeholder="getFacultyLabel(formData.faculty)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem v-for="faculty in faculties" :key="faculty.id" :value="faculty.id">
-                    {{ faculty.name }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
-            <Button variant="outline" @click="showUserDialog = false">Cancel</Button>
-            <Button @click="saveUser">{{ userToEdit ? 'Update' : 'Add' }}</Button>
-          </DialogFooter>
+          <form @submit.prevent="onSubmit" class="space-y-4 py-4">
+            <FormElement>
+              <template #label>
+                <Label for="user_name">Name</Label>
+              </template>
+              <template #field>
+                <Input
+                  name="user_name"
+                  id="user_name"
+                  placeholder="Enter name"
+                  :errors="errors"
+                />
+              </template>
+            </FormElement>
+
+            <FormElement>
+              <template #label>
+                <Label for="nickname">Nickname</Label>
+              </template>
+              <template #field>
+                <Input
+                  name="nickname"
+                  id="nickname"
+                  placeholder="Enter nickname"
+                  :errors="errors"
+                />
+              </template>
+            </FormElement>
+
+            <FormElement>
+              <template #label>
+                <Label for="user_email">Email</Label>
+              </template>
+              <template #field>
+                <Input
+                  name="user_email"
+                  id="user_email"
+                  type="email"
+                  placeholder="Enter email"
+                  :errors="errors"
+                />
+              </template>
+            </FormElement>
+
+            <FormElement>
+              <template #label>
+                <Label for="user_type_id">User Type</Label>
+              </template>
+              <template #field>
+                <CustomSelect
+                  name="user_type_id"
+                  id="user_type_id"
+                  :errors="errors"
+                  :options="userTypes"
+                  :modelValue="values.user_type_id"
+                />
+              </template>
+            </FormElement>
+
+            <FormElement v-if="!['3', '4'].includes(values.user_type_id)">
+              <template #label>
+                <Label for="faculty_id">Faculty</Label>
+              </template>
+              <template #field>
+                <CustomSelect
+                  name="faculty_id"
+                  id="faculty_id"
+                  :errors="errors"
+                  :options="faculties.map(f => ({ label: f.faculty_name, value: f.faculty_id }))"
+                  :modelValue="values.faculty_id"
+                />
+              </template>
+            </FormElement>
+
+            <FormElement>
+              <template #label>
+                <Label for="gender">Gender</Label>
+              </template>
+              <template #field>
+                <CustomSelect
+                  name="gender"
+                  id="gender"
+                  :errors="errors"
+                  :options="genderOptions"
+                  :modelValue="values.gender"
+                ></CustomSelect>
+              </template>
+            </FormElement>
+
+            <FormElement>
+              <template #label>
+                <Label for="date_of_birth">Date of Birth</Label>
+              </template>
+              <template #field>
+                <Input
+                  name="date_of_birth"
+                  id="date_of_birth"
+                  type="date"
+                  :errors="errors"
+                />
+              </template>
+            </FormElement>
+
+            <FormElement>
+              <template #label>
+                <Label for="phone_number">Phone Number</Label>
+              </template>
+              <template #field>
+                <Input
+                  name="phone_number"
+                  id="phone_number"
+                  placeholder="Enter phone number"
+                  :errors="errors"
+                />
+              </template>
+            </FormElement>
+
+            <DialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
+              <Button type="button" variant="outline" @click="showUserDialog = false">Cancel</Button>
+              <Button type="submit">{{ userToEdit ? 'Update' : 'Add' }}</Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 

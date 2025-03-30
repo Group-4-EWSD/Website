@@ -35,3 +35,18 @@ export const GenderOptions = {
   1: 'Male',
   2: 'Female',
 }
+
+export interface CreateUserParams {
+  user_name: string;
+  nickname: string;
+  user_email: string;
+  user_type_id: string;
+  faculty_id: string;
+  gender: number;
+  date_of_birth: string | null;
+  phone_number: string | null;
+}
+
+export interface UpdateUserParams extends CreateUserParams {
+  id: string;
+}

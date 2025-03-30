@@ -204,11 +204,10 @@ const saveSubmissionDate = handleSubmit(async (formValues) => {
 
 // Get filtered submission dates based on selected academic year
 const filteredSubmissionDates = computed(() => {
-  return submissionDates.value
-  // if (!selectedAcademicYearFilter.value) return submissionDates.value
-  // return submissionDates.value.filter(
-  //   (date) => date.academic_year_id === selectedAcademicYearFilter.value,
-  // )
+  if (!selectedAcademicYearFilter.value) return submissionDates.value
+  return submissionDates.value.filter(
+    (date) => date.academic_year_id === selectedAcademicYearFilter.value,
+  )
 })
 
 // Check if selected academic year is current (latest)
@@ -369,7 +368,6 @@ onMounted(async () => {
                       </Select>
                     </div>
 
-                    <!-- :disabled="!isCurrentAcademicYear" -->
                     <Button @click="openSubmissionModal(null)" class="w-full sm:w-auto">
                       <PlusIcon class="mr-2 h-4 w-4" /> Add New Date
                     </Button>

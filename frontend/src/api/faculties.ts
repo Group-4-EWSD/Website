@@ -11,12 +11,12 @@ export const getFacultyYear = async (id: string): Promise<Faculty> => {
   return response.data;
 }
 
-export const createFaculty = async (academicYear: FacultyParams): Promise<Faculty> => {
-  const response = await api.post('faculty/create', academicYear);
+export const createFaculty = async (faculty: FacultyParams): Promise<Faculty> => {
+  const response = await api.post('faculty/create', faculty);
   return response.data;
 }
 
-export const updateFaculty = async (academicYear: FacultyUpdateParams): Promise<Faculty> => {
-  const response = await api.post(`faculty/update`, academicYear);
+export const updateFaculty = async (faculty: FacultyUpdateParams): Promise<Faculty> => {
+  const response = await api.post(`faculty/update`, faculty);
   return response.data;
 }

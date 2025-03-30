@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SystemDataController;
+use App\Http\Controllers\ContactUsController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -105,4 +106,9 @@ Route::prefix('/system-data')->group(function(){
     Route::get('/byfaculty_system-data/{faculty_id}', [SystemDataController::class, 'byFacSysData']);
     Route::post('/create', [SystemDataController::class, 'createSysData']);
     Route::patch('/update', [SystemDataController::class, 'updateSysData']);
+});
+
+Route::prefix('/contact-us')->group(function(){
+    Route::post('/create', [ContactUsController::class, 'createContactUs']);
+    Route::get('/get-all-list', [ContactUsController::class, 'getContactUsList']);
 });

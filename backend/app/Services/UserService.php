@@ -136,6 +136,11 @@ class UserService
         return $this->userRepository->getActiveUserList($request);
     }
 
+    public function getAllUserList()
+    {
+        return $this->userRepository->getAllUserList();
+    }
+
     public function getUserListByType($userTypeId)
     {
         return $this->userRepository->getUserListByType($userTypeId);
@@ -164,5 +169,15 @@ class UserService
         if($this->userRepository->isUserVisitExist($userId, $pageId)){
             return $this->userRepository->addUserVisit($userId, $pageId);
         }
+    }
+
+    public function userRegister($data){
+        $data['user_id']= $this->userRepository->generateUserId();
+
+        return $this->userRepository->userRegister($data);
+    }
+
+    public function userLastLogin($userId){
+        return $this->userRepository->userLastLogin($userId);
     }
 }

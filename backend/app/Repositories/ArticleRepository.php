@@ -77,7 +77,6 @@ class ArticleRepository
                     WHERE u.id = ?
                     LIMIT 1
                 ", [$userId])[0]->system_id; // Use parameter binding to prevent SQL injection
-
         return $systemId;
     }
 

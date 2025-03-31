@@ -182,14 +182,14 @@ class UserController extends Controller
     
     public function getUserList()
     {
-        $users = $this->userService->getAllUserList();// Need to fix to get User List Function 
+        $users = $this->userService->getAllUserList();
         return response()->json($users);
     }
 
     public function getUserListByType($userType)
     {
         $users = $this->userService->getUserListByType($userType);
-        return response()->json(['user by type' => $users]);
+        return response()->json($users);
     }
 
     public function resetPassword($userId)
@@ -217,7 +217,6 @@ class UserController extends Controller
                 'user_name'       => 'required|string|max:255',
                 'nickname'        => 'required|string|max:100',
                 'user_email'      => 'required|email|max:255|unique:users,user_email',
-                'user_password'   => 'required|string|min:8|confirmed',
                 'user_type_id'    => 'required|exists:user_types,user_type_id',
                 'faculty_id'      => 'required|uuid|exists:faculties,faculty_id',
                 'gender'          => 'required|in:1,2', 

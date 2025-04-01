@@ -338,14 +338,13 @@ class ArticleRepository
             ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
             ->join('system_datas as sd', 'sd.system_id', '=', 'a.system_id') // Assuming correct join
             ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
-            ->groupBy('ay.academic_year_start', 'ay.academic_year_end') ;
-        
+            ->groupBy('ay.academic_year_start', 'ay.academic_year_end');
+
         if ($facultyId !== null) {
             $articlePerYear->where('u.faculty_id', '=', $facultyId);
         }
-        $articlePerYear->get();
 
-        return $articlePerYear;
+        return $articlePerYear->get();
     }
 
     public function draftArticleList($userId)

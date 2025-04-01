@@ -65,12 +65,19 @@ class FileRepository
         ]);
 
         $fileContent = $result['Body']->getContents();
-        $tempPath = storage_path('app/temp_' . time() . '.docx');
-        file_put_contents($tempPath, $fileContent);
+        
+        // Use system temp directory (Vercel compatible)
+        $tempPath = sys_get_temp_dir() . '/temp_' . time() . '.docx';
+        
+        // Store temp file
+        if (file_put_contents($tempPath, $fileContent) === false) {
+            throw new \Exception('Failed to write temp file.');
+        }
 
         // Read DOCX contents
         $phpWord = IOFactory::load($tempPath);
         $text = '';
+        
         foreach ($phpWord->getSections() as $section) {
             foreach ($section->getElements() as $element) {
                 if ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
@@ -83,7 +90,8 @@ class FileRepository
             }
         }
 
-        unlink($tempPath); // Delete temp file
+        // Delete temp file
+        unlink($tempPath);
 
         return trim($text);
     }
@@ -113,7 +121,7 @@ class FileRepository
     public function downloadMultipleAsZip($files)
     {
         $zipFileName = time() . '_download.zip';
-        $zipPath = storage_path('app/' . $zipFileName);
+        $zipPath = sys_get_temp_dir() . '/' . $zipFileName;
         $zip = new ZipArchive();
 
         if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
@@ -127,11 +135,26 @@ class FileRepository
                 'Key' => $s3Path,
             ]);
             $fileContent = $result['Body']->getContents();
-            $zip->addFromString($file->file_path, $fileContent);
+            $zip->addFromString(basename($file->file_path), $fileContent);
         }
 
-        $zip->close();
+        $zip->close(); // Finalize ZIP
 
-        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
+        // Define S3 Path (e.g., in "downloads/" folder)
+        $s3ZipPath = 'downloads/' . $zipFileName;
+
+        // Upload ZIP to S3 using your function
+        $this->uploadToS3($s3ZipPath, $zipPath);
+
+        // Delete local ZIP file after upload
+        unlink($zipPath);
+
+        // Generate a temporary signed URL for download (valid for 1 hour)
+        $downloadUrl = $this->s3Client->getObjectUrl('ewsdcloud', $s3ZipPath);
+
+        return response()->json(['download_url' => $downloadUrl]); // Open Url and it will download automatically.
+        // return redirect()->away($downloadUrl);
     }
+
+
 }

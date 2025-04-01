@@ -9,14 +9,13 @@ use App\Models\Comment;
 use App\Models\Feedback;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
 use Illuminate\Support\Str;
 //use Your Model
 
 /**
  * Class actionRepository.
  */
-class actionRepository extends BaseRepository
+class actionRepository
 {
     /**
      * @return string

@@ -215,13 +215,13 @@ class UserController extends Controller
         try {
             $validated = $request->validate([
                 'user_name'       => 'required|string|max:255',
-                'nickname'        => 'required|string|max:100',
+                'nickname'        => 'sometimes|string|max:100',
                 'user_email'      => 'required|email|max:255|unique:users,user_email',
                 'user_type_id'    => 'required|exists:user_types,user_type_id',
                 'faculty_id'      => 'required|uuid|exists:faculties,faculty_id',
                 'gender'          => 'required|in:1,2', 
-                'date_of_birth'   => 'required|date|before:today',
-                'phone_number'    => 'required|string|max:20'
+                'date_of_birth'   => 'sometimes|date|before:today',
+                'phone_number'    => 'sometimes|string|max:20'
             ]);
 
             return response()->json(['new user id' => $this->userService->userRegister($validated)]);

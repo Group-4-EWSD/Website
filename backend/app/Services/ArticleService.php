@@ -35,7 +35,7 @@ class ArticleService
     public function getGuestHomePageData($userId){
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),
-            'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
+            // 'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
             'allArticles' => $this->articleRepository->getAllArticles(4)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'facultyList' => $this->facultyRepository->getfacultyList(),

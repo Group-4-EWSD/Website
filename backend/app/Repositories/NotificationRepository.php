@@ -8,13 +8,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
 //use Your Model
 
 /**
  * Class NotificationRepository.
  */
-class NotificationRepository extends BaseRepository
+class NotificationRepository
 {
     /**
      * @return string

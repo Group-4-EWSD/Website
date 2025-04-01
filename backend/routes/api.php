@@ -100,9 +100,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('upload', [FileController::class, 'upload']);
     Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 
-    Route::post('/contact-us/create', [ContactUsController::class, 'createContactUs']);
+    Route::get('/contact-us/get-all-list', [ContactUsController::class, 'getContactUsList']);
 });
-Route::get('/contact-us/get-all-list', [ContactUsController::class, 'getContactUsList']);
+Route::post('/contact-us/create', [ContactUsController::class, 'createContactUs']);
 
 // Unnecessory, Just for testing
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route

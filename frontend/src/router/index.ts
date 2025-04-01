@@ -161,10 +161,24 @@ const authRoutes = [
 // Wildcard route to catch undefined paths and redirect to login
 const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
+const allRoutes = [...studentRoutes, ...coordinatorRoutes, ...adminRoutes, ...authRoutes]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...studentRoutes, ...coordinatorRoutes, ...adminRoutes, ...authRoutes, wildcardRoute],
+  routes: [...allRoutes, wildcardRoute],
 })
+
+// Function to track page visits
+function trackPageVisit(path: string) {
+  // const userInfo = getCookie('user')
+  // // Get user ID if available
+  // const userId = userInfo ? JSON.parse(userInfo).id : 'anonymous';
+
+  const pageInfo = allRoutes.find(route => route.path === path)
+  if (pageInfo) {
+    console.log(`Page visited: ${pageInfo.name} (${path})`)
+  }
+}
 
 router.beforeEach((to, from, next) => {
   const token = getCookie('token')
@@ -189,6 +203,14 @@ router.beforeEach((to, from, next) => {
   } else {
     // Otherwise, proceed as normal
     next()
+  }
+})
+
+// Add afterEach hook to track page visits after navigation is complete
+router.afterEach((to) => {
+  // Don't track visits to authentication pages
+  if (!to.path.startsWith('/auth/')) {
+    trackPageVisit(to.path);
   }
 })
 

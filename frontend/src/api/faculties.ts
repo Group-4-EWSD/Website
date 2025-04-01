@@ -3,7 +3,7 @@ import api from "./axios"
 
 export const getFacultyList = async (): Promise<Faculty[]> => {
   const response = await api.get('faculty/get-all-faculties');
-  return response.data.faculties;
+  return response.data;
 }
 
 export const getFacultyYear = async (id: string): Promise<Faculty> => {

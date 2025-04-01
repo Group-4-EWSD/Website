@@ -2,14 +2,7 @@
 import dayjs from 'dayjs'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
-import {
-  ArrowDown,
-  ArrowUp,
-  Edit,
-  KeyRound,
-  Plus,
-  Search,
-} from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, Edit, KeyRound, Plus, Search } from 'lucide-vue-next'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { Button } from '@/components/ui/button'
@@ -22,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import CustomInput from '@/components/shared/Input.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Layout from '@/components/ui/Layout.vue'
@@ -53,14 +47,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import FormElement from '@/components/shared/FormElement.vue'
-import { getAllUsers, createUser, updateUser } from '@/api/user'
+import { getAllUsers, createUser, updateUser, forcePasswordReset } from '@/api/user'
 import { getFacultyList } from '@/api/faculties'
 import type { CreateUserParams, UpdateUserParams, User } from '@/types/user'
 import type { Faculty } from '@/types/faculty'
+import { calculateAge } from '@/lib/utils'
+import { toast } from 'vue-sonner'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 
 interface Column {
-  key: string;
-  label: string;
+  key: string
+  label: string
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -89,6 +86,7 @@ const showUserDialog = ref(false)
 const showForcePasswordDialog = ref(false)
 const userToEdit = ref<User | null>(null)
 const userToForcePasswordChange = ref<User | null>(null)
+const isSubmitting = ref(false)
 
 // Gender options mapping
 const genderOptions = [
@@ -97,11 +95,9 @@ const genderOptions = [
   { label: 'Prefer not to say', value: 0 },
 ]
 
-
-// Validation schema for user form
 const validationSchema = yup.object({
   user_name: yup.string().required('Name is required'),
-  nickname: yup.string().required('Nickname is required'),
+  nickname: yup.string().optional(),
   user_email: yup.string().email('Must be a valid email').required('Email is required'),
   user_type_id: yup.string().required('User type is required'),
   faculty_id: yup.string().when('user_type_id', {
@@ -110,8 +106,37 @@ const validationSchema = yup.object({
     otherwise: () => yup.string().nullable(),
   }),
   gender: yup.number().required('Gender is required'),
-  date_of_birth: yup.string().nullable(),
-  phone_number: yup.string().nullable(),
+  date_of_birth: yup
+    .string()
+    .nullable()
+    .optional()
+    .test('format-if-exists', 'Date of birth must be in the format YYYY-MM-DD', (value) => {
+      if (!value) return true
+      return /^\d{4}-\d{2}-\d{2}$/.test(value)
+    })
+    .test('valid-date-if-exists', 'Invalid date', (value) => {
+      if (!value) return true
+      const date = new Date(value)
+      return date instanceof Date && !isNaN(date.getTime())
+    })
+    .test('age-min-if-exists', 'You must be at least 16 years old', (value) => {
+      if (!value) return true
+      const age = calculateAge(value)
+      return age >= 16
+    })
+    .test('age-max-if-exists', 'Age cannot be greater than 100 years', (value) => {
+      if (!value) return true
+      const age = calculateAge(value)
+      return age <= 100
+    }),
+  phone_number: yup
+    .string()
+    .nullable()
+    .optional()
+    .test('format-if-exists', 'Invalid phone number format', (value) => {
+      if (!value) return true
+      return /^\+?[0-9\s\-()]+$/.test(value)
+    }),
 })
 
 // VeeValidate form setup
@@ -174,7 +199,7 @@ function applyFiltersAndSort() {
       (user) =>
         user.user_name.toLowerCase().includes(query) ||
         user.user_email.toLowerCase().includes(query) ||
-        user.nickname.toLowerCase().includes(query)
+        user.nickname.toLowerCase().includes(query),
     )
   }
 
@@ -239,16 +264,28 @@ function handleSearch() {
   applyFiltersAndSort()
 }
 
-function updateUserType(value: string) {
-  selectedUserType.value = value
+// Then update your functions:
+function updateUserType(value: string | null) {
+  selectedUserType.value = value || ''
   // Reset faculty if user type is manager or admin
-  if (['3', '4'].includes(value)) {
+  if (value && ['3', '4'].includes(value)) {
     selectedFaculty.value = ''
   }
 }
 
-function updateFaculty(value: string) {
-  selectedFaculty.value = value
+function updateFaculty(value: string | null) {
+  selectedFaculty.value = value || ''
+}
+
+function getUserTypeLabel(value: string): string {
+  if (!value) return 'All User Types'
+  return getUserTypeName(value)
+}
+
+function getFacultyLabel(value: string): string {
+  if (!value) return 'All Faculties'
+  const faculty = faculties.value.find((f) => f.faculty_id === value)
+  return faculty ? faculty.faculty_name : 'All Faculties'
 }
 
 function sortBy(column: string) {
@@ -286,25 +323,38 @@ function confirmForcePasswordChange(user: User) {
   showForcePasswordDialog.value = true
 }
 
-function forcePasswordChange() {
+async function forcePasswordChange() {
   if (userToForcePasswordChange.value) {
-    // Implement your force password change logic here
-    console.log('Force password change for user:', userToForcePasswordChange.value)
-    showForcePasswordDialog.value = false
-    userToForcePasswordChange.value = null
+    try {
+      isSubmitting.value = true
+      await forcePasswordReset(userToForcePasswordChange.value.id)
+
+      toast.success('Password reset successfully')
+
+      showForcePasswordDialog.value = false
+      userToForcePasswordChange.value = null
+    } catch (error) {
+      toast.error('Failed to reset password. Please try again.')
+    } finally {
+      isSubmitting.value = false
+    }
   }
 }
 
 const onSubmit = handleSubmit(async (formValues) => {
   try {
+    isSubmitting.value = true
     if (userToEdit.value) {
       // Update existing user
       const updateParams: UpdateUserParams = {
         ...formValues,
         id: userToEdit.value.id,
       }
-      await updateUser()
-      
+
+      await updateUser(updateParams)
+
+      toast.success('User updated successfully')
+
       // Update the local state after successful API call
       const index = allUsers.value.findIndex((u) => u.id === userToEdit.value!.id)
       if (index !== -1) {
@@ -319,14 +369,18 @@ const onSubmit = handleSubmit(async (formValues) => {
       // Add new user
       const createParams: CreateUserParams = formValues
       await createUser(createParams)
-      
+
+      toast.success('User created successfully')
+
       // Refresh the user list after successful user creation
       fetchUsers()
     }
     showUserDialog.value = false
     userToEdit.value = null
   } catch (error) {
-    console.error('Error saving user:', error)
+    toast.error('Failed to save user. Please try again.')
+  } finally {
+    isSubmitting.value = false
   }
 })
 
@@ -338,17 +392,6 @@ function getUserTypeName(typeId: string): string {
 function getFacultyName(facultyId: string): string {
   const faculty = faculties.value.find((f) => f.faculty_id === facultyId)
   return faculty ? faculty.faculty_name : ''
-}
-
-function getUserTypeLabel(value: string): string {
-  if (!value) return 'All User Types'
-  return getUserTypeName(value)
-}
-
-function getFacultyLabel(value: string): string {
-  if (!value) return 'All Faculties'
-  const faculty = faculties.value.find((f) => f.faculty_id === value)
-  return faculty ? faculty.faculty_name : 'All Faculties'
 }
 
 function formatDate(dateString: string | null): string {
@@ -384,7 +427,7 @@ function formatDate(dateString: string | null): string {
               <SelectValue :placeholder="getUserTypeLabel(selectedUserType)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All User Types</SelectItem>
+              <SelectItem :value="null">All User Types</SelectItem>
               <SelectItem v-for="type in userTypes" :key="type.value" :value="type.value">
                 {{ type.label }}
               </SelectItem>
@@ -393,7 +436,7 @@ function formatDate(dateString: string | null): string {
 
           <!-- Faculty Filter (conditional) -->
           <Select
-            v-if="!['3', '4'].includes(selectedUserType)"
+            :disabled="['3', '4'].includes(selectedUserType)"
             :modelValue="selectedFaculty"
             @update:modelValue="updateFaculty"
           >
@@ -401,8 +444,12 @@ function formatDate(dateString: string | null): string {
               <SelectValue :placeholder="getFacultyLabel(selectedFaculty)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Faculties</SelectItem>
-              <SelectItem v-for="faculty in faculties" :key="faculty.faculty_id" :value="faculty.faculty_id">
+              <SelectItem :value="null">All Faculties</SelectItem>
+              <SelectItem
+                v-for="faculty in faculties"
+                :key="faculty.faculty_id"
+                :value="faculty.faculty_id"
+              >
                 {{ faculty.faculty_name }}
               </SelectItem>
             </SelectContent>
@@ -485,12 +532,16 @@ function formatDate(dateString: string | null): string {
                 <TableCell>{{ formatDate(user.date_of_birth) }}</TableCell>
                 <TableCell>
                   <div class="flex space-x-2">
-                    <Button variant="ghost" size="icon" @click="editUser(user)">
-                      <Edit class="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" @click="confirmForcePasswordChange(user)">
-                      <KeyRound class="h-4 w-4" />
-                    </Button>
+                    <TooltipWrapper text="Edit User">
+                      <Button variant="ghost" size="icon" @click="editUser(user)">
+                        <Edit class="h-4 w-4" />
+                      </Button>
+                    </TooltipWrapper>
+                    <TooltipWrapper text="Force Password Change">
+                      <Button variant="ghost" size="icon" @click="confirmForcePasswordChange(user)">
+                        <KeyRound class="h-4 w-4" />
+                      </Button>
+                    </TooltipWrapper>
                   </div>
                 </TableCell>
               </TableRow>
@@ -620,56 +671,48 @@ function formatDate(dateString: string | null): string {
 
       <!-- Add/Edit User Dialog -->
       <Dialog v-model:open="showUserDialog">
-        <DialogContent class="w-[90vw] max-w-lg">
+        <DialogContent class="w-[90vw] max-w-2xl">
           <DialogHeader>
             <DialogTitle>{{ userToEdit ? 'Edit User' : 'Add User' }}</DialogTitle>
             <DialogDescription>
-              {{ userToEdit ? 'Update user information below.' : 'Fill in the user information below.' }}
+              {{
+                userToEdit
+                  ? 'Update user information below.'
+                  : 'Fill in the user information below.'
+              }}
             </DialogDescription>
           </DialogHeader>
-          <form @submit.prevent="onSubmit" class="space-y-4 py-4">
-            <FormElement>
-              <template #label>
-                <Label for="user_name">Name</Label>
-              </template>
-              <template #field>
-                <Input
-                  name="user_name"
-                  id="user_name"
-                  placeholder="Enter name"
-                  :errors="errors"
-                />
-              </template>
-            </FormElement>
+          <form @submit.prevent="onSubmit" class="space-y-4 pt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormElement>
+                <template #label>
+                  <Label for="user_name">Name</Label>
+                </template>
+                <template #field>
+                  <CustomInput
+                    name="user_name"
+                    id="user_name"
+                    placeholder="Enter name"
+                    :errors="errors"
+                  />
+                </template>
+              </FormElement>
 
-            <FormElement>
-              <template #label>
-                <Label for="nickname">Nickname</Label>
-              </template>
-              <template #field>
-                <Input
-                  name="nickname"
-                  id="nickname"
-                  placeholder="Enter nickname"
-                  :errors="errors"
-                />
-              </template>
-            </FormElement>
-
-            <FormElement>
-              <template #label>
-                <Label for="user_email">Email</Label>
-              </template>
-              <template #field>
-                <Input
-                  name="user_email"
-                  id="user_email"
-                  type="email"
-                  placeholder="Enter email"
-                  :errors="errors"
-                />
-              </template>
-            </FormElement>
+              <FormElement>
+                <template #label>
+                  <Label for="user_email">Email</Label>
+                </template>
+                <template #field>
+                  <CustomInput
+                    name="user_email"
+                    id="user_email"
+                    type="email"
+                    placeholder="Enter email"
+                    :errors="errors"
+                  />
+                </template>
+              </FormElement>
+            </div>
 
             <FormElement>
               <template #label>
@@ -695,47 +738,49 @@ function formatDate(dateString: string | null): string {
                   name="faculty_id"
                   id="faculty_id"
                   :errors="errors"
-                  :options="faculties.map(f => ({ label: f.faculty_name, value: f.faculty_id }))"
+                  :options="faculties.map((f) => ({ label: f.faculty_name, value: f.faculty_id }))"
                   :modelValue="values.faculty_id"
                 />
               </template>
             </FormElement>
 
-            <FormElement>
-              <template #label>
-                <Label for="gender">Gender</Label>
-              </template>
-              <template #field>
-                <CustomSelect
-                  name="gender"
-                  id="gender"
-                  :errors="errors"
-                  :options="genderOptions"
-                  :modelValue="values.gender"
-                ></CustomSelect>
-              </template>
-            </FormElement>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormElement>
+                <template #label>
+                  <Label for="gender">Gender</Label>
+                </template>
+                <template #field>
+                  <CustomSelect
+                    name="gender"
+                    id="gender"
+                    :errors="errors"
+                    :options="genderOptions"
+                    :modelValue="values.gender"
+                  ></CustomSelect>
+                </template>
+              </FormElement>
 
-            <FormElement>
-              <template #label>
-                <Label for="date_of_birth">Date of Birth</Label>
-              </template>
-              <template #field>
-                <Input
-                  name="date_of_birth"
-                  id="date_of_birth"
-                  type="date"
-                  :errors="errors"
-                />
-              </template>
-            </FormElement>
+              <FormElement>
+                <template #label>
+                  <Label for="date_of_birth">Date of Birth</Label>
+                </template>
+                <template #field>
+                  <CustomInput
+                    name="date_of_birth"
+                    id="date_of_birth"
+                    type="date"
+                    :errors="errors"
+                  />
+                </template>
+              </FormElement>
+            </div>
 
             <FormElement>
               <template #label>
                 <Label for="phone_number">Phone Number</Label>
               </template>
               <template #field>
-                <Input
+                <CustomInput
                   name="phone_number"
                   id="phone_number"
                   placeholder="Enter phone number"
@@ -744,9 +789,13 @@ function formatDate(dateString: string | null): string {
               </template>
             </FormElement>
 
-            <DialogFooter class="flex flex-col sm:flex-row gap-2 sm:gap-0">
-              <Button type="button" variant="outline" @click="showUserDialog = false">Cancel</Button>
-              <Button type="submit">{{ userToEdit ? 'Update' : 'Add' }}</Button>
+            <DialogFooter class="flex flex-col sm:flex-row gap-2 mt-4">
+              <Button type="button" variant="outline" @click="showUserDialog = false"
+                >Cancel</Button
+              >
+              <Button type="submit" :processing="isSubmitting">
+                {{ isSubmitting ? 'Saving...' : 'Save' }}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -763,7 +812,9 @@ function formatDate(dateString: string | null): string {
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" @click="showForcePasswordDialog = false">Cancel</Button>
-            <Button @click="forcePasswordChange">Confirm</Button>
+            <Button @click="forcePasswordChange" :processing="isSubmitting">
+              {{ isSubmitting ? 'Processing...' : 'Confirm' }}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

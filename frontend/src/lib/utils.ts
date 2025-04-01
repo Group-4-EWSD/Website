@@ -67,3 +67,19 @@ export function removeCookie(name: string) {
   const { cookies } = useCookies()
   cookies.remove(name, '/')
 }
+
+
+// Helper function to calculate age from date of birth
+export const calculateAge = (birthDate: string): number => {
+  const today = new Date()
+  const dob = new Date(birthDate)
+  let age = today.getFullYear() - dob.getFullYear()
+  const monthDiff = today.getMonth() - dob.getMonth()
+
+  // If birth month is later in the year or same month but birth day is later, subtract one year
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--
+  }
+
+  return age
+}

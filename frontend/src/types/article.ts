@@ -93,13 +93,3 @@ export interface Category {
   article_type_id: string
   article_type_name: string
 }
-
-export interface CoordinatorArticle {
-  article_id: string
-  article_title: string
-  submission_date: string
-  submission_deadline: string
-  status: number
-  category: string
-  submission_by: string
-}

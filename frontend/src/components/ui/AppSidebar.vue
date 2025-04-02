@@ -37,12 +37,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/student/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/student/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]
@@ -58,12 +58,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/coordinator/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/coordinator/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]

@@ -11,7 +11,7 @@ import {
 import StatusIndicator from '@/components/shared/StatusIndicator.vue'
 import Button from '@/components/ui/button/Button.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import type { CoordinatorArticle } from '@/types/article'
+import type { CoordinatorArticle } from '@/types/coordinator'
 import router from '@/router'
 
 interface Column {

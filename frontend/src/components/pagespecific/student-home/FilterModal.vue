@@ -73,7 +73,7 @@ const resetFilters = () => {
     <TooltipWrapper text="Filter">
       <Dialog>
         <DialogTrigger as-child>
-          <FilterX class="w-5 h-5 cursor-pointer hover:text-black" />
+          <FilterX class="w-5 h-5 cursor-pointer hover:text-black mt-2" />
         </DialogTrigger>
 
         <!-- Modal Content -->

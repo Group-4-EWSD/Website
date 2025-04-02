@@ -19,6 +19,7 @@ const loading = ref(false)
 
 const userStore = useUserStore()
 const userType = userStore.user?.user_type_name
+// const userType = 'Marketing Coordinator'
 let items = []
 
 switch (userType) {
@@ -36,12 +37,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/student/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/student/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]
@@ -57,12 +58,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/coordinator/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/coordinator/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]

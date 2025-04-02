@@ -100,15 +100,15 @@ class ActionController extends Controller
         $success = $this->actionService->feedbackArticle($request);
         $this->notificationService->setNotification('3', $request->articleId);
         if ($success) {
-            return response()->json(['message' => 'Comment added successfully'], 201);
+            return response()->json(['message' => 'Feedback added successfully'], 201);
         } else {
-            return response()->json(['message' => 'Failed to add comment'], 500);
+            return response()->json(['message' => 'Failed to add feedback'], 500);
         }
     }
 
     public function articleFeedbackDelete(Request $request){
         $this->actionService->feedbackDeleteArticle($request);
-        return response()->json(['message' => 'Comment deleted successfully']);
+        return response()->json(['message' => 'Feedback deleted successfully']);
     }
 
     // public function getNotificationList(){

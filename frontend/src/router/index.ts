@@ -2,20 +2,22 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { getCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
+import Unauthorized from '@/views/Unauthorized.vue'
 
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
+const PasswordReset = () => import('@/views/Auth/PasswordReset.vue')
+
 const StudentHome = () => import('@/views/Student/Home.vue')
 const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
-const Notification = () => import('@/views/Student/Notification.vue')
-const Settings = () => import('@/views/Settings.vue')
 
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
-const CoordinatorNotification = () => import('@/views/Coordinator/Notification.vue')
-const CoordinatorSettings = () => import('@/views/Coordinator/Settings.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
+
+const Notification = () => import('@/views/Notification.vue')
+const Settings = () => import('@/views/Settings.vue')
 
 const studentRoutes = [
   {
@@ -24,6 +26,7 @@ const studentRoutes = [
     component: StudentHome,
     meta: {
       requiresAuth: true,
+      roles: ['student'],
     },
   },
   {
@@ -32,14 +35,7 @@ const studentRoutes = [
     component: MyArticles,
     meta: {
       requiresAuth: true,
-    },
-  },
-  {
-    path: '/articles/:id',
-    name: 'getArticleDetails',
-    component: ArticleDetails,
-    meta: {
-      requiresAuth: true,
+      roles: ['student'],
     },
   },
   {
@@ -48,22 +44,7 @@ const studentRoutes = [
     component: DraftArticles,
     meta: {
       requiresAuth: true,
-    },
-  },
-  {
-    path: '/student/notifications',
-    name: 'Student Notifications',
-    component: Notification,
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    path: '/student/settings',
-    name: 'Settings',
-    component: Settings,
-    meta: {
-      requiresAuth: true,
+      roles: ['student'],
     },
   },
 ]
@@ -74,7 +55,8 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
+      roles: ['Marketing Coordinator'],
     },
   },
   {
@@ -82,40 +64,64 @@ const coordinatorRoutes = [
     name: 'Articles',
     component: CoordinatorArticles,
     meta: {
+      // requiresAuth: true,
+      roles: ['Marketing Coordinator'],
+    },
+  },
+]
+
+const commomRoutes = [
+  {
+    path: '/articles/:id',
+    name: 'getArticleDetails',
+    component: ArticleDetails,
+    meta: {
       requiresAuth: true,
+      roles: ['Student', 'Marketing Coordinator'],
     },
   },
   {
-    path: '/coordinator/notifications',
-    name: 'Coordinator Notification',
-    component: CoordinatorNotification,
+    path: '/notifications',
+    name: 'Notification',
+    component: Notification,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
+      roles: ['Student', 'Marketing Coordinator'],
     },
   },
   {
-    path: '/coordinator/settings',
-    name: 'Coordinator Settings',
-    component: CoordinatorSettings,
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
+      roles: ['Student', 'Marketing Coordinator'],
     },
   },
 ]
 
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
-  { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
+  { path: '/auth/forgot-password', name: 'forgot-password', component: PasswordReset },
   { path: '/auth/register', name: 'register', component: Register },
   { path: '/auth/logout', name: 'logout', component: Login },
 ]
+
+const fallbackRoutes = [{ path: '/unauthorized', name: 'Unauthorized', component: Unauthorized }]
 
 // Wildcard route to catch undefined paths and redirect to login
 const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...studentRoutes, ...coordinatorRoutes, ...authRoutes, wildcardRoute],
+  routes: [
+    ...studentRoutes,
+    ...coordinatorRoutes,
+    ...commomRoutes,
+    ...authRoutes,
+    ...fallbackRoutes,
+    wildcardRoute,
+  ],
 })
 
 router.beforeEach((to, from, next) => {
@@ -124,17 +130,25 @@ router.beforeEach((to, from, next) => {
 
   const userStore = useUserStore()
   userStore.setUser(userInfo)
+  const userType = userStore.user?.user_type_name?.trim() || ''
 
   if (
     token &&
     userInfo &&
-    (to.path === '/auth/login' ||
-      to.path === '/auth/register' ||
-      to.path === '/auth/forgot-password')
+    ['/auth/login', '/auth/register', '/auth/forgot-password'].includes(to.path)
   ) {
-    // cookies.remove('token')
+    console.log(token + '' + userType)
     // If user is already authenticated and tries to access login/register, redirect to home
-    next({ path: '/student/home', replace: true })
+    const redirectRoutes: Record<string, string> = {
+      Student: '/student/home',
+      'Marketing Coordinator': '/coordinator/dashboard',
+    }
+
+    return next({ path: redirectRoutes[userType] ?? '/', replace: true })
+  } else if (Array.isArray(to.meta.roles) && !to.meta.roles.includes(userType)) {
+    console.log(userType)
+    // If user does not have permission to access the route, redirect to unauthorize page
+    next({ path: '/unauthorized', replace: true })
   } else if (to.meta.requiresAuth && !token) {
     // If route requires auth and user is not authenticated, redirect to login
     next({ path: '/auth/login', replace: true })

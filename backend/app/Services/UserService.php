@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordResetMail;
+use App\Mail\AccountCreateMail;
 
 class UserService
 {
@@ -130,7 +133,55 @@ class UserService
         return $this->userRepository->updateUser($id, $data);
     }
 
-    public function getUserList($request){
-        return $this->userRepository->getUserList($request);
+    public function getActiveUserList($request= null){
+        return $this->userRepository->getActiveUserList($request);
+    }
+
+    public function getAllUserList()
+    {
+        return $this->userRepository->getAllUserList();
+    }
+
+    public function getUserListByType($userTypeId)
+    {
+        return $this->userRepository->getUserListByType($userTypeId);
+    }
+
+    public function resetPassword($userId)
+    {
+        $user = $this->userRepository->getUserById($userId);
+
+        if (!$user) {
+            return false;
+        }
+
+        $newPassword = 'password123';
+        $hashedPassword = Hash::make($newPassword);
+
+        $this->userRepository->updatePassword($userId, $hashedPassword);
+
+        Mail::to($user->user_email)->send(new PasswordResetMail($user, $newPassword));
+
+        return true;
+    }
+
+
+    public function pageVisitInitial($userId, $pageId){
+        if($this->userRepository->isUserVisitExist($userId, $pageId)){
+            return $this->userRepository->addUserVisit($userId, $pageId);
+        }
+    }
+
+    public function userRegister($data){
+        $data['user_id']= $this->userRepository->generateUserId();
+        $data['user_password']=Str::random(12);
+
+        Mail::to($data['user_email'])->send(new AccountCreateMail($data));
+
+        return $this->userRepository->userRegister($data);
+    }
+
+    public function userLastLogin($userId){
+        return $this->userRepository->userLastLogin($userId);
     }
 }

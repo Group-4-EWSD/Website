@@ -10,6 +10,7 @@ export const useNotificationsStore = defineStore('notifications', () => {
 
   const fetchNotification = async () => {
     isLoading.value = true
+
     await getNotifications()
       .then((response) => {
         console.log(response.data)
@@ -22,8 +23,8 @@ export const useNotificationsStore = defineStore('notifications', () => {
         console.error('Error fetching articles:', error)
       })
   }
-  const changeNotiSeen = (action_id: string) => {
-    const noti = notifications.value.find((n) => n.action_id === action_id)
+  const changeNotiSeen = (notification_id: string) => {
+    const noti = notifications.value.find((n) => n.notification_id === notification_id)
     if (noti) {
       noti.seen = 1
 

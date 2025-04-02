@@ -1,40 +1,56 @@
 {
-  "version": 2,
-  "functions": {
-      "api/index.php": {
-          "runtime": "vercel-php@0.7.3"
-      }
-  },
-  "routes": [
-      {
-          "src": "/(.*)",
-          "dest": "/api/index.php"
-      }
-  ],
-  "outputDirectory": "public/build",
-  "env": {
-      "APP_NAME": "Vercel Laravel",
-      "APP_ENV": "production",
-      "APP_KEY":"base64:EG1ycZM9CBepeO3o65Ff47z32Y42e5OO+6J4YCZPLCI=",
-      "APP_DEBUG": "false",
-      "APP_URL": "https://laravel-vercel-sooty.vercel.app",
-      "VERCEL_DEMO_MODE": "true",
-      "APP_CONFIG_CACHE": "/tmp/config.php",
-      "APP_EVENTS_CACHE": "/tmp/events.php",
-      "APP_PACKAGES_CACHE": "/tmp/packages.php",
-      "APP_ROUTES_CACHE": "/tmp/routes.php",
-      "APP_SERVICES_CACHE": "/tmp/services.php",
-      "DB_CONNECTION":"mysql",
-      "DB_HOST":"mysql-3f974194-myatpaingminn-c35c.c.aivencloud.com",
-      "DB_PORT":"21236",
-      "DB_DATABASE":"defaultdb",
-      "DB_USERNAME":"avnadmin",
-      "DB_PASSWORD":"AVNS_w0ns5vkJlaUCcLLaDyU",
-      "CACHE_DRIVER": "array",
-      "LOG_CHANNEL": "stderr",
-      "SESSION_DRIVER": "cookie",
-      "VIEW_COMPILED_PATH": "/tmp/views",
-      "SSR_TEMP_PATH": "/tmp/ssr",
-      "NODE_PATH": "node"
+    "version": 2,
+    "functions": {
+        "api/index.php": {
+            "runtime": "vercel-php@0.7.3"
+        }
+    },
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ],
+    "outputDirectory": "public/build",
+    "env": {
+        "APP_NAME": "Vercel Laravel",
+        "APP_ENV": "production",
+        "APP_KEY":"base64:EG1ycZM9CBepeO3o65Ff47z32Y42e5OO+6J4YCZPLCI=",
+        "APP_DEBUG": "false",
+        "APP_URL": "https://laravel-vercel-sooty.vercel.app",
+        "VERCEL_DEMO_MODE": "true",
+        "APP_CONFIG_CACHE": "/tmp/config.php",
+        "APP_EVENTS_CACHE": "/tmp/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/services.php",
+  
+        "AWS_ACCESS_KEY_ID" : "AKIA4T4OCN33RPY65L4K",
+        "AWS_SECRET_ACCESS_KEY" : "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",
+        "AWS_DEFAULT_REGION" : "ap-southeast-1",
+        "AWS_BUCKET" : "ewsdcloud",
+        "AWS_URL" : "https://ewsdcloud.s3.ap-southeast-1.amazonaws.com",
+  
+        "MAIL_MAILER" : "smtp",
+        "MAIL_HOST" : "smtp.gmail.com",
+        "MAIL_PORT" : "587",
+        "MAIL_USERNAME" : "group4.ewsd@gmail.com",
+        "MAIL_PASSWORD" : "brlieeprxliqjjdp",
+        "MAIL_ENCRYPTION" : "tls",
+        "MAIL_FROM_ADDRESS" : "group4.ewsd@gmail.com",
+        "MAIL_FROM_NAME" : "${APP_NAME}",
+        
+        "DB_CONNECTION":"mysql",
+        "DB_HOST":"mysql-3f974194-myatpaingminn-c35c.c.aivencloud.com",
+        "DB_PORT":"21236",
+        "DB_DATABASE":"defaultdb",
+        "DB_USERNAME":"avnadmin",
+        "DB_PASSWORD":"AVNS_w0ns5vkJlaUCcLLaDyU",
+        "CACHE_DRIVER": "array",
+        "LOG_CHANNEL": "stderr",
+        "SESSION_DRIVER": "cookie",
+        "VIEW_COMPILED_PATH": "/tmp/views",
+        "SSR_TEMP_PATH": "/tmp/ssr",
+        "NODE_PATH": "node"
+    }
   }
-}

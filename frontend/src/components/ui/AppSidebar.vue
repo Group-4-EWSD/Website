@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BadgeHelp, Bell, CalendarIcon, CircleGauge, FileText, Home, LogOut, Settings, UserIcon } from 'lucide-vue-next'
+import { BadgeHelp, Bell, CircleGauge, FileText, Home, LogOut, Settings } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import {
@@ -19,7 +19,8 @@ import Separator from './separator/Separator.vue'
 const loading = ref(false)
 
 const userStore = useUserStore()
-// const userType = userStore.user?.user_type_name
+const userType = userStore.user?.user_type_name
+// const userType = 'Marketing Coordinator'
 let items = []
 
 const userType = "Admin" // just for development purpose
@@ -39,12 +40,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/student/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/student/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]
@@ -60,33 +61,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/coordinator/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/coordinator/settings',
-        icon: Settings,
-      },
-    ]
-    break
-
-  case 'Admin':
-    items = [
-      { title: 'Management', url: '/admin/management', icon: CalendarIcon },
-      {
-        title: 'Reports',
-        url: '/admin/reports',
-        icon: FileText,
-      },
-      {
-        title: 'Users',
-        url: '/admin/users',
-        icon: UserIcon,
-      },
-      {
-        title: 'Settings',
-        url: '/admin/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]

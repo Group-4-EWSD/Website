@@ -12,7 +12,7 @@ const goHome = () => {
   <div class="flex flex-col items-center justify-center h-screen text-center">
     <h1 class="text-6xl font-bold text-gray-900 dark:text-white">404</h1>
     <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
-      Oops! The page you are looking for doesn’t exist.
+      You are not authorized to access this page.
     </p>
 
     <button

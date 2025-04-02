@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\UserCreatedMail;
 use App\Services\ArticleService;
 use App\Services\FileService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -23,11 +24,13 @@ class ArticleController extends Controller
 
     protected $articleService;
     protected $fileService;
+    protected $notificationService;
 
-    public function __construct(ArticleService $articleService, FileService $fileService)
+    public function __construct(ArticleService $articleService, FileService $fileService, NotificationService $notificationService)
     {
         $this->articleService = $articleService;
         $this->fileService = $fileService;
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -190,5 +193,16 @@ class ArticleController extends Controller
         $item = $request->item;
         $itemList = $this->articleService->getItemList($item);
         return $itemList;
+    }
+
+    public function getTest(){
+        return "Test";
+    }
+
+    public function getAuth(){
+        $user =  Auth::user();
+        $notificationData = $this->notificationService->getNotificationList($user);
+        return response()->json($notificationData);
+        // return $user;
     }
 }

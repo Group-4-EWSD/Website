@@ -19,6 +19,10 @@ const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
 const Notification = () => import('@/views/Notification.vue')
 const Settings = () => import('@/views/Settings.vue')
 
+const AdminManagement = () => import('@/views/Admin/Management.vue')
+const AdminReports = () => import('@/views/Admin/Reports.vue')
+const AdminUsers = () => import('@/views/Admin/Users.vue')
+
 const studentRoutes = [
   {
     path: '/student/home',
@@ -95,10 +99,38 @@ const commomRoutes = [
     component: Settings,
     meta: {
       // requiresAuth: true,
-      roles: ['Student', 'Marketing Coordinator'],
+      roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
     },
   },
 ]
+
+const adminRoutes = [
+  {
+    path: '/admin/management',
+    name: 'Management',
+    component: AdminManagement,
+    meta: {
+      roles: ['Admin'],
+    },
+  },
+  {
+    path: '/admin/reports',
+    name: 'Reports',
+    component: AdminReports,
+    meta: {
+      roles: ['Admin'],
+    },
+  },
+  {
+    path: '/admin/users',
+    name: 'Users',
+    component: AdminUsers,
+    meta: {
+      roles: ['Admin'],
+    },
+  },
+]
+
 
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
@@ -117,6 +149,7 @@ const router = createRouter({
   routes: [
     ...studentRoutes,
     ...coordinatorRoutes,
+    ...adminRoutes,
     ...commomRoutes,
     ...authRoutes,
     ...fallbackRoutes,

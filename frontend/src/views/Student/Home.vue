@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-import { ref, onMounted, watch } from 'vue'
-import { computed } from 'vue'
 import dayjs from 'dayjs'
-import { useArticleStore } from '@/stores/articles'
-import type { Article } from '@/types/article'
+import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+import { onMounted, ref, watch } from 'vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { getArticles } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import Button from '@/components/ui/button/Button.vue'
 import { Card } from '@/components/ui/card'
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Pagination,
   PaginationEllipsis,
@@ -28,12 +30,10 @@ import {
   PaginationPrev,
 } from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
-
-import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import Button from '@/components/ui/button/Button.vue'
-import { useRouter } from 'vue-router'
+import { useArticleStore } from '@/stores/articles'
+import type { Article } from '@/types/article'
+
 
 const router = useRouter()
 const articleStore = useArticleStore()

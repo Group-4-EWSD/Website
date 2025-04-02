@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+
 import Card from '@/components/ui/card/Card.vue'
 import type { Article } from '@/types/coordinator'
 

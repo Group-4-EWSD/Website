@@ -1,10 +1,11 @@
-import api from './axios'
 import type {
   Article,
-  ArticleResponse,
   ArticleParams,
+  ArticleResponse,
   CoordinatorArticle,
 } from '@/types/coordinator'
+
+import api from './axios'
 
 export const getAllArticles = async (): Promise<ArticleResponse> => {
   const response = await api.get(`/articles`)

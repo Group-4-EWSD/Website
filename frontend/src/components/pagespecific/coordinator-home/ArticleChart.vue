@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Bar } from 'vue-chartjs'
 import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
   BarElement,
   CategoryScale,
+  Chart as ChartJS,
+  Legend,
   LinearScale,
+  Title,
+  Tooltip,
 } from 'chart.js'
+import { onMounted, ref } from 'vue'
+import { Bar } from 'vue-chartjs'
+
 import Card from '@/components/ui/card/Card.vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)

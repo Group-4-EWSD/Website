@@ -13,8 +13,8 @@ import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { setCookie } from '@/lib/utils'
-import type { Credentials } from '@/types/auth'
 import { useUserStore } from '@/stores/user'
+import type { Credentials } from '@/types/auth'
 import type { User } from '@/types/user'
 
 const router = useRouter()
@@ -54,7 +54,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
         const user = response.data.user as User;
         userStore.setUser(user)
 
-        let userRole = user.user_type_name
+        const userRole = user.user_type_name
 
         // Role-based redirection
         switch (userRole) {

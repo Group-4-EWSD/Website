@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ErrorMessage, Field, useForm } from 'vee-validate'
-import { onMounted, ref, watch, computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 
@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useMyArticlesStore } from '@/stores/my-articles'
-import type { Category, Article, ArticleResponse, UpdateArcitleData } from '@/types/article'
+import type { Article, ArticleResponse, Category, UpdateArcitleData } from '@/types/article'
 
 interface UploadArticleSchema {
   title: string

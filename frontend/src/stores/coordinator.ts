@@ -1,8 +1,9 @@
-import { getAllArticles } from '@/api/coordinator'
-import type { CoordinatorArticle, CountData, Article, GuestList } from '@/types/coordinator'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
+
+import { getAllArticles } from '@/api/coordinator'
+import type { Article, CoordinatorArticle, CountData, GuestList } from '@/types/coordinator'
 
 export const useCoordinatorStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)

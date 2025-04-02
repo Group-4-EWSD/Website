@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
+import { ArchiveX, CircleCheckBig, FilePenLine, FileText } from 'lucide-vue-next'
+
+import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import Card from '@/components/ui/card/Card.vue'
+import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 
-import { FileText, FilePenLine, CircleCheckBig, ArchiveX } from 'lucide-vue-next'
-import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
+
 </script>
 
 <template>

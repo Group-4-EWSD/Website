@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { Loader2 } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-vue-next'
 
 interface Props {
   title?: string

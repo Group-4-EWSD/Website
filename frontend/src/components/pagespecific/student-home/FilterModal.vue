@@ -2,7 +2,6 @@
 import { FilterX } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
-import { Select, SelectContent, SelectTrigger, SelectItem } from '@/components/ui/select'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 
 const props = defineProps<{
   selectedCategory: string

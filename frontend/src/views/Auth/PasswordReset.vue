@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
 import Logo from '@/assets/logo.png'
+import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
 </script>
 
 <template>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { BellDot, Search, X } from 'lucide-vue-next'
-import Button from '../button/Button.vue'
 import { computed, ref } from 'vue'
+
 import { useUserStore } from '@/stores/user'
 
+import Button from '../button/Button.vue'
 import Input from '../input/Input.vue'
 
 const searchQuery = ref('')

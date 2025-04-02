@@ -1,4 +1,4 @@
-import type { ProfilePhotoParams, ProfilePhotoResponse, User, UserDetailsParams } from "@/types/user"
+import type { CreateUserParams, ProfilePhotoParams, ProfilePhotoResponse, UpdateUserParams, User, UserDetailsParams } from "@/types/user"
 
 import api from "./axios"
 
@@ -14,4 +14,24 @@ export const updateProfilePhoto = async (params: ProfilePhotoParams): Promise<Pr
 
 export const deleteProfilePhoto = async () => {
   return await api.delete(`user/delete-photo`);
+}
+
+export const getAllUsers = async (): Promise<User[]> => {
+  const response = await api.get('all-user-list');
+  return response.data;
+}
+
+export const createUser = async (user: CreateUserParams): Promise<User> => {
+  const response = await api.post('user-create', user);
+  return response.data;
+}
+
+export const updateUser = async (user: UpdateUserParams): Promise<User> => {
+  const response = await api.post('user-update', user);
+  return response.data;
+}
+
+export const forcePasswordReset = async (userId: string): Promise<User> => {
+  const response = await api.post('user-force-password-reset', { userId });
+  return response.data;
 }

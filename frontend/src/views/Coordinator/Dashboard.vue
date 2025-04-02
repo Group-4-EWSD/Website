@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
+
 import { computed, onMounted, ref } from 'vue'
 
 import ArticleChart from '@/components/pagespecific/coordinator-home/ArticleChart.vue'

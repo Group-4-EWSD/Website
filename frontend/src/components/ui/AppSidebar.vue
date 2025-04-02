@@ -23,6 +23,8 @@ const userType = userStore.user?.user_type_name
 // const userType = 'Marketing Coordinator'
 let items = []
 
+const userType = "Admin" // just for development purpose
+
 switch (userType) {
   case 'Student':
     items = [

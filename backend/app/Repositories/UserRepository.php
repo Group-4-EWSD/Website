@@ -55,6 +55,13 @@ class UserRepository
         return $user;
     }
 
+    public function editUser($data)
+    {
+        $user = User::findorFail($data['id']);
+        $user->update($data);
+        return ($data);
+    }
+
     public function findById(string $id): ?User
     {
         return User::find($id);

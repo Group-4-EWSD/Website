@@ -157,6 +157,35 @@ class UserController extends Controller
             'message' => 'Profile updated successfully',
             'user' => $data
         ], 200);
+    }    
+    
+    public function editUser(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'id'   => 'required|string|exists:users,id',
+                'user_name' => 'sometimes|string|max:255',
+                'nickname' => 'sometimes|string|max:255',
+                // 'user_email' => 'sometimes|email',
+                'user_type_id' => 'sometimes|uuid|exists:user_types,user_type_id',
+                'faculty_id'   => 'sometimes|uuid|exists:faculties,faculty_id',
+                'gender' => 'sometimes|in:1,2',
+                'date_of_birth' => 'sometimes|date',  
+                'phone_number' => 'sometimes|string|max:20', 
+            ]);
+
+            $updatedUser = $this->userService->editUser($data);
+
+            return response()->json([
+                'message' => 'Profile updated successfully',
+                'user' => $data
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updatePassword(Request $request): JsonResponse
@@ -192,15 +221,26 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function resetPassword($userId)
+    public function resetPassword(Request $request)
     {
-        $result = $this->userService->resetPassword($userId);
+        try {
+            $validated = $request->validate([
+                'user_id'   => 'required|string|exists:users,id',
+            ]);
 
-        if (!$result) {
-            return response()->json(['message' => 'User not found'], 404);
+            $result = $this->userService->resetPassword($validated['user_id']);
+
+            if (!$result) {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+
+            return response()->json(['message' => 'Password reset successful. Email sent.']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(['message' => 'Password reset successful. Email sent.']);
     }
 
     public function pageVisitInitial($pageId){

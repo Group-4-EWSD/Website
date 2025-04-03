@@ -75,7 +75,7 @@ const coordinatorRoutes = [
   },
 ]
 
-const ManagerRoutes = [
+const managerRoutes = [
   {
     path: '/manager/dashboard',
     name: 'Manager Dashboard',
@@ -167,6 +167,7 @@ const router = createRouter({
     ...studentRoutes,
     ...coordinatorRoutes,
     ...adminRoutes,
+    ...managerRoutes,
     ...commomRoutes,
     ...authRoutes,
     ...fallbackRoutes,

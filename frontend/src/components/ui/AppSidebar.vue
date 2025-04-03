@@ -70,7 +70,7 @@ switch (userType) {
     ]
     break
 
-  case 'Manager':
+  case 'Marketing Manager':
     items = [
       { title: 'Dashboard', url: '/manager/dashboard', icon: CircleGauge },
       {

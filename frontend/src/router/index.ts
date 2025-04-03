@@ -16,6 +16,9 @@ const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
 
+const ManagerDashboard = () => import('@/views/Manager/Dashboard.vue')
+const ManagerArticles = () => import('@/views/Manager/Articles.vue')
+
 const Notification = () => import('@/views/Notification.vue')
 const Settings = () => import('@/views/Settings.vue')
 
@@ -59,7 +62,6 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
-      // requiresAuth: true,
       roles: ['Marketing Coordinator'],
     },
   },
@@ -68,8 +70,26 @@ const coordinatorRoutes = [
     name: 'Articles',
     component: CoordinatorArticles,
     meta: {
-      // requiresAuth: true,
       roles: ['Marketing Coordinator'],
+    },
+  },
+]
+
+const ManagerRoutes = [
+  {
+    path: '/manager/dashboard',
+    name: 'Manager Dashboard',
+    component: ManagerDashboard,
+    meta: {
+      roles: ['Marketing Manager'],
+    },
+  },
+  {
+    path: '/manager/articles',
+    name: 'Articles',
+    component: ManagerArticles,
+    meta: {
+      roles: ['Marketing Manager'],
     },
   },
 ]
@@ -89,7 +109,6 @@ const commomRoutes = [
     name: 'Notification',
     component: Notification,
     meta: {
-      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator'],
     },
   },
@@ -98,7 +117,6 @@ const commomRoutes = [
     name: 'Settings',
     component: Settings,
     meta: {
-      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
     },
   },
@@ -130,7 +148,6 @@ const adminRoutes = [
     },
   },
 ]
-
 
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },

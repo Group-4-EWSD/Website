@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
-
-import { computed, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
 import ArticleChart from '@/components/pagespecific/coordinator-home/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
@@ -9,23 +8,14 @@ import MagazineArticles from '@/components/pagespecific/coordinator-home/Magazin
 import Badge from '@/components/ui/badge/Badge.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
-import { useCoordinatorStore } from '@/stores/coordinator'
 
-const daysLeft = ref()
-const coordinatorStore = useCoordinatorStore()
+const daysLeft = ref(4)
 
 const articleStats = [
   { label1: 'Total Articles', value1: '132 nos', label2: 'Published Articles', value2: '100 nos' },
   { label1: 'Reviewed Articles', value1: '32 nos', label2: 'Approved', value2: '100 nos' },
   { label1: 'Pending Review', value1: '100 nos', label2: 'Reject', value2: '32 nos' },
 ]
-
-onMounted(() => {
-  if (!coordinatorStore.articles.length) {
-    coordinatorStore.fetchArticles()
-  }
-  daysLeft.value = coordinatorStore.publicDate
-})
 </script>
 
 <template>
@@ -35,7 +25,7 @@ onMounted(() => {
         <!-- Dashboard Title and Previous Login Time Section -->
         <div class="flex flex-col">
           <h2 class="text-xl font-bold uppercase">Coordinator Dashboard</h2>
-          <p class="text-sm text-gray-500">Previous Login {{ coordinatorStore.prevLogin }}</p>
+          <p class="text-sm text-gray-500">Previous Login 09/03/2025 9:20 AM</p>
         </div>
         <!-- Top Badges -->
         <div class="flex justify-between">
@@ -53,75 +43,67 @@ onMounted(() => {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card class="bg-primary text-white">
+        <Card class="bg-primary text-white md:col-span-2">
           <CardHeader>
-            <CardTitle class="font-primary">Articles (Pre Submission)</CardTitle>
+            <CardTitle class="font-primary text-lg">Articles</CardTitle>
           </CardHeader>
-          <CardContent class="font-primary flex flex-row">
-            <div class="space-y-2">
-              <p>
-                Total Articles: <strong>{{ coordinatorStore.countData?.total_articles }}</strong>
-              </p>
-              <p>
-                Reviewed Articles:
-                <strong>{{ coordinatorStore.countData?.reviewed_articles }}</strong>
-              </p>
-              <p>
-                Pending Review: <strong>{{ coordinatorStore.countData?.pending_articles }}</strong>
-              </p>
+          <CardContent class="font-primary grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-3">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="text-accent">Total Articles</div>
+                <div class="text-lg">132</div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="text-accent">Review Articles</div>
+                <div class="text-lg">100</div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="text-accent">Under Review</div>
+                <div class="text-lg">32</div>
+              </div>
             </div>
-            <div class="space-y-2 ml-10">
-              <p>
-                Total Articles:
-                <strong>{{ coordinatorStore.countData?.published_articles }}</strong>
-              </p>
-              <p>
-                Approved: <strong>{{ coordinatorStore.countData?.approved_articles }}</strong>
-              </p>
-              <p>
-                Reject: <strong>{{ coordinatorStore.countData?.rejected_articles }}</strong>
-              </p>
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <div class="text-accent">Published Articles</div>
+                <div class="text-lg">100</div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="text-accent">Approved</div>
+                <div class="text-lg">100</div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="text-accent">Rejected</div>
+                <div class="text-lg">100</div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <Card class="bg-primary text-white">
           <CardHeader>
-            <CardTitle class="font-primary">Current Academic Year</CardTitle>
+            <CardTitle class="font-primary text-lg">Current Academic Year</CardTitle>
           </CardHeader>
-          <CardContent class="font-primary space-y-2">
-            <p>
-              Participate Rate: <strong>20%</strong>
-              <ArrowUp class="inline w-4 h-4 text-green-500" />
-            </p>
-            <p>
-              Interest Rate: <strong>10%</strong>
-              <ArrowUp class="inline w-4 h-4 text-green-500" />
-            </p>
-            <p>
-              In Time Rate: <strong>5%</strong>
-              <ArrowDown class="inline w-4 h-4 text-red-500" />
-            </p>
-          </CardContent>
-        </Card>
+          <CardContent class="font-primary flex flex-col gap-3">
+            
+            <div class="flex items-center justify-between">
+              <div class="text-accent">Participate </div>
+              <div class="text-lg">20% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+            </div>
 
-        <Card class="text-primary border-grey-500">
-          <CardHeader>
-            <CardTitle class="font-primary">Current Academic Year</CardTitle>
-          </CardHeader>
-          <CardContent class="font-primary space-y-2">
-            <p>
-              Participate Rate: <strong>20%</strong>
-              <ArrowUp class="inline w-4 h-4 text-green-500" />
-            </p>
-            <p>
-              Interest Rate: <strong>10%</strong>
-              <ArrowUp class="inline w-4 h-4 text-green-500" />
-            </p>
-            <p>
-              In Time Rate: <strong>5%</strong>
-              <ArrowDown class="inline w-4 h-4 text-red-500" />
-            </p>
+            <div class="flex items-center justify-between">
+              <div class="text-accent">Interest Rate </div>
+              <div class="text-lg">10% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="text-accent">In Time Rate </div>
+              <div class="text-lg">10% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
+            </div>
+
           </CardContent>
         </Card>
       </div>
@@ -129,17 +111,10 @@ onMounted(() => {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <ArticleChart />
-          <GuestListTable
-            :guests="coordinatorStore.guestList"
-            :isLoading="coordinatorStore.isLoading"
-            class="mt-6"
-          />
+          <!-- <GuestListTable class="mt-6" /> -->
         </div>
 
-        <MagazineArticles
-          :articles="coordinatorStore.articles"
-          :isLoading="coordinatorStore.isLoading"
-        />
+        <!-- <MagazineArticles /> -->
       </div>
     </div>
   </Layout>

@@ -51,7 +51,7 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
 
         const userStore = useUserStore()
 
-        const user = response.data.user as User;
+        const user = response.data.user as User
         userStore.setUser(user)
 
         const userRole = user.user_type_name

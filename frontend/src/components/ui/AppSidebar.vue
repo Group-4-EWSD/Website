@@ -15,7 +15,6 @@ import { useUserStore } from '@/stores/user'
 import Button from './button/Button.vue'
 import Separator from './separator/Separator.vue'
 
-
 const loading = ref(false)
 
 const userStore = useUserStore()

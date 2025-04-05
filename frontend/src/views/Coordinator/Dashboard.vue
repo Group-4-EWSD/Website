@@ -22,7 +22,7 @@ const articleStats = [
 
 onMounted(() => {
   if (!coordinatorStore.articles.length) {
-    coordinatorStore.fetchArticles()
+    coordinatorStore.fetchAllArticles()
   }
   daysLeft.value = coordinatorStore.publicDate
 })

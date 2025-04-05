@@ -2,7 +2,7 @@ import type {
   Article,
   ArticleParams,
   ArticleResponse,
-  CoordinatorArticle,
+  CoordinatorArticles,
 } from '@/types/coordinator'
 
 import api from './axios'
@@ -12,7 +12,7 @@ export const getAllArticles = async (): Promise<ArticleResponse> => {
   return response.data
 }
 
-export const getArticles = async (params: ArticleParams): Promise<CoordinatorArticle[]> => {
+export const getArticles = async (params: ArticleParams): Promise<CoordinatorArticles> => {
   const response = await api.get('/articles/coordinator', { params })
   return response.data
 }

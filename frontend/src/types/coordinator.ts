@@ -53,6 +53,14 @@ export interface CoordinatorArticle {
   submission_date: string
   submission_deadline: string
   status: number
-  category: string
-  submission_by: string
+  article_type_name: string
+  user_name: string
+}
+
+export type CoordinatorArticles = {
+  totalSubmissions: number
+  pendingReview: number
+  approvedArticles: number
+  rejectedArticles: number
+  articles: CoordinatorArticle[]
 }

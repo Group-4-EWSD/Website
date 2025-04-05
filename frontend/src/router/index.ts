@@ -199,14 +199,14 @@ router.beforeEach((to, from, next) => {
     }
 
     return next({ path: redirectRoutes[userType] ?? '/', replace: true })
+  } else if (to.meta.requiresAuth && !token) {
+    // If route requires auth and user is not authenticated, redirect to login
+    next({ path: '/auth/login', replace: true })
   } else if (Array.isArray(to.meta.roles) && !to.meta.roles.includes(userType)) {
     console.log(userType)
     // If user does not have permission to access the route, redirect to unauthorize page
     // next({ path: '/unauthorized', replace: true })
     next()
-  } else if (to.meta.requiresAuth && !token) {
-    // If route requires auth and user is not authenticated, redirect to login
-    next({ path: '/auth/login', replace: true })
   } else {
     // Otherwise, proceed as normal
     next()

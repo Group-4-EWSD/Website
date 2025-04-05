@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { BellDot, Search, X } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 import { useUserStore } from '@/stores/user'
-
-import Button from '../button/Button.vue'
-import Input from '../input/Input.vue'
 
 const searchQuery = ref('')
 const hasNotification = true
@@ -14,17 +11,6 @@ const toggleSearch = () => {
   isSearchActive.value = !isSearchActive.value
 }
 const userStore = useUserStore()
-
-const notiUrl = computed(() => {
-  switch (userStore.currentUser?.user_type_name) {
-    case 'Student':
-      return '/student/notifications'
-    case 'Coordinator':
-      return '/coordinator/notifications'
-    default:
-      return ''
-  }
-})
 </script>
 
 <template>
@@ -71,7 +57,7 @@ const notiUrl = computed(() => {
 
     <div class="flex items-center space-x-4 pr-2 sm:pr-6">
       <div class="relative">
-        <RouterLink :to="notiUrl">
+        <RouterLink :to="`/notifications`">
           <button class="relative p-1 text-white h-[3rem]">
             <BellDot class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
           </button>

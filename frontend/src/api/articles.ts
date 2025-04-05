@@ -54,3 +54,7 @@ export const getCategories = async (): Promise<Category[]> => {
   const response = await api.get('item-list?item=1')
   return response.data
 }
+
+export const updateStatus = async (status: number, articleId: string) => {
+  return await api.post(`articles/change-status/${articleId}`, status)
+}

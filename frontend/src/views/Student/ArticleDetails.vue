@@ -2,11 +2,11 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Download, Eye, Heart, Send } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 
-import { getArticleDetails } from '@/api/articles'
+import { getArticleDetails, updateStatus } from '@/api/articles'
 import { type actionParams, createComment } from '@/api/notification'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
@@ -31,6 +31,8 @@ const newComment = ref('')
 const comments: any = ref([])
 const feedbacks: any = ref([])
 const isLoading = ref(false)
+const approveLoading = ref(false)
+const rejectLoading = ref(false)
 
 const authorizedFeedbacks = ref<boolean>(false)
 const articleContent: any = ref([])
@@ -53,6 +55,7 @@ const fetchArticleDetails = async (articleId: string) => {
     articleContent.value = article.value.articleContent
     articlePhotos.value = article.value.articlePhotos
     comments.value = article.value.commentList
+    feedbacks.value = article.value.feedbackList
 
     isLoading.value = false
     authorizedFeedbacks.value = article.value.feedbackList.length > 0 ? true : false
@@ -68,7 +71,7 @@ const addComment = () => {
     comments.value.push({
       id: Date.now(),
       name: userStore.user?.user_name,
-      text: newComment.value,
+      message: newComment.value,
       timestamp: dayjs().toISOString(),
     })
 
@@ -96,6 +99,41 @@ onMounted(() => {
   articleId = route.params.id as string
   fetchArticleDetails(articleId)
 })
+
+const handleApprove = async () => {
+  approveLoading.value = true
+  try {
+    await updateStatus(2, articleId)
+  } catch (error) {
+    console.error('Error during status update:', error)
+    toast.error('Failed to update article status.')
+  } finally {
+    approveLoading.value = false
+  }
+}
+
+const handleReject = async () => {
+  rejectLoading.value = true
+  try {
+    await updateStatus(3, articleId)
+  } catch (error) {
+    console.error('Error during status update:', error)
+    toast.error('Failed to update article status.')
+  } finally {
+    rejectLoading.value = false
+  }
+}
+
+const isCoordinator = computed(() => {
+  return userStore.currentUser?.user_type_name === 'Marketing Coordinator'
+})
+
+const articleStatus = computed(() => article.value.articleDetail?.article_status)
+
+const isPending = computed(() => articleStatus.value === 1)
+const isApproved = computed(() => articleStatus.value === 2)
+const isRejected = computed(() => articleStatus.value === 3)
+const isPublished = computed(() => articleStatus.value === 4)
 </script>
 
 <template>
@@ -166,6 +204,29 @@ onMounted(() => {
           </div>
 
           <div class="flex gap-4">
+            <!-- Approve -->
+            <Button
+              v-if="isCoordinator && !isPublished && !isRejected"
+              :disabled="false"
+              :processing="false"
+              class="px-4 py-2 rounded-md border bg-green-100 text-gray-800 hover:bg-green-200 text-sm font-medium"
+              @click="!isApproved ? null : handleApprove"
+            >
+              {{ isApproved ? 'Approved' : 'Approve' }}
+            </Button>
+
+            <!-- Reject -->
+            <Button
+              v-if="isCoordinator && !isPublished && !isApproved"
+              :disabled="false"
+              :processing="false"
+              class="px-4 py-2 rounded-md border bg-red-100 text-gray-800 hover:bg-red-200 text-sm font-medium"
+              @click="!isApproved ? null : handleReject"
+            >
+              {{ isRejected ? 'Rejected' : 'Reject' }}
+            </Button>
+
+            <!-- Download -->
             <Button
               class="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
             >
@@ -181,13 +242,13 @@ onMounted(() => {
               :key="name"
               :src="url"
               :alt="`Article Image - ${name}`"
-              class="w-[350px] max-h-[350px]"
+              class="w-[600px] max-h-[600px]"
             />
           </div>
 
           <p class="mt-4 text-lg text-gray-700 leading-relaxed">
-            <template v-if="articleContent.length > 0">
-              {{ articleContent }}
+            <template v-if="articleContent">
+              {{ Object.values(articleContent)[0] }}
             </template>
             <template v-else>
               <div class="flex justify-center w-full py-4">
@@ -217,10 +278,10 @@ onMounted(() => {
                   />
                   <div class="flex-1">
                     <div class="flex justify-between items-start">
-                      <p class="font-semibold">{{ comment.name }}</p>
-                      <p class="text-gray-700">{{ dayjs(comment.timestamp).fromNow() }}</p>
+                      <p class="font-semibold">{{ comment.user_name }}</p>
+                      <p class="text-gray-700">{{ dayjs(comment.created_at).fromNow() }}</p>
                     </div>
-                    <p class="text-gray-700">{{ comment.text }}</p>
+                    <p class="text-gray-700">{{ comment.message }}</p>
                   </div>
                 </div>
 
@@ -263,10 +324,32 @@ onMounted(() => {
                     />
                     <div class="flex-1">
                       <div class="flex justify-between items-start">
-                        <p class="font-semibold">{{ feedback.name }}</p>
-                        <p class="text-gray-700">{{ dayjs(feedback.timestamp).fromNow() }}</p>
+                        <p class="font-semibold">{{ feedback.user_name }}</p>
+                        <p class="text-gray-700">{{ dayjs(feedback.created_at).fromNow() }}</p>
                       </div>
-                      <p class="text-gray-700">{{ feedback.text }}</p>
+                      <p class="text-gray-700">{{ feedback.message }}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3 mb-4">
+                    <img
+                      src="@/assets/profile.png"
+                      alt="User Avatar"
+                      class="w-10 h-10 rounded-full"
+                    />
+                    <div class="flex items-center space-x-2 w-full">
+                      <input
+                        v-model="newComment"
+                        placeholder="Write a comment..."
+                        class="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
+                        @keydown.enter="addComment()"
+                      />
+                      <Button
+                        @click="addComment"
+                        class="flex items-center justify-center px-4 py-5 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
+                      >
+                        <Send class="w-5 h-5" />
+                        <span>Send</span>
+                      </Button>
                     </div>
                   </div>
                 </TabsContent>

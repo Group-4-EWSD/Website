@@ -2,8 +2,14 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
-import { getAllArticles } from '@/api/coordinator'
-import type { Article, CoordinatorArticle, CountData, GuestList } from '@/types/coordinator'
+import { getAllArticles, getArticles } from '@/api/coordinator'
+import type {
+  Article,
+  CoordinatorArticles,
+  CoordinatorArticle,
+  CountData,
+  GuestList,
+} from '@/types/coordinator'
 
 export const useCoordinatorStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)
@@ -12,10 +18,18 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
   const prevLogin = ref('')
   const publicDate = ref(0)
 
+  const magazineArticles = ref<CoordinatorArticles>({
+    totalSubmissions: 0,
+    pendingReview: 0,
+    approvedArticles: 0,
+    rejectedArticles: 0,
+    articles: [],
+  })
+
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  const fetchArticles = async () => {
+  const fetchAllArticles = async () => {
     isLoading.value = true
     error.value = null
 
@@ -37,6 +51,32 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
       })
   }
 
+  const fetchMagazineArticles = async () => {
+    isLoading.value = true
+    error.value = null
+
+    await getArticles({
+      status: 4,
+    })
+      .then((response) => {
+        magazineArticles.value = {
+          totalSubmissions: response.totalSubmissions,
+          pendingReview: response.pendingReview,
+          approvedArticles: response.approvedArticles,
+          rejectedArticles: response.approvedArticles,
+          articles: response.articles,
+        }
+
+        isLoading.value = false
+      })
+      .catch((error) => {
+        isLoading.value = false
+        toast.error(error.response.data.message)
+        console.error('Error fetching articles:', error)
+        error.value = 'Failed to load articles. Please try again.'
+      })
+  }
+
   return {
     countData,
     guestList,
@@ -44,7 +84,9 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
     prevLogin,
     publicDate,
     isLoading,
+    magazineArticles,
 
-    fetchArticles,
+    fetchAllArticles,
+    fetchMagazineArticles,
   }
 })

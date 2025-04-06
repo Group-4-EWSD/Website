@@ -15,12 +15,12 @@ interface ArticlesResponse {
   allArticles: Article[]
 }
 
-export const ArticleStatus = {
-  DRAFT: 0,
-  PENDING: 1,
-  APPROVED: 2,
-  REJECTED: 3,
-  PUBLISHED: 4,
+export enum ArticleStatus {
+  DRAFT = 0,
+  PENDING = 1,
+  APPROVED = 2,
+  REJECTED = 3,
+  PUBLISHED = 4,
 }
 
 export const getArticles = async (params: ArticleParams): Promise<ArticlesResponse> => {

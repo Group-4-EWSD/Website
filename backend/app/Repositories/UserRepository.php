@@ -4,14 +4,13 @@ namespace App\Repositories;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
 use Illuminate\Support\Facades\Hash;
 //use Your Model
 
 /**
  * Class UserRepository.
  */
-class UserRepository extends BaseRepository
+class UserRepository
 {
     /**
      * @return string
@@ -56,9 +55,16 @@ class UserRepository extends BaseRepository
         return $user;
     }
 
+    public function editUser($data)
+    {
+        $user = User::findorFail($data['id']);
+        $user->update($data);
+        return ($data);
+    }
+
     public function findById(string $id): ?User
     {
-        return $this->model->find($id);
+        return User::find($id);
     }
 
     public function updatePhoto(string $id, ?string $photoPath): bool
@@ -84,7 +90,8 @@ class UserRepository extends BaseRepository
                 'u.phone_number'
             ])
             ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
-            ->where('u.user_type_id', '=', '0');
+            ->where('u.user_type_id', '=', '0')
+            ->get();
     }
     
     public function getMemberList()
@@ -100,10 +107,10 @@ class UserRepository extends BaseRepository
                 'u.gender',
                 'u.phone_number'
             ])
-            ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
-            ->join('user_types as ut', 'ut.user_type_id', 'u.user_type_id')
-            ->join('faculties as f', 'f.faculty_id', 'u.faculty_id')
-            ->where('u.user_type_id', '!=', '0');
+            ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
+            ->where('u.user_type_id', '!=', 0)
+            ->get();
     }
 
     public function getActiveUserList($request)
@@ -120,52 +127,48 @@ class UserRepository extends BaseRepository
             ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
             ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
             ->selectRaw('
-        u.id,
-        u.user_name,
-        u.nickname,
-        u.user_email,
-        u.gender,
-        u.user_type_id,
-        ut.user_type_name,
-        u.faculty_id,
-        f.faculty_name,
-        u.phone_number,
-        CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/", u.user_photo_path) AS user_photo_path,
-        u.date_of_birth,
-        COUNT(DISTINCT a.article_id) as article_count, 
-        COUNT(DISTINCT act.action_id) as action_count, 
-        COUNT(DISTINCT c.comment_id) as comment_count, 
-        ((COUNT(DISTINCT a.article_id) * 20) + 
-         (COUNT(DISTINCT act.action_id) * 1) + 
-         (COUNT(DISTINCT c.comment_id) * 1)) as total_score
-    ')
+                u.id,
+                u.user_name,
+                u.nickname,
+                u.user_email,
+                u.gender,
+                u.user_type_id,
+                ut.user_type_name,
+                u.faculty_id,
+                f.faculty_name,
+                u.phone_number,
+                CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/", u.user_photo_path) AS user_photo_path,
+                u.date_of_birth,
+                COUNT(DISTINCT a.article_id) as article_count, 
+                COUNT(DISTINCT act.action_id) as action_count, 
+                COUNT(DISTINCT c.comment_id) as comment_count, 
+                ((COUNT(DISTINCT a.article_id) * 20) + 
+                (COUNT(DISTINCT act.action_id) * 1) + 
+                (COUNT(DISTINCT c.comment_id) * 1)) as total_score
+            ')
             // ->where('u.user_type_id', '1') // Only Student List
             ->when(
-                $request->has('userId') && $request->userId,
-                fn($query) =>
-                $query->where('u.user_id', $request->userId)
+                $request && isset($request->userId) && $request->userId,
+                fn($query) => $query->where('u.id', $request->userId)
             )
             ->when(
-                $request->has('userName') && $request->userName,
-                fn($query) =>
-                $query->where('u.user_name', 'LIKE', "%{$request->userName}%")
+                $request && isset($request->userName) && $request->userName,
+                fn($query) => $query->where('u.user_name', 'LIKE', "%{$request->userName}%")
             )
             ->when(
-                $request->has('facultyId') && $request->facultyId,
-                fn($query) =>
-                $query->where('u.faculty_id', $request->facultyId)
+                $request && isset($request->facultyId) && $request->facultyId,
+                fn($query) => $query->where('u.faculty_id', $request->facultyId)
             )
             ->when(
-                $request->has('academicYear') && $request->academicYear,
-                fn($query) =>
-                $query->where('ay.academic_year_start', $request->academicYear)
+                $request && isset($request->academicYear) && $request->academicYear,
+                fn($query) => $query->where('ay.academic_year_start', $request->academicYear)
             )
             ->groupBy('u.id')
             ->get();
     }
 
     public function getMostUsedBrowserList(){
-        $browserFreq = DB::table('loginHistories as lh')
+        $browserFreq = DB::table('login_histories as lh')
             ->join('browsers as b', 'b.browser_id', '=', 'lh.browser_id')
             ->select([
                 'b.browser_id',
@@ -193,11 +196,12 @@ class UserRepository extends BaseRepository
     }
 
     public function getMostViewedPageVisit(){
-        return DB::table('view_pages as vp')
-            ->join('app_pages as p', 'vp.page_id', '=', 'p.page_id')
+        $mostViewedPages = DB::table('view_pages as vp')
+            ->join('app_pages as p', 'vp.page_id', '=', 'p.app_page_id')
             ->select('vp.page_id', DB::raw('COUNT(vp.page_id) as view_count'))
             ->groupBy('vp.page_id')
             ->get();
+        return $mostViewedPages;
     }
 
     public function getAllUserList()

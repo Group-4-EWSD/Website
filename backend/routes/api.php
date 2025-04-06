@@ -28,7 +28,7 @@ Route::middleware([RedirectIfAuthenticated::class])->group(function () {
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/visit', [UserController::class, 'pageVisitInitial']);
+    Route::get('/visit/{pageId}', [UserController::class, 'pageVisitInitial']);
     // Articles routes
     Route::prefix('/articles')->group(function () {
         // Normal Routes

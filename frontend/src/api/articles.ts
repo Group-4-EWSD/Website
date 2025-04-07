@@ -15,6 +15,18 @@ interface ArticlesResponse {
   allArticles: Article[]
 }
 
+export interface ActionParams {
+  articleId: string | null
+  message: string
+}
+
+export interface Comment {
+  id: number
+  user_name: string
+  message: string
+  created_at: string
+}
+
 export const ArticleStatus = {
   DRAFT: 0,
   PENDING: 1,
@@ -40,6 +52,14 @@ export const getDraftArticles = async (): Promise<DraftArticle[]> => {
 
 export const getArticleDetails = async (articleId: string) => {
   return await api.get(`articles/${articleId}`)
+}
+
+export const createComment = async (params: ActionParams) => {
+  return await api.post(`/articles/comment`, params)
+}
+
+export const createFeedback = async (params: ActionParams) => {
+  return await api.post(`/articles/feedback`, params)
 }
 
 export const uploadArticle = async (article: ArticleData) => {

@@ -6,8 +6,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 
-import { getArticleDetails, updateStatus } from '@/api/articles'
-import { type actionParams, createComment } from '@/api/notification'
+import {
+  getArticleDetails,
+  updateStatus,
+  type ActionParams,
+  type Comment,
+  createComment,
+  createFeedback,
+} from '@/api/articles'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
@@ -28,20 +34,21 @@ const article = ref<ArticleResponse>({
 })
 const isLiked = ref(false)
 const newComment = ref('')
-const comments: any = ref([])
-const feedbacks: any = ref([])
+const newFeedback = ref('')
+const articleId = ref('')
+const comments = ref<Comment[]>([])
+const feedbacks = ref<Comment[]>([])
 const isLoading = ref(false)
 const approveLoading = ref(false)
 const rejectLoading = ref(false)
 
-const authorizedFeedbacks = ref<boolean>(false)
 const articleContent: any = ref([])
 const articlePhotos = ref<Record<string, string>>({
   '67cbf0b9c7b5d_Exercise Activity 4.jpg':
     'https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/documents/1741418681_victor shoes.jpg',
 })
 
-const params = ref<actionParams>()
+const params = ref<ActionParams>()
 
 dayjs.extend(relativeTime)
 
@@ -58,7 +65,6 @@ const fetchArticleDetails = async (articleId: string) => {
     feedbacks.value = article.value.feedbackList
 
     isLoading.value = false
-    authorizedFeedbacks.value = article.value.feedbackList.length > 0 ? true : false
   } catch (error) {
     isLoading.value = false
     console.error('Error fetching article details:', error)
@@ -70,15 +76,15 @@ const addComment = () => {
   if (newComment.value.trim()) {
     comments.value.push({
       id: Date.now(),
-      name: userStore.user?.user_name,
+      user_name: userStore.user?.user_name || 'User',
       message: newComment.value,
-      timestamp: dayjs().toISOString(),
+      created_at: dayjs().toISOString(),
     })
 
     try {
       params.value = {
-        actionId: '',
-        actionType: 2,
+        articleId: articleId.value,
+        message: newComment.value,
       }
       createComment(params.value)
     } catch (error) {
@@ -89,21 +95,45 @@ const addComment = () => {
   }
 }
 
+const addFeedback = () => {
+  if (newFeedback.value.trim()) {
+    feedbacks.value.push({
+      id: Date.now(),
+      user_name: userStore.user?.user_name || 'User',
+      message: newFeedback.value,
+      created_at: dayjs().toISOString(),
+    })
+
+    try {
+      params.value = {
+        articleId: articleId.value,
+        message: newFeedback.value,
+      }
+      createFeedback(params.value)
+    } catch (error) {
+      console.error('Error updating notification:', error)
+      toast.error('Failed to comment')
+    }
+    newFeedback.value = ''
+  }
+}
+
 const updateLike = () => {
   isLiked.value = !isLiked.value
 }
 
-let articleId = ''
-
 onMounted(() => {
-  articleId = route.params.id as string
-  fetchArticleDetails(articleId)
+  articleId.value = route.params.id as string
+  fetchArticleDetails(articleId.value)
+
+  activeTab.value =
+    userStore.currentUser?.user_type_name === 'Marketing Coordinator' ? 'feedbacks' : 'comments'
 })
 
 const handleApprove = async () => {
   approveLoading.value = true
   try {
-    await updateStatus(2, articleId)
+    await updateStatus(2, articleId.value)
   } catch (error) {
     console.error('Error during status update:', error)
     toast.error('Failed to update article status.')
@@ -115,7 +145,7 @@ const handleApprove = async () => {
 const handleReject = async () => {
   rejectLoading.value = true
   try {
-    await updateStatus(3, articleId)
+    await updateStatus(3, articleId.value)
   } catch (error) {
     console.error('Error during status update:', error)
     toast.error('Failed to update article status.')
@@ -124,13 +154,34 @@ const handleReject = async () => {
   }
 }
 
+const sortedComments = computed(() =>
+  comments.value
+    .slice()
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()),
+)
+
 const isCoordinator = computed(() => {
   return userStore.currentUser?.user_type_name === 'Marketing Coordinator'
 })
 
+const isStudent = computed(() => {
+  return userStore.currentUser?.user_type_name === 'Student'
+})
+
+const isManager = computed(() => {
+  return userStore.currentUser?.user_type_name === 'Marketing Manager'
+})
+
+const isGuest = computed(() => {
+  return userStore.currentUser?.user_type_name === 'Guest'
+})
+
+const isOwnArticle = computed(() => {
+  return userStore.currentUser?.user_name === article.value.articleDetail?.creator_name
+})
+
 const articleStatus = computed(() => article.value.articleDetail?.article_status)
 
-const isPending = computed(() => articleStatus.value === 1)
 const isApproved = computed(() => articleStatus.value === 2)
 const isRejected = computed(() => articleStatus.value === 3)
 const isPublished = computed(() => articleStatus.value === 4)
@@ -180,7 +231,7 @@ const isPublished = computed(() => articleStatus.value === 4)
       <div v-if="article.articleDetail && !isLoading">
         <div class="flex justify-between items-center pb-2">
           <h2 class="text-2xl font-bold uppercase">{{ article.articleDetail.article_title }}</h2>
-          <div class="flex gap-2 text-gray-600">
+          <div v-if="isStudent" class="flex gap-2 text-gray-600">
             <button @click="updateLike">
               <Heart
                 class="w-6 h-6 cursor-pointer transition-colors duration-200"
@@ -260,32 +311,45 @@ const isPublished = computed(() => articleStatus.value === 4)
         <div class="border-t pt-4 mt-6">
           <Tabs v-model="activeTab">
             <TabsList class="mb-4 border-b">
-              <TabsTrigger value="comments" class="p-2">Comments</TabsTrigger>
-              <TabsTrigger v-if="true" value="feedbacks" class="p-2">Feedbacks</TabsTrigger>
+              <TabsTrigger
+                v-if="(isStudent && !isCoordinator) || isOwnArticle || isManager || isGuest"
+                value="comments"
+                class="p-2"
+                >Comments</TabsTrigger
+              >
+              <TabsTrigger v-if="isCoordinator || isOwnArticle" value="feedbacks" class="p-2"
+                >Feedbacks</TabsTrigger
+              >
             </TabsList>
             <div class="w-full min-h-[250px]">
               <!-- Comments Tab -->
-              <TabsContent value="comments">
-                <div
-                  v-for="comment in comments"
-                  :key="comment.id"
-                  class="flex items-start gap-3 mb-4"
-                >
-                  <img
-                    src="@/assets/profile.png"
-                    alt="User Avatar"
-                    class="w-10 h-10 rounded-full"
-                  />
-                  <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                      <p class="font-semibold">{{ comment.user_name }}</p>
-                      <p class="text-gray-700">{{ dayjs(comment.created_at).fromNow() }}</p>
+              <TabsContent
+                v-if="activeTab === 'comments'"
+                value="comments"
+                class="shadow-md border border-gray-200 rounded-lg p-4 flex flex-col max-h-[500px]"
+              >
+                <div class="flex-1 overflow-y-auto pr-2">
+                  <div
+                    v-for="comment in sortedComments"
+                    :key="comment.id"
+                    class="flex items-start gap-3 mb-4"
+                  >
+                    <img
+                      src="@/assets/profile.png"
+                      alt="User Avatar"
+                      class="w-10 h-10 rounded-full"
+                    />
+                    <div class="flex-1">
+                      <div class="flex justify-between items-start">
+                        <p class="font-semibold">{{ comment.user_name }}</p>
+                        <p class="text-gray-700">{{ dayjs(comment.created_at).fromNow() }}</p>
+                      </div>
+                      <p class="text-gray-700">{{ comment.message }}</p>
                     </div>
-                    <p class="text-gray-700">{{ comment.message }}</p>
                   </div>
                 </div>
 
-                <div class="flex items-start gap-3 mb-4">
+                <div class="flex items-start gap-3 mb-2 mt-2">
                   <img
                     src="@/assets/profile.png"
                     alt="User Avatar"
@@ -310,8 +374,12 @@ const isPublished = computed(() => articleStatus.value === 4)
               </TabsContent>
 
               <!-- Feedbacks Tab -->
-              <div v-if="authorizedFeedbacks">
-                <TabsContent value="feedbacks">
+              <TabsContent
+                v-if="activeTab === 'feedbacks'"
+                value="feedbacks"
+                class="shadow-md border border-gray-200 rounded-lg p-4 flex flex-col max-h-[500px]"
+              >
+                <div class="flex-1 overflow-y-auto pr-2">
                   <div
                     v-for="feedback in feedbacks"
                     :key="feedback.id"
@@ -330,30 +398,30 @@ const isPublished = computed(() => articleStatus.value === 4)
                       <p class="text-gray-700">{{ feedback.message }}</p>
                     </div>
                   </div>
-                  <div class="flex items-start gap-3 mb-4">
-                    <img
-                      src="@/assets/profile.png"
-                      alt="User Avatar"
-                      class="w-10 h-10 rounded-full"
+                </div>
+                <div class="flex items-start gap-3 mb-2 mt-2">
+                  <img
+                    src="@/assets/profile.png"
+                    alt="User Avatar"
+                    class="w-10 h-10 rounded-full"
+                  />
+                  <div class="flex items-center space-x-2 w-full">
+                    <input
+                      v-model="newFeedback"
+                      placeholder="Write a feedback..."
+                      class="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
+                      @keydown.enter="addFeedback"
                     />
-                    <div class="flex items-center space-x-2 w-full">
-                      <input
-                        v-model="newComment"
-                        placeholder="Write a comment..."
-                        class="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
-                        @keydown.enter="addComment()"
-                      />
-                      <Button
-                        @click="addComment"
-                        class="flex items-center justify-center px-4 py-5 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
-                      >
-                        <Send class="w-5 h-5" />
-                        <span>Send</span>
-                      </Button>
-                    </div>
+                    <Button
+                      @click="addFeedback"
+                      class="flex items-center justify-center px-4 py-5 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
+                    >
+                      <Send class="w-5 h-5" />
+                      <span>Send</span>
+                    </Button>
                   </div>
-                </TabsContent>
-              </div>
+                </div>
+              </TabsContent>
             </div>
           </Tabs>
         </div>

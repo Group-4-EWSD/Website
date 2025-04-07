@@ -9,7 +9,7 @@ const Register = () => import('@/views/Auth/Register.vue')
 const PasswordReset = () => import('@/views/Auth/PasswordReset.vue')
 
 const StudentHome = () => import('@/views/Student/Home.vue')
-const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
+const ArticleDetails = () => import('@/views/ArticleDetails.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 
@@ -32,7 +32,7 @@ const studentRoutes = [
     name: 'Student Home',
     component: StudentHome,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       roles: ['student'],
     },
   },
@@ -41,7 +41,7 @@ const studentRoutes = [
     name: 'My Articles',
     component: MyArticles,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       roles: ['student'],
     },
   },
@@ -50,7 +50,7 @@ const studentRoutes = [
     name: 'Draft Articles',
     component: DraftArticles,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       roles: ['student'],
     },
   },
@@ -62,14 +62,16 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
+      // requiresAuth: true,
       roles: ['Marketing Coordinator'],
     },
   },
   {
     path: '/coordinator/articles',
-    name: 'Articles',
+    name: 'Coordinator Articles',
     component: CoordinatorArticles,
     meta: {
+      // requiresAuth: true,
       roles: ['Marketing Coordinator'],
     },
   },
@@ -100,7 +102,7 @@ const commomRoutes = [
     name: 'getArticleDetails',
     component: ArticleDetails,
     meta: {
-      requiresAuth: true,
+      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator'],
     },
   },
@@ -109,6 +111,7 @@ const commomRoutes = [
     name: 'Notification',
     component: Notification,
     meta: {
+      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator'],
     },
   },
@@ -117,6 +120,7 @@ const commomRoutes = [
     name: 'Settings',
     component: Settings,
     meta: {
+      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
     },
   },

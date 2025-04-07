@@ -3,13 +3,7 @@ import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
 import { getAllArticles, getArticles } from '@/api/coordinator'
-import type {
-  Article,
-  CoordinatorArticles,
-  CoordinatorArticle,
-  CountData,
-  GuestList,
-} from '@/types/coordinator'
+import type { Article, CoordinatorArticles, CountData, GuestList } from '@/types/coordinator'
 
 export const useCoordinatorStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)

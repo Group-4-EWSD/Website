@@ -1,9 +1,4 @@
-import type {
-  Article,
-  ArticleParams,
-  ArticleResponse,
-  CoordinatorArticles,
-} from '@/types/coordinator'
+import type { ArticleParams, ArticleResponse, CoordinatorArticles } from '@/types/coordinator'
 
 import api from './axios'
 

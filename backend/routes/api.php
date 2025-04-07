@@ -36,9 +36,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
         Route::get('/coordinator', [ArticleController::class, 'coordinatorArticles']); // Get all articles
         Route::get('/manager', [ArticleController::class, 'managerArticles']); // Get all articles
-        Route::get('/artilcle-list', [ArticleController::class, 'articleList']); // Get all articles
+        Route::get('/article-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
-        Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
+        Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']); // Single Article Download
+        Route::get('/download', [ArticleController::class, 'articleDownload']); // Multiple Article Download
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
         Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
@@ -53,7 +54,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Category routes
     Route::get('/item-list', [ArticleController::class, 'getItemList']);
 
-    // User routes
+    // User routes 
     Route::prefix('/user')->group(function () {
         Route::post('/update-photo', [UserController::class, 'updateUserPhoto']);
         Route::get('/get-photo', [UserController::class, 'getUserPhoto']);

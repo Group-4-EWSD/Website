@@ -92,32 +92,39 @@ class ArticleService
             'actualUploadDeadline' => $deadlines->actual_submission_date,
             'countData' => $countData,
             'latestArticles' => $latestArticles,
-            'myArticles' => $myArticles->get()
+            'myArticles' => $myArticles->get(),
+            'myArticlesCount' => $myArticles->count()
         ];
     }
 
     public function getCoordinatorArticles($facultyId, $request)
     {
         $countData = $this->articleRepository->getCoordinatorCountData($facultyId);
-        $articles = $this->articleRepository->getAllArticles(3, $facultyId, $request)->orderBy('created_at', 'desc')->get();
+        $articles = $this->articleRepository->getAllArticles(3, $facultyId, $request)->orderBy('created_at', 'desc');
         return [
             'totalSubmissions' => $countData['totalSubmissions'], // Correct array access
             'pendingReview' => $countData['pendingReview'],
             'approvedArticles' => $countData['approvedArticles'],
             'rejectedArticles' => $countData['rejectedArticles'],
-            'articles' => $articles
+            'articles' => $articles->get(),
+            'articlesCount' => $articles->count(),
         ];
     }
 
     public function getManagerArticles($request)
     {
-        return $this->articleRepository->getAllArticles(4, $request)->orderBy('created_at', 'desc')->get();
+        $articles = $this->articleRepository->getAllArticles(4, $request)->orderBy('created_at', 'desc');
+        return [
+            'articles' => $articles->get(),
+            'articlesCount' => $articles->count(),
+        ];
     }
 
     public function getArticleList($user_id, $faculty_id, $request){
         return [
             'countData' => $this->articleRepository->getCountDataByFaculty($faculty_id),
-            'articleList' => $this->articleRepository->getAllArticles(3, $faculty_id, $request),
+            'articleList' => $this->articleRepository->getAllArticles(3, $faculty_id, $request)->get(),
+            'articleListCount' => $this->articleRepository->getAllArticles(3, $faculty_id, $request)->count(),
         ];
     }
 
@@ -194,11 +201,15 @@ class ArticleService
     }
 
     public function draftArticleList($userId){
-        return $this->articleRepository->getAllArticles(2, $userId)->get();
+        $articles = $this->articleRepository->getAllArticles(2, $userId);
+        return [
+            'draftArticles' => $articles->get(),
+            'draftArticlesCount' => $articles->count()
+        ];
     }
 
-    public function getFileList($articleId){
-        return $this->articleRepository->getFileList($articleId);
+    public function getFileList($articleId, $request){
+        return $this->articleRepository->getFileList($articleId, $request);
     }
 
     public function getItemList($item){

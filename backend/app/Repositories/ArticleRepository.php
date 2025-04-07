@@ -214,11 +214,12 @@ class ArticleRepository
                 'u.gender',
                 'art.created_at',
                 'art.updated_at',
+                'sd.actual_submission_date as submission_deadline',
                 DB::raw("(SELECT MIN(avt.created_at) FROM activities avt WHERE avt.article_id = art.article_id AND avt.article_status != 0) AS submission_date"),
                 DB::raw("(SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) AS status"),
                 DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id) AS view_count"),
                 DB::raw("(SELECT COUNT(*) FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1) AS like_count"),
-                DB::raw("(SELECT COUNT(*) FROM comments cmmt WHERE cmmt.article_id = art.article_id ) AS comment_count")
+                DB::raw("(SELECT COUNT(*) FROM comments cmmt WHERE cmmt.article_id = art.article_id ) AS comment_count"),
             ])
             ->join('users as u', 'u.id', '=', 'art.user_id')
             ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
@@ -263,17 +264,43 @@ class ArticleRepository
                 }
             }
         }
-        if ($state == 3 || $state == 4) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4
-            $articles->addSelect(DB::raw("
-                CASE 
-                    WHEN (SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
-                    THEN (SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) 
-                    ELSE NULL 
-                END AS reject_reason
-            "));
-            if($state == 3){ // Only for coordinator 3
+        if ($state == 3 || $state == 4 || $state == 0) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4
+            if($state != 0){
+                $articles->addSelect(DB::raw("
+                    CASE 
+                        WHEN (SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
+                        THEN (SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) 
+                        ELSE NULL 
+                    END AS reject_reason
+                "));
+            }
+            
+            if ($state == 3 || $state == 0) {
+                // 1: Feedback within 14 days, 2: Feedback after 14 days, 3: No feedback
+                $articles->addSelect(DB::raw("
+                    CASE 
+                        WHEN EXISTS (
+                            SELECT 1 
+                            FROM feedbacks fb 
+                            WHERE fb.article_id = art.article_id
+                        ) THEN (
+                            CASE 
+                                WHEN (
+                                    SELECT fb.created_at 
+                                    FROM feedbacks fb 
+                                    WHERE fb.article_id = art.article_id 
+                                    ORDER BY fb.created_at DESC 
+                                    LIMIT 1
+                                ) <= DATE_ADD(art.created_at, INTERVAL 14 DAY) 
+                                THEN 1
+                                ELSE 2
+                            END
+                        )
+                        ELSE 0
+                    END AS feedback_status
+                "));
                 $articles->where('sd.faculty_id', '=', $primaryKey);
-            }else{
+            } else {
                 $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
                 $articles->havingRaw("status = 4");
             }
@@ -374,9 +401,20 @@ class ArticleRepository
         return $deadlines;
     }
 
-    public function getFileList($articleId)
+    public function getFileList($articleId, $request)
     {
-        $files = ArticleDetail::where('article_id', $articleId)->get();
+        $files = DB::table('article_details ad')->select('ad.file_path');
+        if(!empty($articleId)){
+            $files = $files->where('article_id', $articleId)->get();
+        }else if(!empty($request->articleIdList)|| !empty($request->academicYear)){
+            if(!empty($request->articleIdList)){
+                $files = $files->where('article_id', 'in' , $request->articleIdList)->get();
+            } else if (!empty($request->academicYear)){
+                $files = $files->join('system_datas sd', 'sd.system_id', 'ad.system_id')
+                        ->join('academic_years ay','ay.academic_year_id', 'sd.academic_year_id')
+                        ->where('ay.academic_year_id','=',$request->academicYearId);
+            }
+        }
         return $files ?: []; // Ensures an empty array if no files found
     }
 

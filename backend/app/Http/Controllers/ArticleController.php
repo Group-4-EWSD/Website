@@ -178,9 +178,9 @@ class ArticleController extends Controller
         return response()->json($articles);
     }
 
-    public function articleDownload($articleId)
+    public function articleDownload($articleId = null, Request $request)
     {
-        $articleFileList = $this->articleService->getFileList($articleId);
+        $articleFileList = $this->articleService->getFileList($articleId, $request);
         if (!empty($articleFileList)) {
             return $this->fileService->downloadMultipleAsZip($articleFileList);
         }

@@ -84,11 +84,12 @@ class SystemDataRepository
         return $query->exists();
     }
 
-    public function updateSysData($systemId, array $data)
+    public function updateSysData($systemId, $data)
     {
-        return DB::table('system_datas')
+        DB::table('system_datas')
             ->where('system_id', $systemId)
             ->update($data);
+        return $this->byidSysData($systemId);
     }
     
     public function getById($systemId)

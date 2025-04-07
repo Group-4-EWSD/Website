@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User; 
 use App\Services\UserService;
+use App\Repositories\UserRepository;
 // use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,11 +12,13 @@ use Illuminate\Support\Facades\Auth;
 class UserController extends Controller
 {
     protected $userService;
+    protected $userRepository;
     // protected $fileService;
 
-    public function __construct(UserService $userService)//, FileService $fileService)
+    public function __construct(UserService $userService, UserRepository $userRepository)//, FileService $fileService)
     {
         $this->userService = $userService;
+        $this->userRepository = $userRepository;
         // $this->fileService = $fileService;
     }
     /**
@@ -155,7 +158,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user' => $data
+            'updated_user' => $updatedUser
         ], 200);
     }    
     
@@ -166,7 +169,6 @@ class UserController extends Controller
                 'id'   => 'required|string|exists:users,id',
                 'user_name' => 'sometimes|string|max:255',
                 'nickname' => 'sometimes|string|max:255',
-                // 'user_email' => 'sometimes|email',
                 'user_type_id' => 'sometimes|uuid|exists:user_types,user_type_id',
                 'faculty_id'   => 'sometimes|uuid|exists:faculties,faculty_id',
                 'gender' => 'sometimes|in:1,2',
@@ -178,7 +180,7 @@ class UserController extends Controller
 
             return response()->json([
                 'message' => 'Profile updated successfully',
-                'user' => $data
+                'updated_user' => $updatedUser
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -188,21 +190,28 @@ class UserController extends Controller
         }
     }
 
-    public function updatePassword(Request $request): JsonResponse
+    public function updatePassword(Request $request)
     {
-        $userId = Auth::id();
+        try {
+            $userId = Auth::id();
 
-        $data = $request->validate([
-            'user_password' => 'required|string|min:8|confirmed',
-        ]);
+            $data = $request->validate([
+                'user_password' => 'required|string|min:8|confirmed',
+            ]);
 
-        $data['user_password'] = bcrypt($data['user_password']);
-        $updatedUser = $this->userService->updateUserProfile($userId, $data);
+            $data['user_password'] = bcrypt($data['user_password']);
+            $updatedUser = $this->userService->updateUserProfile($userId, $data);
 
-        return response()->json([
-            'message' => 'Password updated successfully',
-            'user' => $updatedUser
-        ], 200);
+            return response()->json([
+                'message' => 'Password updated successfully',
+                'user' => $updatedUser
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getActiveUserList(Request $request){
@@ -279,5 +288,12 @@ class UserController extends Controller
         $userId = Auth::id();
         
         return response()->json(['latest login time' => $this->userService->userLastLogin($userId)]);
+    }
+
+    public function getUserById($userId)
+    {
+        $result = $this->userRepository->getUserById($userId);
+
+        return response()->json($result);
     }
 }

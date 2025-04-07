@@ -61,7 +61,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
         Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getActiveUserList']);
-        Route::patch('/update-password', [UserController::class, 'updatePassword']);
+        Route::post('/update-password', [UserController::class, 'updatePassword']);
         Route::get('/user-last-login', [UserController::class, 'userLastLogin']);
         // Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
@@ -75,20 +75,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/get-all-faculties', [FacultyController::class, 'listAllFaculties']);
         Route::get('/get-faculty-byID/{faculty_id}', [FacultyController::class, 'selectFacultyByID']);
         Route::post('/create', [FacultyController::class, 'createFaculty']);
-        Route::patch('/update', [FacultyController::class, 'updateFaculty']);
+        Route::post('/update', [FacultyController::class, 'updateFaculty']);
     });
 
     Route::post('/user-create', [UserController::class, 'userRegister']);
     Route::get('/all-user-list', [UserController::class, 'getUserList']);
     Route::get('/get-user-bytype/{user_type}', [UserController::class, 'getUserListByType']);
     Route::post('/password-reset', [UserController::class, 'resetPassword']);
-    Route::patch('/edit-user', [UserController::class, 'editUser']);
+    Route::post('/edit-user', [UserController::class, 'editUser']);
+    Route::get('/get-user-by-id/{userId}', [UserController::class, 'getUserById']);
 
     Route::prefix('/academic-years')->group(function(){
         Route::get('/get-all-academic-years', [AcademicYearController::class, 'getAllAcademicYears']);
         Route::get('/get-byid-academic-years/{academicYearId}', [AcademicYearController::class, 'getAcademicYearById']);
         Route::post('/create', [AcademicYearController::class, 'createAcademicYear']);
-        Route::patch('/update', [AcademicYearController::class, 'updateAcademicYear']);
+        Route::post('/update', [AcademicYearController::class, 'updateAcademicYear']);
     });
 
     Route::prefix('/system-data')->group(function(){
@@ -96,7 +97,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/byid-system-data/{system_data_id}', [SystemDataController::class, 'byidSysData']);
         Route::get('/byfaculty_system-data/{faculty_id}', [SystemDataController::class, 'byFacSysData']);
         Route::post('/create', [SystemDataController::class, 'createSysData']);
-        Route::patch('/update', [SystemDataController::class, 'updateSysData']);
+        Route::post('/update', [SystemDataController::class, 'updateSysData']);
     });
     Route::post('upload', [FileController::class, 'upload']);
     Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);

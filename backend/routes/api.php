@@ -81,7 +81,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/user-create', [UserController::class, 'userRegister']);
     Route::get('/all-user-list', [UserController::class, 'getUserList']);
     Route::get('/get-user-bytype/{user_type}', [UserController::class, 'getUserListByType']);
-    Route::get('/password-reset/{user_id}', [UserController::class, 'resetPassword']);
+    Route::post('/password-reset', [UserController::class, 'resetPassword']);
+    Route::patch('/edit-user', [UserController::class, 'editUser']);
 
     Route::prefix('/academic-years')->group(function(){
         Route::get('/get-all-academic-years', [AcademicYearController::class, 'getAllAcademicYears']);

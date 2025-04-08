@@ -45,14 +45,24 @@ class UserRepository
 
     public function getUserById($id)
     {
-        return User::findOrFail($id);
+        return DB::table('users')
+            ->where('id', $id)
+            ->first();
     }
 
-    public function updateUser($id, array $data)
+    public function updateUser($id, $data)
     {
         $user = User::findOrFail($id);
         $user->update($data);
-        return $user;
+        return $this->getUserById($id);
+    }
+
+    public function editUser($data)
+    {
+        $user = User::findorFail($data['id']);
+        $user->update($data);
+        $return = $this->getUserById($data['id']);
+        return $return;
     }
 
     public function findById(string $id): ?User
@@ -300,4 +310,11 @@ class UserRepository
     
         return $lastLogin->login_datetime;
     }       
+
+    public function userRepository($userId)
+    {
+        return DB::table('users')
+            ->where('user_id', $userId)
+            ->first();
+    }
 }

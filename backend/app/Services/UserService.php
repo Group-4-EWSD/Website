@@ -133,6 +133,11 @@ class UserService
         return $this->userRepository->updateUser($id, $data);
     }
 
+    public function editUser($data)
+    {
+        return $this->userRepository->editUser($data);
+    }
+
     public function getActiveUserList($request= null){
         return $this->userRepository->getActiveUserList($request);
     }
@@ -155,7 +160,7 @@ class UserService
             return false;
         }
 
-        $newPassword = 'password123';
+        $newPassword = Str::random(12);
         $hashedPassword = Hash::make($newPassword);
 
         $this->userRepository->updatePassword($userId, $hashedPassword);

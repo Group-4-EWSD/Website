@@ -11,7 +11,8 @@ class FacultyRepository
     public function getfacultyList(){
         return Faculty::select('faculties.*')
             ->selectRaw('COUNT(articles.article_id) AS articleCount')
-            ->join('articles', 'faculties.faculty_id', '=', 'articles.facultyId')
+            ->join('system_datas', 'system_datas.faculty_id', '=', 'faculties.faculty_id')
+            ->join('articles', 'system_datas.system_id', '=', 'articles.system_id')
             ->groupBy('faculties.faculty_id')
             ->get();
     }

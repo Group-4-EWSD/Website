@@ -29,3 +29,14 @@ export interface SubmissionDateParams {
 export interface SubmissionDateUpdateParams extends SubmissionDateParams {
   system_id: string
 }
+
+export interface ContactUsInfo { 
+  contact_us_id: string
+  visitor_name: string
+  visitor_email: string
+  title: string
+  description: string
+  read: number
+  created_at: string
+  updated_at: string
+}

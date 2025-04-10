@@ -25,12 +25,15 @@ import { useArticleStore } from '@/stores/manager-articles'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'vue-sonner'
+import { downloadArticles } from '@/api/articles'
 
 // Store for persisting state across page visits
 const articleStore = useArticleStore()
 const selectedAcademicYearId = ref('')
 const articleTitle = ref('')
 const displayNumber = ref<number>(10)
+const downloadingArticles = ref(false)
 
 // Selection functionality
 const selectedArticles = ref<string[]>([])
@@ -85,7 +88,32 @@ const isArticleSelected = (articleId: string) => {
 
 // Download selected articles
 const downloadSelectedArticles = () => {
-  console.log('Downloading articles:', selectedArticles.value)
+  if (selectedArticles.value.length === 0) {
+    toast.error('Please select at least one article to download.')
+    return
+  }
+  downloadingArticles.value = true
+  downloadArticles(selectedArticles.value)
+    .then((res) => {
+      // download from link
+      const url = res.data.url
+      const link = document.createElement('a')
+      link.href = url
+      link.download = res.data.filename || 'articles.zip'
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link) 
+
+      toast.success('Download started. Check your downloads folder.')
+      selectedArticles.value = []
+    })
+    .catch((error) => {
+      toast.error('Error downloading articles: ' + error.message)
+    })
+    .finally(() => {
+      downloadingArticles.value = false
+    })
 }
 
 const goToPage = (page: number) => {
@@ -256,10 +284,7 @@ watchEffect(() => {
             </span>
           </div>
 
-          <Select
-            v-model="selectedAcademicYearId"
-            @update:modelValue="handleAcademicYearChange"
-          >
+          <Select v-model="selectedAcademicYearId" @update:modelValue="handleAcademicYearChange">
             <SelectTrigger class="w-full md:min-w-[300px] md:max-w-md">
               <SelectValue placeholder="All Academic Years" />
             </SelectTrigger>

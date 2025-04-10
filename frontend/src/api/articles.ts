@@ -78,3 +78,7 @@ export const getCategories = async (): Promise<Category[]> => {
 export const updateStatus = async (status: number, articleId: string) => {
   return await api.post(`articles/change-status/${articleId}`, status)
 }
+
+export const downloadArticles = async (articleIds: string[]) => {
+  return await api.post(`articles/download`, articleIds)
+}

@@ -32,11 +32,11 @@ class ArticleService
         $this->notificationRepository = $notificationRepository;
     }
 
-    public function getGuestHomePageData($userId){
+    public function getGuestHomePageData($userId, $request){
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),
             // 'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
-            'allArticles' => $this->articleRepository->getAllArticles(4)->get(),
+            'allArticles' => $this->articleRepository->getAllArticles(4, null, $request)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'facultyList' => $this->facultyRepository->getfacultyList(),
             'publishedList' => $this->articleRepository->getPublishedList()
@@ -57,7 +57,7 @@ class ArticleService
             'remaining_final_publish' => $this->articleRepository->getRemainingFinalPublish($facultyId),
             'current_system_data' => $this->articleRepository->getCurrentSystemData($facultyId),
             'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData($facultyId),
-            'allArticles' => $this->articleRepository->getAllArticles(3, $request)->get(),
+            'allArticles' => $this->articleRepository->getAllArticles(3, null, $request)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear($facultyId),
             'guestList' => $this->userRepository->getGuestList()
         ];
@@ -73,8 +73,6 @@ class ArticleService
     }
     public function getAdminReports(){
         return [
-            'allArticles' => $this->articleRepository->getAllArticles(4)->get(),
-            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'mostViewedPages' => $this->userRepository->getMostViewedPageVisit(),
             'activeUserList' => $this->userRepository->getActiveUserList(null),
             'browserList' => $this->userRepository->getMostUsedBrowserList()
@@ -86,45 +84,51 @@ class ArticleService
         $deadlines = $this->articleRepository->getDeadlines($facultyId);
         $countData = $this->articleRepository->getStudentHomeCountData();
         $myArticles = $this->articleRepository->getAllArticles(1,$userId, $request);
-        $latestArticles = $myArticles->orderBy('created_at', 'desc')->take(3)->get();
+        $myArticlesList = $this->articleRepository->limitArticleList($request,$myArticles)->orderBy('art.created_at', 'desc')->get();
+        $latestArticles = $myArticles->orderBy('art.created_at', 'desc')->take(3)->get();
         return [
             'preUploadDeadline' => $deadlines->pre_submission_date,
             'actualUploadDeadline' => $deadlines->actual_submission_date,
             'countData' => $countData,
             'latestArticles' => $latestArticles,
-            'myArticles' => $myArticles->get(),
-            'myArticlesCount' => $myArticles->count()
+            'myArticles' => $myArticlesList,
+            'myArticlesCount' => $myArticles->get()->count()
         ];
     }
 
     public function getCoordinatorArticles($facultyId, $request)
     {
         $countData = $this->articleRepository->getCoordinatorCountData($facultyId);
-        $articles = $this->articleRepository->getAllArticles(3, $facultyId, $request)->orderBy('created_at', 'desc');
+        $articles = $this->articleRepository->getAllArticles(3, $facultyId, $request);
+        // dd($articles->get()->count());
+        $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
         return [
             'totalSubmissions' => $countData['totalSubmissions'], // Correct array access
             'pendingReview' => $countData['pendingReview'],
             'approvedArticles' => $countData['approvedArticles'],
             'rejectedArticles' => $countData['rejectedArticles'],
-            'articles' => $articles->get(),
-            'articlesCount' => $articles->count(),
+            'articlesCount' => $articles->get()->count(),
+            'articles' => $articleList,
         ];
     }
 
     public function getManagerArticles($request)
     {
-        $articles = $this->articleRepository->getAllArticles(4, $request)->orderBy('created_at', 'desc');
+        $articles = $this->articleRepository->getAllArticles(4, null, $request);
+        $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
         return [
-            'articles' => $articles->get(),
-            'articlesCount' => $articles->count(),
+            'articles' => $articleList,
+            'articlesCount' => $articles->get()->count(),
         ];
     }
 
     public function getArticleList($user_id, $faculty_id, $request){
+        $articles = $this->articleRepository->getAllArticles(3, $faculty_id, $request);
+        $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
         return [
             'countData' => $this->articleRepository->getCountDataByFaculty($faculty_id),
-            'articleList' => $this->articleRepository->getAllArticles(3, $faculty_id, $request)->get(),
-            'articleListCount' => $this->articleRepository->getAllArticles(3, $faculty_id, $request)->count(),
+            'articleList' => $articleList,
+            'articleListCount' => $articles->get()->count(),
         ];
     }
 
@@ -204,7 +208,7 @@ class ArticleService
         $articles = $this->articleRepository->getAllArticles(2, $userId);
         return [
             'draftArticles' => $articles->get(),
-            'draftArticlesCount' => $articles->count()
+            'draftArticlesCount' => $articles->get()->count()
         ];
     }
 

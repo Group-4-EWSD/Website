@@ -151,9 +151,44 @@ class ArticleRepository
 
         $results = $query->first();
 
+        // reject ratio
+        $subquery = DB::table('activities as act')
+            ->select('act.article_id', 'ay.academic_year_start')
+            ->join('articles as art', 'art.article_id', '=', 'act.article_id')
+            ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
+            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->join(DB::raw('(
+                SELECT article_id, MAX(created_at) as latest_created
+                FROM activities
+                GROUP BY article_id
+            ) as latest_act'), function ($join) {
+                $join->on('latest_act.article_id', '=', 'act.article_id')
+                    ->on('latest_act.latest_created', '=', 'act.created_at');
+            })
+            ->where('act.article_status', 3)
+            ->whereIn('ay.academic_year_start', [$currentYear, $lastYear]);
+
+        if ($facultyId !== null) {
+            $subquery->where('sd.faculty_id', $facultyId);
+        }
+
+        $result = DB::table(DB::raw("({$subquery->toSql()}) as sub"))
+            ->mergeBindings($subquery)
+            ->selectRaw("
+                COUNT(CASE WHEN academic_year_start = ? THEN 1 END) as count_current_year,
+                COUNT(CASE WHEN academic_year_start = ? THEN 1 END) as count_last_year
+            ", [$currentYear, $lastYear])
+            ->first();
+        $finalResults['deri_reject_ratio'] = ($result->count_last_year > 0)
+            ? ($result->count_current_year / $result->count_last_year) * 100
+            : 0;
+        $finalResults['deri_reject_ratio'] = number_format($finalResults['deri_reject_ratio'], 2);
+        $finalResults['deri_participate_rate'] = number_format($results->deri_participate_rate, 2);
+
         // Convert object to array and add the derived field
         $finalResults = (array) $results;
-        $finalResults['deriActiveUser'] = $deriActiveUser;
+        $finalResults['deri_active_user'] = $deriActiveUser;
+        $finalResults['deri_active_user'] = number_format($finalResults['deri_active_user'], 2);
 
         return $finalResults;
     }
@@ -265,7 +300,7 @@ class ArticleRepository
             }
         }
         if ($state == 3 || $state == 4 || $state == 0) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4
-            if($state != 0){
+            if ($state != 0) {
                 $articles->addSelect(DB::raw("
                     CASE 
                         WHEN (SELECT act.article_status FROM activities act WHERE act.article_id = art.article_id ORDER BY act.created_at DESC LIMIT 1) = 3 
@@ -274,7 +309,7 @@ class ArticleRepository
                     END AS reject_reason
                 "));
             }
-            
+
             if ($state == 3 || $state == 0) {
                 // 1: Feedback within 14 days, 2: Feedback after 14 days, 3: No feedback
                 $articles->addSelect(DB::raw("
@@ -339,19 +374,24 @@ class ArticleRepository
             $articles->orderBy('art.created_at', 'desc');
         }
 
+        return $articles;
+    }
+
+    public function limitArticleList($request, $articles){
         // Apply LIMIT only if `displayNumber` is set
+        $articleList = clone $articles;
         if (!empty($request->displayNumber)) {
             if ($request->displayNumber > 0) {
-                $articles->limit($request->displayNumber);
+                $articleList->limit($request->displayNumber);
 
                 // Apply OFFSET only if `pageNumber` > 1
                 if ($request->pageNumber > 1) {
                     $offset = ($request->pageNumber - 1) * $request->displayNumber;
-                    $articles->offset($offset);
+                    $articleList->offset($offset);
                 }
             }
         }
-        return $articles;
+        return $articleList;
     }
 
     public function getArticlePerYear($facultyId = null)
@@ -359,7 +399,7 @@ class ArticleRepository
         $articlePerYear = DB::table('articles as a')
             ->select([
                 DB::raw('COUNT(a.article_id) as article_count'),
-                DB::raw("CONCAT(ay.academic_year_start, '-', ay.academic_year_end) as academic_year")
+                DB::raw("ay.academic_year_start as academic_year")
             ])
             ->join('users as u', 'u.id', '=', 'a.user_id')
             ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
@@ -404,15 +444,15 @@ class ArticleRepository
     public function getFileList($articleId, $request)
     {
         $files = DB::table('article_details ad')->select('ad.file_path');
-        if(!empty($articleId)){
+        if (!empty($articleId)) {
             $files = $files->where('article_id', $articleId)->get();
-        }else if(!empty($request->articleIdList)|| !empty($request->academicYear)){
-            if(!empty($request->articleIdList)){
-                $files = $files->where('article_id', 'in' , $request->articleIdList)->get();
-            } else if (!empty($request->academicYear)){
+        } else if (!empty($request->articleIdList) || !empty($request->academicYear)) {
+            if (!empty($request->articleIdList)) {
+                $files = $files->where('article_id', 'in', $request->articleIdList)->get();
+            } else if (!empty($request->academicYear)) {
                 $files = $files->join('system_datas sd', 'sd.system_id', 'ad.system_id')
-                        ->join('academic_years ay','ay.academic_year_id', 'sd.academic_year_id')
-                        ->where('ay.academic_year_id','=',$request->academicYearId);
+                    ->join('academic_years ay', 'ay.academic_year_id', 'sd.academic_year_id')
+                    ->where('ay.academic_year_id', '=', $request->academicYearId);
             }
         }
         return $files ?: []; // Ensures an empty array if no files found
@@ -448,7 +488,8 @@ class ArticleRepository
             ->first();
     }
 
-    public function getPreviousLogin($userId){
+    public function getPreviousLogin($userId)
+    {
         $prevLogin = DB::table('login_histories')
             ->where('user_id', $userId)
             ->orderByDesc('login_datetime')
@@ -460,7 +501,7 @@ class ArticleRepository
     public function getCurrentSystemData($facultyId)
     {
         $currentYear = date('Y');
-        
+
         $systemData = DB::table('system_datas as sd')
             ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
             ->where('ay.academic_year_start', '=', $currentYear)
@@ -471,12 +512,13 @@ class ArticleRepository
     }
 
 
-    public function getSubmissionStatus($facultyId){
+    public function getSubmissionStatus($facultyId)
+    {
         // Get the system data
         $systemData = $this->getCurrentSystemData($facultyId);
         // Get today's date
         $today = Carbon::today(); // Carbon instance of today's date
-    
+
         // Assuming the system data contains the correct date format for comparison (Y-m-d or any standard format)
         if ($today->lt($systemData->pre_submission_date)) {
             return '0'; // Before Pre Submission
@@ -487,25 +529,27 @@ class ArticleRepository
         }
     }
 
-    public function getRemainingFinalPublish($facultyId){
+    public function getRemainingFinalPublish($facultyId)
+    {
         // Get the system data
         $systemData = $this->getCurrentSystemData($facultyId);
-    
+
         // Get today's date
         $today = Carbon::today(); // Carbon instance of today's date
-    
+
         // Check if today is before the final submission date
         if ($today->lt($systemData->actual_submission_date)) {
             // Calculate the difference between today and the final submission date
             $remainingTime = $today->diffInDays($systemData->actual_submission_date);
-    
+
             return $remainingTime; // Return the remaining days
         }
-    
+
         return '0'; // Return '0' if the final submission date has passed
     }
 
-    public function getPublishedList(){
+    public function getPublishedList()
+    {
         $publishedList = DB::table('articles')
             ->join('activities', 'articles.article_id', '=', 'activities.article_id')
             ->join('system_datas', 'articles.system_id', '=', 'system_datas.system_id')
@@ -517,5 +561,4 @@ class ArticleRepository
 
         return $publishedList;
     }
-
 }

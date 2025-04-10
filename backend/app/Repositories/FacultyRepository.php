@@ -35,19 +35,10 @@ class FacultyRepository
             ->first();
 
         if (!$faculty) {
-            return response()->json([
-                'message' => 'Faculty not found'
-            ], 404);
+            return false;
         }
 
-
-        $updatedAt = $faculty->updated_at; 
-
-        return response()->json([
-            'faculty_id' => $faculty->faculty_id,
-            'faculty_name' => $faculty->faculty_name,
-            'updated_at' => $updatedAt
-        ]);
+        return $faculty;
     }
 
     public function createFaculty($data)
@@ -76,13 +67,15 @@ class FacultyRepository
                 return false;
             }
 
-            return DB::table('faculties')
+            DB::table('faculties')
                 ->where('faculty_id', $data['faculty_id'])
                 ->update([
                     'faculty_name' => $data['faculty_name'] ?? $existing->faculty_name,
                     'remark'       => $data['remark'] ?? $existing->remark,
                     'updated_at'   => now(),
                 ]);
+
+            return $this->selectFacultyByID($data['faculty_id']);
         });
     }  
 }

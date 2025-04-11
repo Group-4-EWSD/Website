@@ -33,6 +33,6 @@ class ContactUsController extends Controller
     }
 
     public function getContactUsList(){
-        return response()->json([$this->contactUsService->getContactUsList()]);
+        return response()->json($this->contactUsService->getContactUsList());
     }
 }

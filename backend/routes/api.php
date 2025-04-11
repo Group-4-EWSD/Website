@@ -102,10 +102,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('upload', [FileController::class, 'upload']);
     Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 
-    Route::get('/contact-us/get-all-list', [ContactUsController::class, 'getContactUsList']);
+    Route::prefix('/contact-us')->group(function(){
+        Route::get('/get-all-list', [ContactUsController::class, 'getContactUsList']);
+        Route::post('/create', [ContactUsController::class, 'createContactUs']);
+    });
 });
-Route::post('/contact-us/create', [ContactUsController::class, 'createContactUs']);
-
 // Unnecessory, Just for testing
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
 Route::post('/list-file', [FileController::class, 'listFiles']); // New route

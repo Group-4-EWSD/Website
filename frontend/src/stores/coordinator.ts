@@ -3,12 +3,19 @@ import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
 import { getAllArticles, getArticles } from '@/api/coordinator'
-import type { Article, CoordinatorArticles, CountData, GuestList } from '@/types/coordinator'
+import type {
+  Article,
+  ChartData,
+  CoordinatorArticles,
+  CountData,
+  GuestList,
+} from '@/types/coordinator'
 
 export const useCoordinatorStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)
   const articles = ref<Article[]>([])
   const guestList = ref<GuestList[]>([])
+  const chartData = ref<ChartData[]>([])
   const prevLogin = ref('')
   const publicDate = ref(0)
 
@@ -34,6 +41,7 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
         guestList.value = response.guestList
         prevLogin.value = response.prev_login
         publicDate.value = response.remaining_final_publish
+        chartData.value = response.articlesPerYear
 
         isLoading.value = false
       })
@@ -71,6 +79,7 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
 
   return {
     countData,
+    chartData,
     guestList,
     articles,
     prevLogin,

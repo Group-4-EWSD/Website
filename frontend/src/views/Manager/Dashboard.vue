@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
-import { ref } from 'vue'
 
 import ArticleChart from '@/components/pagespecific/coordinator-home/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
@@ -8,15 +7,14 @@ import AuroraMembers from '@/components/pagespecific/manager-dashboard/AuroraMem
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import { useManagerStore } from '@/stores/manager'
+import { onMounted } from 'vue'
 
-const daysLeft = ref(4)
 const managerStore = useManagerStore()
 
-const articleStats = [
-  { label1: 'Total Articles', value1: '132 nos', label2: 'Published Articles', value2: '100 nos' },
-  { label1: 'Reviewed Articles', value1: '32 nos', label2: 'Approved', value2: '100 nos' },
-  { label1: 'Pending Review', value1: '100 nos', label2: 'Reject', value2: '32 nos' },
-]
+onMounted(() => {
+  managerStore.fetchDashboardData()
+  console.log(managerStore.chartData)
+})
 </script>
 
 <template>
@@ -101,12 +99,13 @@ const articleStats = [
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <ArticleChart />
-        </div>
-        <div>
-          <GuestListTable :guests="managerStore.guestList" :isLoading="managerStore.isLoading" />
-        </div>
+        <ArticleChart :data="managerStore.chartData" class="h-full" />
+
+        <GuestListTable
+          :guests="managerStore.guestList"
+          :isLoading="managerStore.isLoading"
+          class="h-full"
+        />
       </div>
       <div>
         <AuroraMembers :members="managerStore.members" :isLoading="managerStore.isLoading" />

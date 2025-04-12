@@ -9,7 +9,7 @@ export const useManagerStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)
   const members = ref<AuroraMember[]>([])
   const guestList = ref<GuestList[]>([])
-  const chartData = ref<ChartData>()
+  const chartData = ref<ChartData[]>([])
   const prevLogin = ref('')
 
   const isLoading = ref(false)
@@ -39,6 +39,7 @@ export const useManagerStore = defineStore('coordinator-article', () => {
 
   return {
     countData,
+    chartData,
     guestList,
     members,
     prevLogin,

@@ -88,7 +88,7 @@ const managerRoutes = [
   },
   {
     path: '/manager/articles',
-    name: 'Articles',
+    name: 'Manager Articles',
     component: ManagerArticles,
     meta: {
       roles: ['Marketing Manager'],
@@ -112,7 +112,7 @@ const commomRoutes = [
     component: Notification,
     meta: {
       // requiresAuth: true,
-      roles: ['Student', 'Marketing Coordinator'],
+      roles: ['Student', 'Marketing Coordinator', 'Marketing Manager'],
     },
   },
   {

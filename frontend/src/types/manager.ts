@@ -3,7 +3,7 @@ export interface DashboardParams {}
 export interface DashboardResponse {
   prev_login: string
   countData: CountData
-  articlesPerYear: ChartData
+  articlesPerYear: ChartData[]
   guestList: GuestList[]
   memberList: AuroraMember[]
 }
@@ -21,8 +21,8 @@ export interface CountData {
 }
 
 export interface ChartData {
-  article_count: []
-  academic_year: []
+  article_count: number
+  academic_year: string
 }
 
 export interface AuroraMember {

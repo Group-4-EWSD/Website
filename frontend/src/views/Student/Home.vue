@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 import { onMounted, ref, watch } from 'vue'
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getArticles } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -33,7 +31,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
 import type { Article } from '@/types/article'
-
 
 const router = useRouter()
 const articleStore = useArticleStore()

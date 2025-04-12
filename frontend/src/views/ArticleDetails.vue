@@ -20,6 +20,7 @@ import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUserStore } from '@/stores/user'
 import type { ArticleResponse } from '@/types/article'
+import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -95,7 +96,7 @@ const addComment = () => {
   }
 }
 
-const addFeedback = () => {
+const addFeedback = async () => {
   if (newFeedback.value.trim()) {
     feedbacks.value.push({
       id: Date.now(),
@@ -109,7 +110,7 @@ const addFeedback = () => {
         articleId: articleId.value,
         message: newFeedback.value,
       }
-      createFeedback(params.value)
+      await createFeedback(params.value)
     } catch (error) {
       console.error('Error updating notification:', error)
       toast.error('Failed to comment')
@@ -130,10 +131,40 @@ onMounted(() => {
     userStore.currentUser?.user_type_name === 'Marketing Coordinator' ? 'feedbacks' : 'comments'
 })
 
-const handleApprove = async () => {
+const showFeedbackModal = ref(false)
+const feedbackAction = ref<'approve' | 'reject' | null>(null)
+
+const triggerFeedback = (action: 'approve' | 'reject') => {
+  feedbackAction.value = action
+  showFeedbackModal.value = true
+}
+
+const handleFeedbackSubmit = (text: string) => {
+  console.log(`${feedbackAction.value} submitted with feedback:`, text)
+
+  if (feedbackAction.value === 'approve') {
+    handleApprove(text)
+  } else {
+    handleReject(text)
+  }
+
+  showFeedbackModal.value = false
+}
+
+const handleQuickApprove = () => {
+  console.log('Quick Approve selected')
+  handleApprove('') // Quick Approve without feedback
+}
+
+const handleApprove = async (feedback: string) => {
   approveLoading.value = true
   try {
+    if (feedback.trim()) {
+      newFeedback.value = feedback
+      await addFeedback()
+    }
     await updateStatus(2, articleId.value)
+    await fetchArticleDetails(articleId.value)
   } catch (error) {
     console.error('Error during status update:', error)
     toast.error('Failed to update article status.')
@@ -142,10 +173,15 @@ const handleApprove = async () => {
   }
 }
 
-const handleReject = async () => {
+const handleReject = async (feedback: string) => {
   rejectLoading.value = true
   try {
+    if (feedback.trim()) {
+      newFeedback.value = feedback
+      await addFeedback()
+    }
     await updateStatus(3, articleId.value)
+    await fetchArticleDetails(articleId.value)
   } catch (error) {
     console.error('Error during status update:', error)
     toast.error('Failed to update article status.')
@@ -255,13 +291,18 @@ const isPublished = computed(() => articleStatus.value === 4)
           </div>
 
           <div class="flex gap-4">
+            <FeedbackModal
+              v-model="showFeedbackModal"
+              :title="feedbackAction === 'approve' ? 'Approve' : 'Reject'"
+              @quick-approve="handleQuickApprove"
+              @submit="handleFeedbackSubmit"
+            />
             <!-- Approve -->
             <Button
               v-if="isCoordinator && !isPublished && !isRejected"
               :disabled="false"
-              :processing="false"
               class="px-4 py-2 rounded-md border bg-green-100 text-gray-800 hover:bg-green-200 text-sm font-medium"
-              @click="!isApproved ? null : handleApprove"
+              @click="triggerFeedback('approve')"
             >
               {{ isApproved ? 'Approved' : 'Approve' }}
             </Button>
@@ -270,9 +311,8 @@ const isPublished = computed(() => articleStatus.value === 4)
             <Button
               v-if="isCoordinator && !isPublished && !isApproved"
               :disabled="false"
-              :processing="false"
               class="px-4 py-2 rounded-md border bg-red-100 text-gray-800 hover:bg-red-200 text-sm font-medium"
-              @click="!isApproved ? null : handleReject"
+              @click="triggerFeedback('reject')"
             >
               {{ isRejected ? 'Rejected' : 'Reject' }}
             </Button>
@@ -363,7 +403,7 @@ const isPublished = computed(() => articleStatus.value === 4)
                       @keydown.enter="addComment()"
                     />
                     <Button
-                      @click="addComment"
+                      @click="addComment()"
                       class="flex items-center justify-center px-4 py-5 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
                     >
                       <Send class="w-5 h-5" />
@@ -410,10 +450,10 @@ const isPublished = computed(() => articleStatus.value === 4)
                       v-model="newFeedback"
                       placeholder="Write a feedback..."
                       class="flex-1 p-2 border rounded-md focus:outline-none focus:ring focus:ring-secondary"
-                      @keydown.enter="addFeedback"
+                      @keydown.enter="addFeedback()"
                     />
                     <Button
-                      @click="addFeedback"
+                      @click="addFeedback()"
                       class="flex items-center justify-center px-4 py-5 bg-primary text-white rounded-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
                     >
                       <Send class="w-5 h-5" />

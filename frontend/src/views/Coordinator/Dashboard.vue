@@ -94,12 +94,18 @@ onMounted(() => {
           <CardContent class="font-primary flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div class="text-accent">Participate</div>
-              <div class="text-lg">20% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+              <div class="text-lg">
+                {{ coordinatorStore.countData?.deri_participate_rate }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="text-accent">Interest Rate</div>
-              <div class="text-lg">10% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+              <div class="text-lg">
+                {{ coordinatorStore.countData?.deriActiveUser }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
 
             <div class="flex items-center justify-between">

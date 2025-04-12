@@ -45,13 +45,11 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
       })
   }
 
-  const fetchMagazineArticles = async () => {
+  const fetchCoordinatorArticles = async () => {
     isLoading.value = true
     error.value = null
 
-    await getArticles({
-      status: 4,
-    })
+    await getArticles({})
       .then((response) => {
         magazineArticles.value = {
           totalSubmissions: response.totalSubmissions,
@@ -81,6 +79,6 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
     magazineArticles,
 
     fetchAllArticles,
-    fetchMagazineArticles,
+    fetchCoordinatorArticles,
   }
 })

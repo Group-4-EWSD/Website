@@ -5,7 +5,6 @@ import { ref } from 'vue'
 import ArticleChart from '@/components/pagespecific/coordinator-home/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
 import AuroraMembers from '@/components/pagespecific/manager-dashboard/AuroraMembers.vue'
-import Badge from '@/components/ui/badge/Badge.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import { useManagerStore } from '@/stores/manager'
@@ -79,12 +78,18 @@ const articleStats = [
           <CardContent class="font-primary flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div class="text-accent">Participate</div>
-              <div class="text-lg">20% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+              <div class="text-lg">
+                {{ managerStore.countData?.deri_participate_rate }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
 
             <div class="flex items-center justify-between">
-              <div class="text-accent">Interest Rate</div>
-              <div class="text-lg">10% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+              <div class="text-accent">Active Rate</div>
+              <div class="text-lg">
+                {{ managerStore.countData?.deriActiveUser }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
 
             <div class="flex items-center justify-between">
@@ -104,7 +109,7 @@ const articleStats = [
         </div>
       </div>
       <div>
-        <AuroraMembers />
+        <AuroraMembers :members="managerStore.members" :isLoading="managerStore.isLoading" />
       </div>
     </div>
   </Layout>

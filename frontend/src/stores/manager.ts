@@ -7,7 +7,7 @@ import type { AuroraMember, CountData, ChartData, GuestList } from '@/types/mana
 
 export const useManagerStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)
-  const articles = ref<AuroraMember[]>([])
+  const members = ref<AuroraMember[]>([])
   const guestList = ref<GuestList[]>([])
   const chartData = ref<ChartData>()
   const prevLogin = ref('')
@@ -25,6 +25,7 @@ export const useManagerStore = defineStore('coordinator-article', () => {
         guestList.value = response.guestList
         prevLogin.value = response.prev_login
         chartData.value = response.articlesPerYear
+        members.value = response.memberList
 
         isLoading.value = false
       })
@@ -39,7 +40,7 @@ export const useManagerStore = defineStore('coordinator-article', () => {
   return {
     countData,
     guestList,
-    articles,
+    members,
     prevLogin,
     isLoading,
 

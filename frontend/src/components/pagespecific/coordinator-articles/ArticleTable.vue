@@ -11,8 +11,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import router from '@/router'
+import { useRouter } from 'vue-router'
 import type { CoordinatorArticle } from '@/types/coordinator'
+
+const router = useRouter()
 
 interface Column {
   key: string
@@ -34,6 +36,7 @@ const props = defineProps<{
 }>()
 
 const goToArticleDetails = (articleId: string) => {
+  if (!articleId) return
   router.push({ name: 'getArticleDetails', params: { id: articleId } })
 }
 </script>

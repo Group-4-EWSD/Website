@@ -17,6 +17,7 @@
         "APP_ENV": "production",
         "APP_KEY":"base64:EG1ycZM9CBepeO3o65Ff47z32Y42e5OO+6J4YCZPLCI=",
         "APP_DEBUG": "false",
+        "APP_TIMEZONE": "UTC",
         "APP_URL": "https://laravel-vercel-sooty.vercel.app",
         "VERCEL_DEMO_MODE": "true",
         "APP_CONFIG_CACHE": "/tmp/config.php",

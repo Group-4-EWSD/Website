@@ -36,7 +36,6 @@ class SystemDataController extends Controller
                 'system_title' => 'required|string|max:255',
                 'pre_submission_date' => 'required|date',
                 'actual_submission_date' => 'required|date|after_or_equal:pre_submission_date',
-                'system_status' => 'required|in:0,1',
                 'faculty_id' => 'required|uuid|exists:faculties,faculty_id',
                 'academic_year_id' => 'required|uuid|exists:academic_years,academic_year_id',
             ]);
@@ -64,10 +63,9 @@ class SystemDataController extends Controller
                 'system_title' => 'sometimes|string|max:255',
                 'pre_submission_date' => 'sometimes|date',
                 'actual_submission_date' => 'sometimes|date|after_or_equal:pre_submission_date',
-                'system_status' => 'sometimes|in:0,1',
                 'faculty_id' => 'sometimes|uuid|exists:faculties,faculty_id',
                 'academic_year_id' => 'sometimes|uuid|exists:academic_years,academic_year_id',
-                'updated_at' => 'required|date',
+                'updated_at' => 'required|date_format:Y-m-d H:i:s',
             ]);
     
             $result = $this->systemDataService->updateSysData($validated);

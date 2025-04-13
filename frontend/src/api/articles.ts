@@ -79,6 +79,8 @@ export const updateStatus = async (status: number, articleId: string) => {
   return await api.post(`articles/change-status/${articleId}`, status)
 }
 
-export const downloadArticles = async (articleIds: string[]) => {
-  return await api.post(`articles/download`, articleIds)
+export const downloadArticles = async (articleIdList: string[]) => {
+  return await api.get('articles/download', {
+    params: { articleIdList }
+  });
 }

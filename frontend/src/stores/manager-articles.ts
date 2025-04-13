@@ -93,13 +93,12 @@ export const useArticleStore = defineStore('article', () => {
           academicYearId: params.academicYearId || '',
           articleTitle: params.articleTitle || '',
           sorting: params.sorting || '',
-          status: params.status !== undefined ? params.status : 2 // Default to status 2
+          // status: params.status !== undefined ? params.status : 2 // Default to status 2
         }
       })
 
-      const fetchedArticles = response.data
-      const total = 100
-      // const total = response.data.totalCount
+      const fetchedArticles = response.data.articles
+      const total = response.data.articlesCount
 
       // Update the cache
       articlesCache.value[cacheKey] = {

@@ -97,14 +97,14 @@ const downloadSelectedArticles = () => {
   downloadArticles(selectedArticles.value)
     .then((res) => {
       // download from link
-      const url = res.data.url
+      const url = res.data.download_url
       const link = document.createElement('a')
       link.href = url
       link.download = res.data.filename || 'articles.zip'
       link.target = '_blank'
       document.body.appendChild(link)
       link.click()
-      document.body.removeChild(link) 
+      document.body.removeChild(link)
 
       toast.success('Download started. Check your downloads folder.')
       selectedArticles.value = []
@@ -303,9 +303,10 @@ watchEffect(() => {
           <Button
             class="items-center gap-2 hidden md:flex"
             :disabled="selectedArticles.length === 0"
+            :processing="downloadingArticles"
             @click="downloadSelectedArticles"
           >
-            <Download class="h-4 w-4" />
+            <Download class="h-4 w-4" v-if="!downloadingArticles" />
             Download
           </Button>
         </div>
@@ -399,9 +400,10 @@ watchEffect(() => {
             size="sm"
             class="flex items-center gap-1"
             :disabled="selectedArticles.length === 0"
+            :processing="downloadingArticles"
             @click="downloadSelectedArticles"
           >
-            <Download class="h-3 w-3" />
+            <Download class="h-3 w-3" v-if="!downloadingArticles" />
             Download
           </Button>
         </div>

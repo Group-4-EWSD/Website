@@ -201,7 +201,7 @@ class UserRepository
     public function getMostViewedPageVisit(){
         $mostViewedPages = DB::table('view_pages as vp')
             ->join('app_pages as p', 'vp.page_id', '=', 'p.app_page_id')
-            ->select('vp.page_id', DB::raw('COUNT(vp.page_id) as view_count'))
+            ->select('vp.page_id', 'p.app_page_name', DB::raw('COUNT(vp.page_id) as view_count'))
             ->groupBy('vp.page_id')
             ->get();
         return $mostViewedPages;

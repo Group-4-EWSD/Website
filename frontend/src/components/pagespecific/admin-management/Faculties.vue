@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
-import { ref } from 'vue'
 import { ErrorMessage, Field, useForm } from 'vee-validate'
+import { ref } from 'vue'
+import { toast } from 'vue-sonner'
 import * as yup from 'yup'
+
+import { createFaculty, updateFaculty } from '@/api/faculties'
+import FormElement from '@/components/shared/FormElement.vue'
+import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -13,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import Input from '@/components/shared/Input.vue'
 import { Label } from '@/components/ui/label'
 import {
   Table,
@@ -24,9 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Faculty, FacultyParams, FacultyUpdateParams } from '@/types/faculty'
-import FormElement from '@/components/shared/FormElement.vue'
-import { createFaculty, updateFaculty } from '@/api/faculties'
-import { toast } from 'vue-sonner'
+
 
 // Props and emits
 const props = defineProps<{
@@ -88,6 +90,7 @@ const saveFaculty = handleSubmit(async (values) => {
         faculty_id: formId.value,
         faculty_name: values.faculty_name,
         remark: values.remark,
+        updated_at: editing.value.updated_at,
       }
       await updateFaculty(params)
       emit('refresh')

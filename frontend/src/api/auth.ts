@@ -6,8 +6,11 @@ export const login = async (credentials: Credentials) => {
 }
 
 export const logout = async () => {
-  console.log('logout api call')
   return await api.post(`logout`)
+}
+
+export const visitCount = async (id: string) => {
+  return await api.get(`visit/${id}`)
 }
 
 export const register = async (user: RegisterData) => {}

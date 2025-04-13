@@ -28,8 +28,7 @@ Route::middleware([RedirectIfAuthenticated::class])->group(function () {
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/checkAuth', [ArticleController::class, 'getAuth']);
-    Route::get('/visit', [UserController::class, 'pageVisitInitial']);
+    Route::get('/visit/{pageId}', [UserController::class, 'pageVisitInitial']);
     // Articles routes
     Route::prefix('/articles')->group(function () {
         // Normal Routes
@@ -37,9 +36,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
         Route::get('/coordinator', [ArticleController::class, 'coordinatorArticles']); // Get all articles
         Route::get('/manager', [ArticleController::class, 'managerArticles']); // Get all articles
-        Route::get('/artilcle-list', [ArticleController::class, 'articleList']); // Get all articles
+        Route::get('/article-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
-        Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']);
+        Route::get('/download/{articleId?}', [ArticleController::class, 'articleDownload']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
         Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);
@@ -54,14 +53,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Category routes
     Route::get('/item-list', [ArticleController::class, 'getItemList']);
 
-    // User routes
+    // User routes 
     Route::prefix('/user')->group(function () {
         Route::post('/update-photo', [UserController::class, 'updateUserPhoto']);
         Route::get('/get-photo', [UserController::class, 'getUserPhoto']);
         Route::delete('/delete-photo', [UserController::class, 'deleteUserPhoto']);
         Route::post('/edit-detail', [UserController::class, 'updateProfile']);
         Route::get('/active-user-list', [UserController::class, 'getActiveUserList']);
-        Route::patch('/update-password', [UserController::class, 'updatePassword']);
+        Route::post('/update-password', [UserController::class, 'updatePassword']);
         Route::get('/user-last-login', [UserController::class, 'userLastLogin']);
         // Route::get('/active-user-list', [UserController::class, 'getUserList']);
     });
@@ -75,20 +74,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/get-all-faculties', [FacultyController::class, 'listAllFaculties']);
         Route::get('/get-faculty-byID/{faculty_id}', [FacultyController::class, 'selectFacultyByID']);
         Route::post('/create', [FacultyController::class, 'createFaculty']);
-        Route::patch('/update', [FacultyController::class, 'updateFaculty']);
+        Route::post('/update', [FacultyController::class, 'updateFaculty']);
     });
 
     Route::post('/user-create', [UserController::class, 'userRegister']);
     Route::get('/all-user-list', [UserController::class, 'getUserList']);
     Route::get('/get-user-bytype/{user_type}', [UserController::class, 'getUserListByType']);
     Route::post('/password-reset', [UserController::class, 'resetPassword']);
-    Route::patch('/edit-user', [UserController::class, 'editUser']);
+    Route::post('/edit-user', [UserController::class, 'editUser']);
+    Route::get('/get-user-by-id/{userId}', [UserController::class, 'getUserById']);
 
     Route::prefix('/academic-years')->group(function(){
         Route::get('/get-all-academic-years', [AcademicYearController::class, 'getAllAcademicYears']);
         Route::get('/get-byid-academic-years/{academicYearId}', [AcademicYearController::class, 'getAcademicYearById']);
         Route::post('/create', [AcademicYearController::class, 'createAcademicYear']);
-        Route::patch('/update', [AcademicYearController::class, 'updateAcademicYear']);
+        Route::post('/update', [AcademicYearController::class, 'updateAcademicYear']);
     });
 
     Route::prefix('/system-data')->group(function(){
@@ -96,15 +96,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/byid-system-data/{system_data_id}', [SystemDataController::class, 'byidSysData']);
         Route::get('/byfaculty_system-data/{faculty_id}', [SystemDataController::class, 'byFacSysData']);
         Route::post('/create', [SystemDataController::class, 'createSysData']);
-        Route::patch('/update', [SystemDataController::class, 'updateSysData']);
+        Route::post('/update', [SystemDataController::class, 'updateSysData']);
     });
     Route::post('upload', [FileController::class, 'upload']);
     Route::get('download/{fileName}', [FileController::class, 'downloadAsZip']);
 
-    Route::get('/contact-us/get-all-list', [ContactUsController::class, 'getContactUsList']);
+    Route::prefix('/contact-us')->group(function(){
+        Route::get('/get-all-list', [ContactUsController::class, 'getContactUsList']);
+        Route::post('/create', [ContactUsController::class, 'createContactUs']);
+    });
 });
-Route::post('/contact-us/create', [ContactUsController::class, 'createContactUs']);
-
 // Unnecessory, Just for testing
 Route::get('/list-files', [FileController::class, 'listFiles']); // New route
 Route::post('/list-file', [FileController::class, 'listFiles']); // New route

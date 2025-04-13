@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { PencilIcon, PlusIcon } from 'lucide-vue-next'
-import { ref } from 'vue'
 import { useForm } from 'vee-validate'
+import type { Update } from 'vite/types/hmrPayload.js'
+import { ref } from 'vue'
+import { toast } from 'vue-sonner'
 import * as yup from 'yup'
+
+import { createAcademicYear, updateAcademicYear } from '@/api/academic-years'
+import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -13,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import Input from '@/components/shared/Input.vue'
 import { Label } from '@/components/ui/label'
 import {
   Table,
@@ -28,9 +32,8 @@ import type {
   AcademicYearParams,
   AcademicYearUpdateParams,
 } from '@/types/academic-years'
-import type { Update } from 'vite/types/hmrPayload.js'
-import { toast } from 'vue-sonner'
-import { createAcademicYear, updateAcademicYear } from '@/api/academic-years'
+
+
 
 // Props and emits
 const props = defineProps<{
@@ -80,6 +83,7 @@ const openModal = (year: AcademicYear | null): void => {
     setFieldValue('id', year.academic_year_id)
     setFieldValue('academic_year_start', parts[0])
     setFieldValue('academic_year_end', parts[1])
+    setFieldValue('updated_at', year.updated_at || null)
 
     // resetForm({
     //   id: year.academic_year_id,
@@ -88,11 +92,17 @@ const openModal = (year: AcademicYear | null): void => {
     // })
   } else {
     editing.value = null
-    resetForm({
-      id: null,
-      academic_year_start: '',
-      academic_year_end: '',
-    })
+
+    setFieldValue('id', null)
+    setFieldValue('academic_year_start', "")
+    setFieldValue('academic_year_end', "")
+    setFieldValue('updated_at', null)
+
+    // resetForm({
+    //   id: null,
+    //   academic_year_start: '',
+    //   academic_year_end: '',
+    // })
   }
   isModalOpen.value = true
 }
@@ -103,6 +113,7 @@ const { handleSubmit, resetForm, values, setFieldValue, errors } = useForm({
     id: null as string | null,
     academic_year_start: '',
     academic_year_end: '',
+    updated_at: null as string | null,
   },
 })
 
@@ -114,6 +125,7 @@ const saveAcademicYear = handleSubmit(async (values) => {
         academic_year_id: values.id,
         academic_year_start: values.academic_year_start,
         academic_year_end: values.academic_year_end,
+        updated_at: values.updated_at || "",
       }
       await updateAcademicYear(params)
       emit('refresh')

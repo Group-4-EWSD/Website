@@ -20,7 +20,7 @@ class AccountCreateMail extends Mailable
     public function build()
     {
         return $this->from(config('mail.from.address'))
-            ->subject('Your Password Has Been Reset')
+            ->subject('New Guest Account Created')
             ->view('emails.account_created_mail')
             ->with([
                 'user_name' => $this->user_name,

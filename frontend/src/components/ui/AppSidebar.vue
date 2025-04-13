@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BadgeHelp, Bell, Calendar, CircleGauge, FileText, Home, LogOut, Settings, User } from 'lucide-vue-next'
+import { BadgeHelp, Bell, BellIcon, Calendar, CircleGauge, FileText, Home, LogOut, Settings, User } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import {
@@ -101,6 +101,11 @@ switch (userType) {
         title: 'Users',
         url: '/admin/users',
         icon: User,
+      },
+      {
+        title: 'Contact Messages',
+        url: '/admin/contact-us',
+        icon: BellIcon,
       },
       {
         title: 'Settings',

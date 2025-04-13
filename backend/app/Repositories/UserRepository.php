@@ -45,21 +45,27 @@ class UserRepository
 
     public function getUserById($id)
     {
-        return User::findOrFail($id);
+        return DB::table('users as u')
+            ->select('u.id','u.user_name','u.user_email','u.nickname','u.user_type_id','u.faculty_id','u.gender','u.date_of_birth','u.phone_number','u.user_photo_path','ut.user_type_name','f.faculty_name')
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
+            ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+            ->where('id', $id)
+            ->first();
     }
 
-    public function updateUser($id, array $data)
+    public function updateUser($id, $data)
     {
         $user = User::findOrFail($id);
         $user->update($data);
-        return $user;
+        return $this->getUserById($id);
     }
 
     public function editUser($data)
     {
         $user = User::findorFail($data['id']);
         $user->update($data);
-        return ($data);
+        $return = $this->getUserById($data['id']);
+        return $return;
     }
 
     public function findById(string $id): ?User
@@ -198,7 +204,7 @@ class UserRepository
     public function getMostViewedPageVisit(){
         $mostViewedPages = DB::table('view_pages as vp')
             ->join('app_pages as p', 'vp.page_id', '=', 'p.app_page_id')
-            ->select('vp.page_id', DB::raw('COUNT(vp.page_id) as view_count'))
+            ->select('vp.page_id', 'p.app_page_name', DB::raw('COUNT(vp.page_id) as view_count'))
             ->groupBy('vp.page_id')
             ->get();
         return $mostViewedPages;
@@ -307,4 +313,11 @@ class UserRepository
     
         return $lastLogin->login_datetime;
     }       
+
+    public function userRepository($userId)
+    {
+        return DB::table('users')
+            ->where('user_id', $userId)
+            ->first();
+    }
 }

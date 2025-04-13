@@ -95,7 +95,7 @@ class AcademicYearRepository
                 return false;
             }
     
-            return DB::table('academic_years')
+            DB::table('academic_years')
                 ->where('academic_year_id', $academicYearId)
                 ->update([
                     'academic_year_description' => "{$data['academic_year_start']}-{$data['academic_year_end']}",
@@ -103,6 +103,8 @@ class AcademicYearRepository
                     'academic_year_end' => $data['academic_year_end'],
                     'updated_at' => now(),
                 ]);
+
+            return $this->getAcademicYearById($academicYearId);
         });
     }    
 }

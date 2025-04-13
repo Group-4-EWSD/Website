@@ -30,11 +30,11 @@ export interface ProfilePhotoResponse {
   photo_path: string
 }
 
-export const GenderOptions = {
+export const GenderOptions: Record<number, string> = {
   0: 'Prefer not to say',
   1: 'Male',
   2: 'Female',
-}
+};
 
 export interface Guest {
   guest_name: string

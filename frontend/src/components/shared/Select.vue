@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from 'reka-ui'
 import { ErrorMessage, Field, useField } from 'vee-validate'
 import { useAttrs, watchEffect } from 'vue'
 
@@ -10,7 +11,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import type { AcceptableValue } from 'reka-ui'
 
 interface Props {
   name: string

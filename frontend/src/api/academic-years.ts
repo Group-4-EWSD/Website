@@ -1,5 +1,6 @@
-import api from "./axios"
 import type { AcademicYear, AcademicYearParams, AcademicYearUpdateParams } from "@/types/academic-years";
+
+import api from "./axios"
 
 export const getAcademicYearList = async (): Promise<AcademicYear[]> => {
   const response = await api.get('academic-years/get-all-academic-years');

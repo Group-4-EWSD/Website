@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-vue-next'
+import { useField, useForm } from 'vee-validate'
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useForm, useField } from 'vee-validate'
+import { toast } from 'vue-sonner'
 import * as yup from 'yup'
 
+import { getAcademicYearList } from '@/api/academic-years'
+import { getFacultyList } from '@/api/faculties'
+import { createSubmissionDate, getSubmissionDates, updateSubmissionDate } from '@/api/system-data'
 import AcademicYears from '@/components/pagespecific/admin-management/AcademicYears.vue'
 import Faculties from '@/components/pagespecific/admin-management/Faculties.vue'
 import FormElement from '@/components/shared/FormElement.vue'
+import Input from '@/components/shared/Input.vue'
+import CustomSelect from '@/components/shared/Select.vue'
 import {
   Accordion,
   AccordionContent,
@@ -24,10 +30,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import Input from '@/components/shared/Input.vue'
-import CustomSelect from '@/components/shared/Select.vue'
 import { Label } from '@/components/ui/label'
 import Layout from '@/components/ui/Layout.vue'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -37,31 +48,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { getAcademicYearList } from '@/api/academic-years'
 import type { AcademicYear } from '@/types/academic-years'
-import { toast } from 'vue-sonner'
 import type { Faculty } from '@/types/faculty'
-import { getFacultyList } from '@/api/faculties'
 import type {
   SubmissionDate,
   SubmissionDateForm,
   SubmissionDateParams,
   SubmissionDateUpdateParams,
 } from '@/types/system-data'
-import { getSubmissionDates, createSubmissionDate, updateSubmissionDate } from '@/api/system-data'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 // Loading states
 const isLoading = ref<boolean>(true)
 
 // Data for academic years
-let academicYears = ref<AcademicYear[]>([])
+const academicYears = ref<AcademicYear[]>([])
 
 // Data for faculties
 const faculties = ref<Faculty[]>([])

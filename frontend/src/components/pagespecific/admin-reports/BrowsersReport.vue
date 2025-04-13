@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, type PropType, computed } from 'vue'
+import { computed, defineComponent, type PropType } from 'vue'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'

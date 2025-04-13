@@ -1,6 +1,6 @@
 <!-- PageViewsReport.vue -->
 <script lang="ts">
-import { defineComponent, onMounted, ref, computed, watch } from 'vue'
+import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 
 import {
   Card,

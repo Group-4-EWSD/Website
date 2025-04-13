@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { visitCount } from '@/api/auth'
 import { getCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
 import Unauthorized from '@/views/Unauthorized.vue'
-import { visitCount } from '@/api/auth'
 
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')

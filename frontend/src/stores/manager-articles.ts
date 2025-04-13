@@ -1,8 +1,9 @@
 // src/stores/article.ts
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import api from '@/api/axios'
+import { computed, ref } from 'vue'
+
 import { getAcademicYearList } from '@/api/academic-years'
+import api from '@/api/axios'
 
 export interface AcademicYear {
   academic_year_id: string

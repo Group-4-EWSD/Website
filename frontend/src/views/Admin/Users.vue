@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { useForm } from 'vee-validate'
-import * as yup from 'yup'
 import { ArrowDown, ArrowUp, Edit, KeyRound, Plus, Search } from 'lucide-vue-next'
+import type { AcceptableValue } from 'reka-ui'
+import { useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
+import { toast } from 'vue-sonner'
+import * as yup from 'yup'
 
+import { getFacultyList } from '@/api/faculties'
+import { createUser, forcePasswordReset, getAllUsers, updateUser } from '@/api/user'
+import FormElement from '@/components/shared/FormElement.vue'
+import CustomInput from '@/components/shared/Input.vue'
+import CustomSelect from '@/components/shared/Select.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -15,7 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import CustomInput from '@/components/shared/Input.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Layout from '@/components/ui/Layout.vue'
@@ -36,7 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import CustomSelect from '@/components/shared/Select.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -46,15 +52,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import FormElement from '@/components/shared/FormElement.vue'
-import { getAllUsers, createUser, updateUser, forcePasswordReset } from '@/api/user'
-import { getFacultyList } from '@/api/faculties'
-import type { CreateUserParams, UpdateUserParams, User } from '@/types/user'
-import type { Faculty } from '@/types/faculty'
 import { calculateAge } from '@/lib/utils'
-import { toast } from 'vue-sonner'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import type { AcceptableValue } from 'reka-ui'
+import type { Faculty } from '@/types/faculty'
+import type { CreateUserParams, UpdateUserParams, User } from '@/types/user'
+
 
 interface Column {
   key: string

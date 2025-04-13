@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ArchiveX, CircleCheckBig, FilePenLine, FileText } from 'lucide-vue-next'
+import { onMounted } from 'vue'
 
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import Card from '@/components/ui/card/Card.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import { onMounted } from 'vue'
 import { useCoordinatorStore } from '@/stores/coordinator'
 
 const coordinatorStore = useCoordinatorStore()

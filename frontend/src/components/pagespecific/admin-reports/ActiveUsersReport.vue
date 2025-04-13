@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, type PropType, computed } from 'vue'
+import { computed, defineComponent, type PropType } from 'vue'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'

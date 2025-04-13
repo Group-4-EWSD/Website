@@ -1,4 +1,5 @@
 import type { Faculty, FacultyParams, FacultyUpdateParams } from "@/types/faculty";
+
 import api from "./axios"
 
 export const getFacultyList = async (): Promise<Faculty[]> => {

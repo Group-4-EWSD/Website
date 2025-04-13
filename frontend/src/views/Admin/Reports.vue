@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
 import { getArticles } from '@/api/articles'
 import ActiveUsersReport from '@/components/pagespecific/admin-reports/ActiveUsersReport.vue'
 import BrowsersReport from '@/components/pagespecific/admin-reports/BrowsersReport.vue'
 import PageViewsReport from '@/components/pagespecific/admin-reports/PageViewsReport.vue'
 import Layout from '@/components/ui/Layout.vue'
-import { onMounted, ref } from 'vue'
 
 interface ResponseData {
   mostViewedPages: MostViewedPage[];
@@ -76,7 +77,7 @@ const data = ref<ResponseData>({
   browserList: []
 })
 
-let isLoading = ref<boolean>(false)
+const isLoading = ref<boolean>(false)
 
 onMounted(async () => {
   isLoading.value = true

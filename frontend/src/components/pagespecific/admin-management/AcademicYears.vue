@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { PencilIcon, PlusIcon } from 'lucide-vue-next'
-import { ref } from 'vue'
 import { useForm } from 'vee-validate'
+import type { Update } from 'vite/types/hmrPayload.js'
+import { ref } from 'vue'
+import { toast } from 'vue-sonner'
 import * as yup from 'yup'
+
+import { createAcademicYear, updateAcademicYear } from '@/api/academic-years'
+import Input from '@/components/shared/Input.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -13,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import Input from '@/components/shared/Input.vue'
 import { Label } from '@/components/ui/label'
 import {
   Table,
@@ -28,9 +32,8 @@ import type {
   AcademicYearParams,
   AcademicYearUpdateParams,
 } from '@/types/academic-years'
-import type { Update } from 'vite/types/hmrPayload.js'
-import { toast } from 'vue-sonner'
-import { createAcademicYear, updateAcademicYear } from '@/api/academic-years'
+
+
 
 // Props and emits
 const props = defineProps<{

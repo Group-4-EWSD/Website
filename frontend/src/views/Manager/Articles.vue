@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, watchEffect, computed } from 'vue'
-import { Search, Download, CheckSquare, Square } from 'lucide-vue-next'
-import Layout from '@/components/ui/Layout.vue'
-import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
+import { CheckSquare, Download, Search, Square } from 'lucide-vue-next'
+import type { AcceptableValue } from 'reka-ui'
+import { computed, onMounted, ref, watchEffect } from 'vue'
+import { toast } from 'vue-sonner'
+
+import { downloadArticles } from '@/api/articles'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Select,
   SelectContent,
@@ -12,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import {
   Table,
   TableBody,
@@ -22,12 +29,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/manager-articles'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { toast } from 'vue-sonner'
-import { downloadArticles } from '@/api/articles'
-import type { AcceptableValue } from 'reka-ui'
+
+
+
 
 // Store for persisting state across page visits
 const articleStore = useArticleStore()
@@ -223,7 +227,7 @@ const pageNumbers = computed(() => {
   const totalPages = Math.ceil(articleStore.totalArticles / displayNumber.value)
   const currentPage = articleStore.currentPage
 
-  let pages = []
+  const pages = []
 
   // Always include page 1
   pages.push(1)

@@ -38,8 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/manager', [ArticleController::class, 'managerArticles']); // Get all articles
         Route::get('/article-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
-        Route::get('/download/{articleId}', [ArticleController::class, 'articleDownload']); // Single Article Download
-        Route::get('/download', [ArticleController::class, 'articleDownload']); // Multiple Article Download
+        Route::get('/download/{articleId?}', [ArticleController::class, 'articleDownload']);
         Route::post('/like', [ActionController::class, 'articleLike']);
         Route::post('/comment', [ActionController::class, 'articleComment']);
         Route::delete('/comment-delete', [ActionController::class, 'articleCommentDelete']);

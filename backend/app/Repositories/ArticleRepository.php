@@ -443,20 +443,27 @@ class ArticleRepository
 
     public function getFileList($articleId, $request)
     {
-        $files = DB::table('article_details ad')->select('ad.file_path');
+        $files = DB::table('article_details as ad')->select('a.article_id','a.article_title','ad.file_path');
+
         if (!empty($articleId)) {
             $files = $files->where('article_id', $articleId)->get();
-        } else if (!empty($request->articleIdList) || !empty($request->academicYear)) {
+        } else if (!empty($request->articleIdList) || !empty($request->academicYearId)) {
             if (!empty($request->articleIdList)) {
-                $files = $files->where('article_id', 'in', $request->articleIdList)->get();
-            } else if (!empty($request->academicYear)) {
-                $files = $files->join('system_datas sd', 'sd.system_id', 'ad.system_id')
-                    ->join('academic_years ay', 'ay.academic_year_id', 'sd.academic_year_id')
-                    ->where('ay.academic_year_id', '=', $request->academicYearId);
+                $files = $files->whereIn('article_id', $request->articleIdList)->get();
             }
+            if (!empty($request->academicYearId)) {
+                $files = $files->join('articles as a', 'a.article_id', 'ad.article_id')
+                    ->join('system_datas as sd', 'sd.system_id', 'a.system_id')
+                    ->join('academic_years as ay', 'ay.academic_year_id', 'sd.academic_year_id')
+                    ->where('ay.academic_year_id', '=', $request->academicYearId)
+                    ->get();
+            }
+        } else {
+            $files = collect(); // In case no condition matched, return an empty collection
         }
-        return $files ?: []; // Ensures an empty array if no files found
+        return $files;
     }
+
 
     public function getItemList($item)
     {

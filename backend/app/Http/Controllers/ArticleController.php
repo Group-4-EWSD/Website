@@ -178,13 +178,12 @@ class ArticleController extends Controller
         return response()->json($articles);
     }
 
-    public function articleDownload($articleId = null, Request $request)
+    public function articleDownload(Request $request, $articleId = null)
     {
         $articleFileList = $this->articleService->getFileList($articleId, $request);
         if (!empty($articleFileList)) {
             return $this->fileService->downloadMultipleAsZip($articleFileList);
         }
-        // Mail::to(Auth::user()->email)->send(new UserCreatedMail(Auth::user()));
 
         return response()->json(['message' => 'No files found'], 404);
     }

@@ -236,6 +236,11 @@ class ArticleRepository
 
     public function getAllArticles($state, $primaryKey = null, $request = null)
     {
+        //$state = 0; // Student Common Dashboard
+        //$state = 1; // Student My Articles
+        //$state = 2; // Student My Draft Articles
+        //$state = 3; // Coordinator Common Dashboard, My Articles
+        //$state = 4; // All Articles By Manager
         $articles = DB::table('articles as art')
             ->select([
                 'art.article_id',
@@ -273,32 +278,33 @@ class ArticleRepository
             $articles->addSelect(
                 DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = '$primaryKey')) AS current_user_react")
             );
+            $articles->havingRaw("status IN (2, 4)");
         } else if ($state == 1) { // My Articles Student (userId)
             $articles->addSelect(
                 DB::raw("(SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) AS last_feedback"),
                 DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = '$primaryKey')) AS current_user_react")
             );
             $articles->where('art.user_id', '=', $primaryKey);
-            $articles->havingRaw("status IN (1, 2, 3)");
         } else if ($state == 2) { // My Draft Articles Student (userId)
             $articles->where('art.user_id', '=', $primaryKey);
             $articles->havingRaw("status = 0");
-        } else {
-            if (!empty($request->status)) {
-                $status = $request->status;
-                if ($status == '0') {
-                    $articles->havingRaw(" status IN (0, 1, 2, 3) ");
-                } else if ($status == '1') {
-                    $articles->havingRaw(" status IN (1, 2, 3) ");
-                } else if ($status == '2') {
-                    $articles->havingRaw(" status IN (2, 3) ");
-                } else if ($status == '3') {
-                    $articles->havingRaw(" status = 3 ");
-                } else {
-                    $articles->havingRaw(" status IN (2, 3) ");
-                }
+        }
+
+        if (!empty($request->status)) {
+            $status = $request->status;
+            if ($status == '0') {
+                $articles->havingRaw(" status IN (0, 1, 2, 3) ");
+            } else if ($status == '1') {
+                $articles->havingRaw(" status IN (1, 2, 3) ");
+            } else if ($status == '2') {
+                $articles->havingRaw(" status IN (2, 3) ");
+            } else if ($status == '3') {
+                $articles->havingRaw(" status = 3 ");
+            } else {
+                $articles->havingRaw(" status IN (2, 3) ");
             }
         }
+
         if ($state == 3 || $state == 4 || $state == 0) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4
             if ($state != 0) {
                 $articles->addSelect(DB::raw("
@@ -337,7 +343,7 @@ class ArticleRepository
                 $articles->where('sd.faculty_id', '=', $primaryKey);
             } else {
                 $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
-                $articles->havingRaw("status = 4");
+                $articles->havingRaw("status IN (2, 4)");
             }
         }
         // Ensure GROUP BY is valid by including `art.article_id`
@@ -443,18 +449,19 @@ class ArticleRepository
 
     public function getFileList($articleId, $request)
     {
-        $files = DB::table('article_details as ad')->select('a.article_id','a.article_title','ad.file_path');
+        $files = DB::table('article_details as ad')->select('a.article_id','a.article_title','ad.file_path')
+                    ->join('articles as a', 'a.article_id', 'ad.article_id')
+                    ->join('system_datas as sd', 'sd.system_id', 'a.system_id')
+                    ->join('academic_years as ay', 'ay.academic_year_id', 'sd.academic_year_id');
 
         if (!empty($articleId)) {
-            $files = $files->where('article_id', $articleId)->get();
+            $files = $files->where('a.article_id', $articleId)->get();
         } else if (!empty($request->articleIdList) || !empty($request->academicYearId)) {
             if (!empty($request->articleIdList)) {
-                $files = $files->whereIn('article_id', $request->articleIdList)->get();
+                $files = $files->whereIn('a.article_id', $request->articleIdList)->get();
             }
             if (!empty($request->academicYearId)) {
-                $files = $files->join('articles as a', 'a.article_id', 'ad.article_id')
-                    ->join('system_datas as sd', 'sd.system_id', 'a.system_id')
-                    ->join('academic_years as ay', 'ay.academic_year_id', 'sd.academic_year_id')
+                $files = $files
                     ->where('ay.academic_year_id', '=', $request->academicYearId)
                     ->get();
             }
@@ -481,18 +488,6 @@ class ArticleRepository
         [$table, $selectColumns] = $tables[$item];
 
         return DB::table($table)->select($selectColumns)->get();
-    }
-
-    public function getCountDataByFaculty($facultyId)
-    {
-        return DB::table('articles')
-            ->selectRaw('
-            (SELECT COUNT(*) FROM articles art JOIN users as u ON u.id = art.user_id WHERE u.faculty_id = ?) as totalSubmissionCount,
-            (SELECT COUNT(*) FROM (SELECT act.status, MAX(act.created_at) FROM articles act JOIN activities act ON act.article_id = art.article_id JOIN users as u ON u.id = art.user_id WHERE u.faculty_id = ? GROUP BY act.activity_id)) subquery WHERE subquery.status = 1) as pendingReviewCount,
-            (SELECT COUNT(*) FROM (SELECT act.status, MAX(act.created_at) FROM articles act JOIN activities act ON act.article_id = art.article_id JOIN users as u ON u.id = art.user_id WHERE u.faculty_id = ? GROUP BY act.activity_id)) subquery WHERE subquery.status = 2) as pendingReviewCount,
-            (SELECT COUNT(*) FROM (SELECT act.status, MAX(act.created_at) FROM articles act JOIN activities act ON act.article_id = art.article_id JOIN users as u ON u.id = art.user_id WHERE u.faculty_id = ? GROUP BY act.activity_id)) subquery WHERE subquery.status = 3) as pendingReviewCount,
-        ', [$facultyId, $facultyId, $facultyId, $facultyId]) // WHERE ay.academic_year = CURRENT_YEAR() AND 
-            ->first();
     }
 
     public function getPreviousLogin($userId)

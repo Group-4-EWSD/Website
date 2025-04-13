@@ -116,15 +116,6 @@ class ArticleController extends Controller
         $articles = $this->articleService->getManagerArticles($request);
         return response()->json($articles);
     }
-    
-    public function articleList(Request $request)
-    {
-        $user = Auth::user();
-        $userId = $user->id;
-        $facultyId = $user->faculty_id;
-        $articleList = $this->articleService->getArticleList($userId, $facultyId, $request);
-        return response()->json($articleList);
-    }
 
     public function articleCreateUpdate(Request $request)
     {

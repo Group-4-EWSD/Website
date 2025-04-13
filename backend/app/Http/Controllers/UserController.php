@@ -254,10 +254,15 @@ class UserController extends Controller
 
     public function pageVisitInitial($pageId){
         $user = Auth::user();
-        $this->userService->pageVisitInitial($user->id, $pageId);
-        return response()->json([
-            'message' => 'Page visit recorded successfully',
-        ], 200);
+        if($this->userService->pageVisitInitial($user->id, $pageId)){
+            return response()->json([
+                'message' => 'Page visit recorded successfully',
+            ], 200);
+        }else{
+            return response()->json([
+                'message' => 'Page visit record with the user already exists.',
+            ], 200);
+        }
     }
 
     public function userRegister(Request $request){

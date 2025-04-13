@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SystemDataController;
 use App\Http\Controllers\ContactUsController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -115,4 +116,8 @@ Route::get('/test', [ArticleController::class, 'getTest']);
 
 Route::get('/testDirect', function () {
     return response()->json(['message' => 'API is working!']);
+});
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+    return 'Cache cleared';
 });

@@ -239,7 +239,7 @@ class ArticleRepository
         //$state = 0; // Student Common Dashboard
         //$state = 1; // Student My Articles
         //$state = 2; // Student My Draft Articles
-        //$state = 3; // Coordinator Common Dashboard, My Articles
+        //$state = 3; // Coordinator Common Dashboard, Coordinator My Articles
         //$state = 4; // All Articles By Manager
         $articles = DB::table('articles as art')
             ->select([

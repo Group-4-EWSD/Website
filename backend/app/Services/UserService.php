@@ -181,7 +181,12 @@ class UserService
         $data['user_id']= $this->userRepository->generateUserId();
         $data['user_password']=Str::random(12);
 
-        Mail::to($data['user_email'])->send(new AccountCreateMail($data));
+        $coordinatorEmail = DB::table('users')
+            ->where('faculty_id', Auth::user()->faculty_id)
+            ->where('user_type_id', 2)
+            ->value('user_email');
+        
+        Mail::to($coordinatorEmail)->send(new AccountCreateMail($data));
 
         return $this->userRepository->userRegister($data);
     }

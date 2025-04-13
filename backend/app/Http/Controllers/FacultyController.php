@@ -29,10 +29,7 @@ class FacultyController extends Controller
                 'message' => 'Faculty not found'
             ], 404);
         }
-        return response()->json([
-            'message' => 'Faculty updated successfully',
-            'updated_faculty' => $result
-        ], 200);
+        return response()->json($result, 200);
     }
 
     public function createFaculty(Request $request)

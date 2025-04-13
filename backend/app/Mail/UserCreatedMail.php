@@ -25,7 +25,7 @@ class UserCreatedMail extends Mailable
     public function build()
     {
         return $this->from(config('mail.from.address'))
-            ->subject('Welcome to Our System!')
+            ->subject('New Article Has been Created')
             ->view('emails.article_create_mail')
             ->with([
                 'user' => $this->user,

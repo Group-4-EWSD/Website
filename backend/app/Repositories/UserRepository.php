@@ -45,7 +45,10 @@ class UserRepository
 
     public function getUserById($id)
     {
-        return DB::table('users')
+        return DB::table('users as u')
+            ->select('u.id','u.user_name','u.user_email','u.nickname','u.user_type_id','u.faculty_id','u.gender','u.date_of_birth','u.phone_number','u.user_photo_path','ut.user_type_name','f.faculty_name')
+            ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
+            ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
             ->where('id', $id)
             ->first();
     }

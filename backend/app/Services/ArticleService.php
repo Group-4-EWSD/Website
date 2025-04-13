@@ -100,7 +100,6 @@ class ArticleService
     {
         $countData = $this->articleRepository->getCoordinatorCountData($facultyId);
         $articles = $this->articleRepository->getAllArticles(3, $facultyId, $request);
-        // dd($articles->get()->count());
         $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
         return [
             'totalSubmissions' => $countData['totalSubmissions'], // Correct array access
@@ -119,16 +118,6 @@ class ArticleService
         return [
             'articles' => $articleList,
             'articlesCount' => $articles->get()->count(),
-        ];
-    }
-
-    public function getArticleList($user_id, $faculty_id, $request){
-        $articles = $this->articleRepository->getAllArticles(3, $faculty_id, $request);
-        $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
-        return [
-            'countData' => $this->articleRepository->getCountDataByFaculty($faculty_id),
-            'articleList' => $articleList,
-            'articleListCount' => $articles->get()->count(),
         ];
     }
 

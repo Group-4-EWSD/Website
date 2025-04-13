@@ -57,7 +57,7 @@ class ArticleService
             'remaining_final_publish' => $this->articleRepository->getRemainingFinalPublish($facultyId),
             'current_system_data' => $this->articleRepository->getCurrentSystemData($facultyId),
             'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData($facultyId),
-            'allArticles' => $this->articleRepository->getAllArticles(3, null, $request)->get(),
+            'allArticles' => $this->articleRepository->getAllArticles(3, $facultyId, $request)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear($facultyId),
             'guestList' => $this->userRepository->getGuestList()
         ];

@@ -80,6 +80,7 @@ const openModal = (year: AcademicYear | null): void => {
     setFieldValue('id', year.academic_year_id)
     setFieldValue('academic_year_start', parts[0])
     setFieldValue('academic_year_end', parts[1])
+    setFieldValue('updated_at', year.updated_at || null)
 
     // resetForm({
     //   id: year.academic_year_id,
@@ -88,11 +89,17 @@ const openModal = (year: AcademicYear | null): void => {
     // })
   } else {
     editing.value = null
-    resetForm({
-      id: null,
-      academic_year_start: '',
-      academic_year_end: '',
-    })
+
+    setFieldValue('id', null)
+    setFieldValue('academic_year_start', "")
+    setFieldValue('academic_year_end', "")
+    setFieldValue('updated_at', null)
+
+    // resetForm({
+    //   id: null,
+    //   academic_year_start: '',
+    //   academic_year_end: '',
+    // })
   }
   isModalOpen.value = true
 }
@@ -103,6 +110,7 @@ const { handleSubmit, resetForm, values, setFieldValue, errors } = useForm({
     id: null as string | null,
     academic_year_start: '',
     academic_year_end: '',
+    updated_at: null as string | null,
   },
 })
 
@@ -114,6 +122,7 @@ const saveAcademicYear = handleSubmit(async (values) => {
         academic_year_id: values.id,
         academic_year_start: values.academic_year_start,
         academic_year_end: values.academic_year_end,
+        updated_at: values.updated_at || "",
       }
       await updateAcademicYear(params)
       emit('refresh')

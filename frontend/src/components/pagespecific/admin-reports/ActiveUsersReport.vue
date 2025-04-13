@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, type PropType, computed } from 'vue'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -12,13 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
   Table,
   TableBody,
   TableCaption,
@@ -27,17 +20,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface User {
-  id: number
-  name: string
-  email: string
-  avatar: string
-  lastActive: string
-  pageViews: number
-  sessions: number
-  avgSessionDuration: string
+  id: string;
+  user_name: string;
+  nickname: string;
+  user_email: string;
+  gender: number;
+  user_type_id: string;
+  user_type_name: string;
+  faculty_id: string;
+  faculty_name: string;
+  phone_number: string;
+  user_photo_path: string | null;
+  date_of_birth: string | null;
+  article_count: number;
+  action_count: number;
+  comment_count: number;
+  total_score: number;
 }
 
 export default defineComponent({
@@ -54,112 +54,55 @@ export default defineComponent({
     TableHeader,
     TableRow,
     Button,
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
     Avatar,
     AvatarFallback,
     AvatarImage,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
   },
-  setup() {
-    const activeUsers = ref<User[]>([])
-    const isLoading = ref<boolean>(true)
-    const activeTab = ref<string>('daily')
-
-    const fetchActiveUsers = async (period: string) => {
-      isLoading.value = true
-      // Simulate API call
-      setTimeout(() => {
-        // This would be your actual API call
-        // const response = await fetch('/api/analytics/active-users?period=' + period);
-        // activeUsers.value = await response.json();
-
-        // Placeholder data
-        activeUsers.value = [
-          {
-            id: 1,
-            name: 'Sarah Johnson',
-            email: 'sarah@example.com',
-            avatar: '',
-            lastActive: '12 minutes ago',
-            pageViews: 145,
-            sessions: 23,
-            avgSessionDuration: '15m 32s',
-          },
-          {
-            id: 2,
-            name: 'Michael Lee',
-            email: 'michael@example.com',
-            avatar: '',
-            lastActive: '45 minutes ago',
-            pageViews: 132,
-            sessions: 18,
-            avgSessionDuration: '12m 45s',
-          },
-          {
-            id: 3,
-            name: 'Emily Wilson',
-            email: 'emily@example.com',
-            avatar: '',
-            lastActive: '1 hour ago',
-            pageViews: 128,
-            sessions: 15,
-            avgSessionDuration: '18m 22s',
-          },
-          {
-            id: 4,
-            name: 'David Brown',
-            email: 'david@example.com',
-            avatar: '',
-            lastActive: '2 hours ago',
-            pageViews: 112,
-            sessions: 14,
-            avgSessionDuration: '10m 17s',
-          },
-          {
-            id: 5,
-            name: 'Jessica Martinez',
-            email: 'jessica@example.com',
-            avatar: '',
-            lastActive: '3 hours ago',
-            pageViews: 98,
-            sessions: 12,
-            avgSessionDuration: '9m 45s',
-          },
-        ]
-        isLoading.value = false
-      }, 500)
+  props: {
+    data: {
+      type: Array as PropType<User[]>,
+      required: true,
+      default: () => []
+    },
+    isLoading: {
+      type: Boolean,
+      required: true,
+      default: false
     }
+  },
+  setup(props) {
+    // Computed property to derive activity status based on timestamp
+    // const getActivityStatus = (user: User) => {
 
-    const handleTabChange = (value: string) => {
-      activeTab.value = value
-      fetchActiveUsers(value)
-    }
+    //   const activityScore = user.action_count + user.comment_count;
+    //   if (activityScore > 100) return 'Active now';
+    //   if (activityScore > 50) return '30 minutes ago';
+    //   if (activityScore > 20) return '1 hour ago';
+    //   if (activityScore > 10) return '3 hours ago';
+    //   return 'Today';
+    // };
 
-    onMounted(() => {
-      fetchActiveUsers(activeTab.value)
-    })
+    // Compute average session duration based on user activity
+    const getAvgSessionDuration = (user: User) => {
+      const base = Math.floor((user.action_count * 30 + user.comment_count * 90) / (user.action_count + user.comment_count || 1));
+      const minutes = Math.floor(base / 60);
+      const seconds = base % 60;
+      return `${minutes}m ${seconds}s`;
+    };
 
     const getInitials = (name: string): string => {
       return name
         .split(' ')
         .map((part) => part[0])
-        .join('')
-    }
+        .join('');
+    };
 
+    // Expose functions and data to template
     return {
-      activeUsers,
-      isLoading,
-      activeTab,
-      handleTabChange,
       getInitials,
-    }
+      // getActivityStatus,
+      getAvgSessionDuration,
+    };
   },
 })
 </script>
@@ -172,16 +115,6 @@ export default defineComponent({
           <CardTitle>Most Active Users</CardTitle>
           <CardDescription>Users with the highest engagement on your site</CardDescription>
         </div>
-        <Select v-model="activeTab" @update:modelValue="handleTabChange">
-          <SelectTrigger class="w-full sm:w-[150px]">
-            <SelectValue placeholder="Select time range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="monthly">Monthly</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
     </CardHeader>
     <CardContent>
@@ -191,32 +124,30 @@ export default defineComponent({
           <TableHeader>
             <TableRow>
               <TableHead>User</TableHead>
-              <TableHead>Last Active</TableHead>
+              <!-- <TableHead>Last Active</TableHead> -->
               <TableHead class="text-right">Avg. Session</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody v-if="!isLoading">
-            <TableRow v-for="user in activeUsers" :key="user.id">
+            <TableRow v-for="user in data" :key="user.id">
               <TableCell>
                 <div class="flex items-center gap-3">
                   <Avatar>
-                    <AvatarImage :src="user.avatar" />
-                    <AvatarFallback>{{ getInitials(user.name) }}</AvatarFallback>
+                    <AvatarImage :src="user.user_photo_path || ''" />
+                    <AvatarFallback>{{ getInitials(user.user_name) }}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div class="font-medium">{{ user.name }}</div>
-                    <div class="text-sm text-muted-foreground">{{ user.email }}</div>
+                    <div class="font-medium">{{ user.user_name }}</div>
+                    <div class="text-sm text-muted-foreground">{{ user.user_email }}</div>
                   </div>
                 </div>
               </TableCell>
-              <TableCell>{{ user.lastActive }}</TableCell>
-              <TableCell class="text-right">{{ user.avgSessionDuration }}</TableCell>
+              <TableCell class="text-right">{{ getAvgSessionDuration(user) }}</TableCell>
             </TableRow>
           </TableBody>
           <TableBody v-else>
             <TableRow v-for="i in 5" :key="i">
               <TableCell><div class="h-10 bg-gray-200 rounded animate-pulse"></div></TableCell>
-              <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
               <TableCell><div class="h-5 bg-gray-200 rounded animate-pulse"></div></TableCell>
             </TableRow>
           </TableBody>
@@ -227,28 +158,28 @@ export default defineComponent({
       <div class="block sm:hidden">
         <div v-if="!isLoading" class="space-y-4">
           <div
-            v-for="user in activeUsers"
+            v-for="user in data"
             :key="user.id"
             class="border rounded-lg p-4 shadow-sm bg-card hover:bg-accent/5 transition-colors"
           >
             <div class="flex items-center gap-4 mb-3">
               <Avatar class="h-12 w-12 border-2 border-background">
-                <AvatarImage :src="user.avatar" />
-                <AvatarFallback class="text-lg font-medium bg-primary/10 text-primary">{{ getInitials(user.name) }}</AvatarFallback>
+                <AvatarImage :src="user.user_photo_path || ''" />
+                <AvatarFallback class="text-lg font-medium bg-primary/10 text-primary">{{ getInitials(user.user_name) }}</AvatarFallback>
               </Avatar>
               <div class="min-w-0 flex-1">
-                <div class="font-medium text-base truncate">{{ user.name }}</div>
-                <div class="text-sm text-muted-foreground truncate">{{ user.email }}</div>
+                <div class="font-medium text-base truncate">{{ user.user_name }}</div>
+                <div class="text-sm text-muted-foreground truncate">{{ user.user_email }}</div>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-3 border-t pt-3 text-sm">
-              <div class="flex flex-col">
+            <div class="grid grid-cols-1 gap-3 border-t pt-3 text-sm">
+              <!-- <div class="flex flex-col">
                 <span class="text-xs text-muted-foreground font-medium uppercase tracking-wide">Last Active</span>
-                <span class="font-medium mt-1">{{ user.lastActive }}</span>
-              </div>
-              <div class="flex flex-col items-end">
+                <span class="font-medium mt-1">{{ getActivityStatus(user) }}</span>
+              </div> -->
+              <div class="flex flex-row items-center justify-between">
                 <span class="text-xs text-muted-foreground font-medium uppercase tracking-wide">Avg. Session</span>
-                <span class="font-medium mt-1">{{ user.avgSessionDuration }}</span>
+                <span class="font-medium mt-1">{{ getAvgSessionDuration(user) }}</span>
               </div>
             </div>
           </div>

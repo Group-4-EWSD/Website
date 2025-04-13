@@ -19,5 +19,5 @@ export const updateSubmissionDate = async (submissionDate: SubmissionDateUpdateP
 
 export const getContactUsData = async (): Promise<ContactUsInfo[]> => {
   const response = await api.get(`contact-us/get-all-list`);
-  return response.data[0];
+  return response.data;
 }

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import type { AcceptableValue } from 'reka-ui'
 
 interface Props {
   name: string
@@ -17,7 +18,7 @@ interface Props {
   placeholder?: string
   options: { label: string; value: string | number }[]
   errors?: Record<string, string | string[] | null | undefined>
-  modelValue?: string | number
+  modelValue?: AcceptableValue
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 const attrs = useAttrs() as Record<string, unknown> // Get rest props
 
 // Vee-validate field
-const { value, setValue } = useField(() => props.name)
+const { value, setValue } = useField<AcceptableValue>(() => props.name)
 
 // Watch for external modelValue updates and sync with vee-validate
 watchEffect(() => {
@@ -41,24 +42,25 @@ watchEffect(() => {
 <template>
   <div class="w-full">
     <Field v-bind="attrs" :name="props.name" :validate-on-mount="false">
-      <Select :model-value="value" @update:model-value="setValue">
+      <Select
+        :name="props.name"
+        :options="props.options"
+        :model-value="value"
+        @update:model-value="setValue"
+      >
         <SelectTrigger
           :class="
             cn(
               'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
               props.class,
-              { 'border-red-500': props.errors && props.errors[props.name] }
+              { 'border-red-500': props.errors && props.errors[props.name] },
             )
           "
         >
           <SelectValue :placeholder="props.placeholder" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem
-            v-for="option in props.options"
-            :key="option.value"
-            :value="option.value"
-          >
+          <SelectItem v-for="option in props.options" :key="option.value" :value="option.value">
             {{ option.label }}
           </SelectItem>
         </SelectContent>

@@ -34,7 +34,7 @@ const studentRoutes = [
     name: 'Student Home',
     component: StudentHome,
     meta: {
-      id: 1,
+      id: 1, // Student Dashboard Page
       roles: ['student'],
     },
   },
@@ -43,7 +43,7 @@ const studentRoutes = [
     name: 'My Articles',
     component: MyArticles,
     meta: {
-      id: 2,
+      id: 4, // Student My Articles Page
       roles: ['student'],
     },
   },
@@ -52,7 +52,7 @@ const studentRoutes = [
     name: 'Draft Articles',
     component: DraftArticles,
     meta: {
-      id: 5,
+      id: 5, // Student Draft Articles Page
       roles: ['student'],
     },
   },
@@ -64,7 +64,7 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
-      id: 8,
+      id: 8, // Marketing Coordinator Dashboard Page
       roles: ['Marketing Coordinator'],
     },
   },
@@ -73,7 +73,7 @@ const coordinatorRoutes = [
     name: 'Coordinator Articles',
     component: CoordinatorArticles,
     meta: {
-      id: 9,
+      id: 9, // Marketing Coordinator Articles Page
       roles: ['Marketing Coordinator'],
     },
   },
@@ -85,7 +85,7 @@ const managerRoutes = [
     name: 'Manager Dashboard',
     component: ManagerDashboard,
     meta: {
-      id: 10,
+      id: 11, // Marketing Manager Dashboard Page
       roles: ['Marketing Manager'],
     },
   },
@@ -94,7 +94,7 @@ const managerRoutes = [
     name: 'Articles',
     component: ManagerArticles,
     meta: {
-      id: 14,
+      id: 12, // Marketing Manager Articles Page
       roles: ['Marketing Manager'],
     },
   },
@@ -133,7 +133,7 @@ const adminRoutes = [
     name: 'Management',
     component: AdminManagement,
     meta: {
-      id: 17,
+      id: 13, // Admin Dashboard Page
       roles: ['Admin'],
     },
   },
@@ -142,7 +142,7 @@ const adminRoutes = [
     name: 'Reports',
     component: AdminReports,
     meta: {
-      id: 18,
+      id: 14, // Admin Reports Page
       roles: ['Admin'],
     },
   },
@@ -151,7 +151,7 @@ const adminRoutes = [
     name: 'Users',
     component: AdminUsers,
     meta: {
-      id: 20,
+      id: 17, // Admin User Page
       roles: ['Admin'],
     },
   },
@@ -160,7 +160,7 @@ const adminRoutes = [
     name: 'Contact Us',
     component: ContactUs,
     meta: {
-      id: 21,
+      id: 18, // Admin Contact Us Page
       roles: ['Admin'],
     },
   },
@@ -233,10 +233,6 @@ router.afterEach((to) => {
 
 // Function to track page visits
 function trackPageVisit(path: string) {
-  // const userInfo = getCookie('user')
-  // // Get user ID if available
-  // const userId = userInfo ? JSON.parse(userInfo).id : 'anonymous';
-
   const pageInfo = allValidRoutes.find((route) => route.path === path)
   if (pageInfo) {
     visitCount(pageInfo.meta.id.toString())
@@ -247,24 +243,24 @@ function trackPageVisit(path: string) {
 
     const roleAndPageMap: Record<string, Record<string, number>> = {
       Student: {
-        '/articles/:id': 3,
-        '/notifications': 6,
-        '/settings': 7,
+        '/articles/:id': 3, // Student Article Detail Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7,     // Setting Page
       },
       'Marketing Coordinator': {
-        '/articles/:id': 10,
-        '/notifications': 11,
-        '/settings': 12,
+        '/articles/:id': 10, // Marketing Coordinator Article Detail Page
+        '/notifications': 6,  // Notification Page
+        '/settings': 7,       // Setting Page
       },
       'Marketing Manager': {
-        '/notifications': 15,
-        '/settings': 16,
+        '/notifications': 6,  // Notification Page
+        '/settings': 7,       // Setting Page
       },
       Admin: {
-        '/settings': 19,
+        '/settings': 7,       // Setting Page
       },
       Guest: {
-        '/settings': 21,
+        '/settings': 7,       // Setting Page
       },
     }
 

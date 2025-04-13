@@ -176,6 +176,7 @@ const saveSubmissionDate = handleSubmit(async (formValues) => {
       // Update existing submission date
       const updateData: SubmissionDateUpdateParams = {
         ...submissionData,
+        updated_at: editingSubmission.value.updated_at,
         system_id: editingSubmission.value.system_id,
       }
 

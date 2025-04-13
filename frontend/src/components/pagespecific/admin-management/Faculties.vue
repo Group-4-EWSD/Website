@@ -88,6 +88,7 @@ const saveFaculty = handleSubmit(async (values) => {
         faculty_id: formId.value,
         faculty_name: values.faculty_name,
         remark: values.remark,
+        updated_at: editing.value.updated_at,
       }
       await updateFaculty(params)
       emit('refresh')

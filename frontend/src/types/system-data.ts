@@ -7,6 +7,7 @@ export interface SubmissionDate {
   faculty_id: string
   pre_submission_date: string
   actual_submission_date: string
+  updated_at: string
 }
 
 export interface SubmissionDateForm {
@@ -28,6 +29,7 @@ export interface SubmissionDateParams {
 
 export interface SubmissionDateUpdateParams extends SubmissionDateParams {
   system_id: string
+  updated_at: string
 }
 
 export interface ContactUsInfo { 

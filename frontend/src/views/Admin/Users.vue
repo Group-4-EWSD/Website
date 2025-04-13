@@ -54,6 +54,7 @@ import type { Faculty } from '@/types/faculty'
 import { calculateAge } from '@/lib/utils'
 import { toast } from 'vue-sonner'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import type { AcceptableValue } from 'reka-ui'
 
 interface Column {
   key: string
@@ -149,8 +150,8 @@ const { handleSubmit, errors, values, resetForm, setValues } = useForm({
     user_type_id: '',
     faculty_id: '',
     gender: 0,
-    date_of_birth: null,
-    phone_number: null,
+    date_of_birth: "",
+    phone_number: "",
   },
 })
 
@@ -218,6 +219,9 @@ function applyFiltersAndSort() {
     const aValue = a[sortColumn.value as keyof User]
     const bValue = b[sortColumn.value as keyof User]
 
+    if (aValue === null || aValue === undefined) return 1
+    if (bValue === null || bValue === undefined) return -1
+
     if (aValue < bValue) return sortDirection.value === 'asc' ? -1 : 1
     if (aValue > bValue) return sortDirection.value === 'asc' ? 1 : -1
     return 0
@@ -265,16 +269,16 @@ function handleSearch() {
 }
 
 // Then update your functions:
-function updateUserType(value: string | null) {
-  selectedUserType.value = value || ''
+function updateUserType(value: AcceptableValue) {
+  selectedUserType.value = value ? value.toString() : ''
   // Reset faculty if user type is manager or admin
-  if (value && ['3', '4'].includes(value)) {
+  if (value && ['3', '4'].includes(selectedUserType.value)) {
     selectedFaculty.value = ''
   }
 }
 
-function updateFaculty(value: string | null) {
-  selectedFaculty.value = value || ''
+function updateFaculty(value: AcceptableValue) {
+  selectedFaculty.value = value ? value.toString() : ''
 }
 
 function getUserTypeLabel(value: string): string {
@@ -306,8 +310,8 @@ function editUser(user: User) {
     user_type_id: user.user_type_id,
     faculty_id: user.faculty_id,
     gender: user.gender,
-    date_of_birth: user.date_of_birth,
-    phone_number: user.phone_number,
+    date_of_birth: user.date_of_birth as string,
+    phone_number: user.phone_number as string,
   })
   showUserDialog.value = true
 }

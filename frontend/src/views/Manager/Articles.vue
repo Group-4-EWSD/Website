@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'vue-sonner'
 import { downloadArticles } from '@/api/articles'
+import type { AcceptableValue } from 'reka-ui'
 
 // Store for persisting state across page visits
 const articleStore = useArticleStore()
@@ -159,8 +160,8 @@ const handleSearch = () => {
   loadArticles()
 }
 
-const handleAcademicYearChange = (value: string) => {
-  selectedAcademicYearId.value = value
+const handleAcademicYearChange = (value: AcceptableValue) => {
+  selectedAcademicYearId.value = value ? value.toString() : ''
   articleStore.setCurrentPage(1) // Reset to first page when changing filter
   loadArticles()
 }
@@ -437,7 +438,7 @@ watchEffect(() => {
                     {{ article.article_title }}
                   </CardTitle>
                 </div>
-                <Badge :variant="getStatusBadgeVariant(article.status)">
+                <Badge>
                   {{ getStatusDisplay(article.status) }}
                 </Badge>
               </div>

@@ -239,7 +239,7 @@ class ArticleRepository
         //$state = 0; // Student Common Dashboard
         //$state = 1; // Student My Articles
         //$state = 2; // Student My Draft Articles
-        //$state = 3; // Coordinator Common Dashboard, My Articles
+        //$state = 3; // Coordinator Common Dashboard, Coordinator My Articles
         //$state = 4; // All Articles By Manager
         $articles = DB::table('articles as art')
             ->select([
@@ -340,7 +340,11 @@ class ArticleRepository
                         ELSE 0
                     END AS feedback_status
                 "));
-                $articles->where('sd.faculty_id', '=', $primaryKey);
+                if ($state == 3) {
+                    $articles->where('sd.faculty_id', '=', $primaryKey);
+                } else if ($state == 0){
+                    $articles->where('u.id', '=', $primaryKey);
+                }
             } else {
                 $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
                 $articles->havingRaw("status IN (2, 4)");
@@ -402,23 +406,29 @@ class ArticleRepository
 
     public function getArticlePerYear($facultyId = null)
     {
-        $articlePerYear = DB::table('articles as a')
-            ->select([
-                DB::raw('COUNT(a.article_id) as article_count'),
-                DB::raw("ay.academic_year_start as academic_year")
-            ])
-            ->join('users as u', 'u.id', '=', 'a.user_id')
-            ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
-            ->join('system_datas as sd', 'sd.system_id', '=', 'a.system_id') // Assuming correct join
-            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
-            ->groupBy('ay.academic_year_start', 'ay.academic_year_end');
-
+        $query = DB::table('academic_years as ay')
+            ->selectRaw('COUNT(DISTINCT a.article_id) as article_count, ay.academic_year_start as academic_year')
+            ->leftJoin('system_datas as sd', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->leftJoin('articles as a', 'sd.system_id', '=', 'a.system_id')
+            ->leftJoin('users as u', 'u.id', '=', 'a.user_id');
+    
         if ($facultyId !== null) {
-            $articlePerYear->where('u.faculty_id', '=', $facultyId);
+            // Wrap condition to ensure null articles are excluded unless they belong to the given faculty
+            $query->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+                  ->where(function($q) use ($facultyId) {
+                      $q->where('f.faculty_id', $facultyId)
+                        ->orWhereNull('f.faculty_id'); // include years where no articles at all
+                  });
         }
-
-        return $articlePerYear->get();
+    
+        $results = $query
+            ->groupBy('ay.academic_year_start')
+            ->orderBy('ay.academic_year_start', 'asc')
+            ->get();
+    
+        return $results;
     }
+    
 
     public function draftArticleList($userId)
     {

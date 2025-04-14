@@ -26,6 +26,8 @@ const AdminManagement = () => import('@/views/Admin/Management.vue')
 const AdminReports = () => import('@/views/Admin/Reports.vue')
 const AdminUsers = () => import('@/views/Admin/Users.vue')
 
+const Home = () => import('@/views/Home.vue')
+
 const studentRoutes = [
   {
     path: '/student/home',
@@ -97,6 +99,15 @@ const managerRoutes = [
 ]
 
 const commomRoutes = [
+  {
+    path: '/home',
+    name: 'Home',
+    component: Home,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
   {
     path: '/articles/:id',
     name: 'getArticleDetails',
@@ -186,6 +197,11 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   userStore.setUser(userInfo)
   const userType = userStore.user?.user_type_name?.trim() || ''
+
+  if (to.meta.public) {
+    // If the route is public, allow access
+    return next()
+  }
 
   if (
     token &&

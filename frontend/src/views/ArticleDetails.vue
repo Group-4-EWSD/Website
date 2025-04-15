@@ -317,6 +317,16 @@ const isPublished = computed(() => articleStatus.value === 4)
               {{ isRejected ? 'Rejected' : 'Reject' }}
             </Button>
 
+            <!-- Published -->
+            <Button
+              v-if="isCoordinator && isPublished"
+              :disabled="false"
+              class="px-4 py-2 rounded-md border bg-blue-100 text-gray-800 hover:bg-blue-200 text-sm font-medium"
+              @click="triggerFeedback('reject')"
+            >
+              Published
+            </Button>
+
             <!-- Download -->
             <Button
               class="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"

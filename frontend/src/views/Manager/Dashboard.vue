@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
 
-import ArticleChart from '@/components/pagespecific/coordinator-home/ArticleChart.vue'
+import ArticleChart from '@/components/shared/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
 import AuroraMembers from '@/components/pagespecific/manager-dashboard/AuroraMembers.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

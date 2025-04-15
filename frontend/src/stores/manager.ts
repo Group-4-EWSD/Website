@@ -5,7 +5,7 @@ import { toast } from 'vue-sonner'
 import { getDashboardData } from '@/api/manager'
 import type { AuroraMember, CountData, ChartData, GuestList } from '@/types/manager'
 
-export const useManagerStore = defineStore('coordinator-article', () => {
+export const useManagerStore = defineStore('manager', () => {
   const countData = ref<CountData | null>(null)
   const members = ref<AuroraMember[]>([])
   const guestList = ref<GuestList[]>([])

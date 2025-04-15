@@ -2,6 +2,7 @@
 import {
   BadgeHelp,
   Bell,
+  BellIcon,
   Calendar,
   CircleGauge,
   FileText,
@@ -112,6 +113,11 @@ switch (userType) {
         title: 'Users',
         url: '/admin/users',
         icon: User,
+      },
+      {
+        title: 'Contact Messages',
+        url: '/admin/contact-us',
+        icon: BellIcon,
       },
       {
         title: 'Settings',

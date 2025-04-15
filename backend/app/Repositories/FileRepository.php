@@ -65,10 +65,10 @@ class FileRepository
         ]);
 
         $fileContent = $result['Body']->getContents();
-        
+
         // Use system temp directory (Vercel compatible)
         $tempPath = sys_get_temp_dir() . '/temp_' . time() . '.docx';
-        
+
         // Store temp file
         if (file_put_contents($tempPath, $fileContent) === false) {
             throw new \Exception('Failed to write temp file.');
@@ -77,7 +77,7 @@ class FileRepository
         // Read DOCX contents
         $phpWord = IOFactory::load($tempPath);
         $text = '';
-        
+
         foreach ($phpWord->getSections() as $section) {
             foreach ($section->getElements() as $element) {
                 if ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
@@ -130,12 +130,18 @@ class FileRepository
 
         foreach ($files as $file) {
             $s3Path = $file->file_path;
+            $articleTitle = preg_replace('/[^\w\-]/', '_', $file->article_title); // Sanitize title
+            $fileName = basename($file->file_path); // e.g. 'document.pdf'
+
             $result = $this->s3Client->getObject([
                 'Bucket' => 'ewsdcloud',
                 'Key' => $s3Path,
             ]);
+
             $fileContent = $result['Body']->getContents();
-            $zip->addFromString(basename($file->file_path), $fileContent);
+
+            // Add to a folder named after article_title inside the ZIP
+            $zip->addFromString("{$articleTitle}/{$fileName}", $fileContent);
         }
 
         $zip->close(); // Finalize ZIP
@@ -155,6 +161,4 @@ class FileRepository
         return response()->json(['download_url' => $downloadUrl]); // Open Url and it will download automatically.
         // return redirect()->away($downloadUrl);
     }
-
-
 }

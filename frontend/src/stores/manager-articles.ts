@@ -1,6 +1,8 @@
 // src/stores/article.ts
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+
+import { getAcademicYearList } from '@/api/academic-years'
 import api from '@/api/axios'
 
 export interface AcademicYear {
@@ -92,12 +94,12 @@ export const useArticleStore = defineStore('article', () => {
           academicYearId: params.academicYearId || '',
           articleTitle: params.articleTitle || '',
           sorting: params.sorting || '',
-          status: params.status !== undefined ? params.status : 2 // Default to status 2
+          // status: params.status !== undefined ? params.status : 2 // Default to status 2
         }
       })
 
-      const fetchedArticles = response.data
-      const total = response.data.totalCount
+      const fetchedArticles = response.data.articles
+      const total = response.data.articlesCount
 
       // Update the cache
       articlesCache.value[cacheKey] = {
@@ -124,8 +126,7 @@ export const useArticleStore = defineStore('article', () => {
     
     try {
       isLoading.value = true
-      const response = await api.get('academic-years/get-all-academic-years')
-      academicYears.value = response.data
+      academicYears.value = await getAcademicYearList();
       academicYearsLoaded.value = true
     } catch (error) {
       console.error('Error fetching academic years:', error)

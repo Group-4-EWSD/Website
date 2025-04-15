@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { visitCount } from '@/api/auth'
 import { getCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
 import Unauthorized from '@/views/Unauthorized.vue'
@@ -25,6 +26,7 @@ const Settings = () => import('@/views/Settings.vue')
 const AdminManagement = () => import('@/views/Admin/Management.vue')
 const AdminReports = () => import('@/views/Admin/Reports.vue')
 const AdminUsers = () => import('@/views/Admin/Users.vue')
+const ContactUs = () => import('@/views/Admin/ContactUs.vue')
 
 const studentRoutes = [
   {
@@ -32,7 +34,7 @@ const studentRoutes = [
     name: 'Student Home',
     component: StudentHome,
     meta: {
-      // requiresAuth: true,
+      id: 1, // Student Dashboard Page
       roles: ['student'],
     },
   },
@@ -41,7 +43,7 @@ const studentRoutes = [
     name: 'My Articles',
     component: MyArticles,
     meta: {
-      // requiresAuth: true,
+      id: 4, // Student My Articles Page
       roles: ['student'],
     },
   },
@@ -50,7 +52,7 @@ const studentRoutes = [
     name: 'Draft Articles',
     component: DraftArticles,
     meta: {
-      // requiresAuth: true,
+      id: 5, // Student Draft Articles Page
       roles: ['student'],
     },
   },
@@ -62,7 +64,7 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
-      // requiresAuth: true,
+      id: 8, // Marketing Coordinator Dashboard Page
       roles: ['Marketing Coordinator'],
     },
   },
@@ -71,7 +73,7 @@ const coordinatorRoutes = [
     name: 'Coordinator Articles',
     component: CoordinatorArticles,
     meta: {
-      // requiresAuth: true,
+      id: 9, // Marketing Coordinator Articles Page
       roles: ['Marketing Coordinator'],
     },
   },
@@ -83,6 +85,7 @@ const managerRoutes = [
     name: 'Manager Dashboard',
     component: ManagerDashboard,
     meta: {
+      id: 11, // Marketing Manager Dashboard Page
       roles: ['Marketing Manager'],
     },
   },
@@ -91,6 +94,7 @@ const managerRoutes = [
     name: 'Manager Articles',
     component: ManagerArticles,
     meta: {
+      id: 12, // Marketing Manager Articles Page
       roles: ['Marketing Manager'],
     },
   },
@@ -102,7 +106,6 @@ const commomRoutes = [
     name: 'getArticleDetails',
     component: ArticleDetails,
     meta: {
-      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator'],
     },
   },
@@ -120,7 +123,6 @@ const commomRoutes = [
     name: 'Settings',
     component: Settings,
     meta: {
-      // requiresAuth: true,
       roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
     },
   },
@@ -132,6 +134,7 @@ const adminRoutes = [
     name: 'Management',
     component: AdminManagement,
     meta: {
+      id: 13, // Admin Dashboard Page
       roles: ['Admin'],
     },
   },
@@ -140,6 +143,7 @@ const adminRoutes = [
     name: 'Reports',
     component: AdminReports,
     meta: {
+      id: 14, // Admin Reports Page
       roles: ['Admin'],
     },
   },
@@ -148,6 +152,16 @@ const adminRoutes = [
     name: 'Users',
     component: AdminUsers,
     meta: {
+      id: 17, // Admin User Page
+      roles: ['Admin'],
+    },
+  },
+  {
+    path: '/admin/contact-us',
+    name: 'Contact Us',
+    component: ContactUs,
+    meta: {
+      id: 18, // Admin Contact Us Page
       roles: ['Admin'],
     },
   },
@@ -165,18 +179,11 @@ const fallbackRoutes = [{ path: '/unauthorized', name: 'Unauthorized', component
 // Wildcard route to catch undefined paths and redirect to login
 const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
+const allValidRoutes = [...studentRoutes, ...coordinatorRoutes, ...managerRoutes, ...adminRoutes]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    ...studentRoutes,
-    ...coordinatorRoutes,
-    ...adminRoutes,
-    ...managerRoutes,
-    ...commomRoutes,
-    ...authRoutes,
-    ...fallbackRoutes,
-    wildcardRoute,
-  ],
+  routes: [...allValidRoutes, ...commomRoutes, ...authRoutes, ...fallbackRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {
@@ -216,5 +223,53 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
+// Add afterEach hook to track page visits after navigation is complete
+router.afterEach((to) => {
+  // Don't track visits to authentication pages
+  if (!to.path.startsWith('/auth/')) {
+    trackPageVisit(to.path)
+  }
+})
+
+// Function to track page visits
+function trackPageVisit(path: string) {
+  const pageInfo = allValidRoutes.find((route) => route.path === path)
+  if (pageInfo) {
+    visitCount(pageInfo.meta.id.toString())
+  } else if (commomRoutes.find((route) => route.path === path)) {
+    // if common route, check with role and set id accordingly
+    const userStore = useUserStore()
+    const userType = userStore.user?.user_type_name?.trim() || ''
+
+    const roleAndPageMap: Record<string, Record<string, number>> = {
+      Student: {
+        '/articles/:id': 3, // Student Article Detail Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
+      },
+      'Marketing Coordinator': {
+        '/articles/:id': 10, // Marketing Coordinator Article Detail Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
+      },
+      'Marketing Manager': {
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
+      },
+      Admin: {
+        '/settings': 7, // Setting Page
+      },
+      Guest: {
+        '/settings': 7, // Setting Page
+      },
+    }
+
+    const pageId = roleAndPageMap[userType]?.[path] || 0
+    if (pageId) {
+      visitCount(pageId.toString())
+    }
+  }
+}
 
 export default router

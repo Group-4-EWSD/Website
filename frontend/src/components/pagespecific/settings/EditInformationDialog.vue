@@ -19,9 +19,9 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { calculateAge } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
 import type { User, UserDetailsParams } from '@/types/user'
-import { calculateAge } from '@/lib/utils'
 
 
 

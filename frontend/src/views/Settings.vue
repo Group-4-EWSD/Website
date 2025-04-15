@@ -84,9 +84,9 @@ const handleRemovePhoto = () => {
               <SettingsRow label="Nick Name" :value="user?.nickname" />
               <SettingsRow label="Email" :value="user?.user_email" />
               <SettingsRow label="Faculty" :value="user?.faculty_name" />
-              <SettingsRow label="Date of Birth" :value="user?.date_of_birth" />
-              <SettingsRow label="Gender" :value="GenderOptions[user?.gender]" />
-              <SettingsRow label="Phone Number" :value="user?.phone_number" />
+              <SettingsRow label="Date of Birth" :value="user?.date_of_birth || ''" />
+              <SettingsRow label="Gender" :value="GenderOptions[Number(user?.gender || '3')]" />
+              <SettingsRow label="Phone Number" :value="user?.phone_number || ''" />
             </div>
           </CardContent>
         </Card>

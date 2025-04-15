@@ -7,12 +7,12 @@ import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 
 import {
-  getArticleDetails,
-  updateStatus,
   type ActionParams,
   type Comment,
   createComment,
   createFeedback,
+  getArticleDetails,
+  updateStatus,
 } from '@/api/articles'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'

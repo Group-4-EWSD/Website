@@ -30,7 +30,7 @@ const ContactUs = () => import('@/views/Admin/ContactUs.vue')
 
 const Home = () => import('@/views/Home.vue')
 const AboutUs = () => import('@/views/AboutUs.vue')
-const ContactUs = () => import('@/views/ContactUs.vue')
+const ContactUsForm = () => import('@/views/ContactUsForm.vue')
 
 const studentRoutes = [
   {
@@ -125,8 +125,8 @@ const commomRoutes = [
   },
   {
     path: '/contact-us',
-    name: 'Contact Us',
-    component: ContactUs,
+    name: 'Contact Us Form',
+    component: ContactUsForm,
     meta: {
       public: true,
       roles: [],

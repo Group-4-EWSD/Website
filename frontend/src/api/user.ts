@@ -32,6 +32,6 @@ export const updateUser = async (user: UpdateUserParams): Promise<User> => {
 }
 
 export const forcePasswordReset = async (userId: string): Promise<User> => {
-  const response = await api.post('user-force-password-reset', { userId });
+  const response = await api.post(`password-reset`, { user_id : userId });
   return response.data;
 }

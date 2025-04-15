@@ -32,12 +32,15 @@ export interface SubmissionDateUpdateParams extends SubmissionDateParams {
   updated_at: string
 }
 
-export interface ContactUsInfo { 
-  contact_us_id: string
+export interface ContactUsParams { 
   visitor_name: string
   visitor_email: string
   title: string
   description: string
+}
+
+export interface ContactUsInfo extends ContactUsParams { 
+  contact_us_id: string
   read: number
   created_at: string
   updated_at: string

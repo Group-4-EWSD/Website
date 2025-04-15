@@ -9,6 +9,9 @@ import FormElement from '@/components/shared/FormElement.vue'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { ref } from 'vue'
+import type { ContactUsParams } from '@/types/system-data'
+import { createContactUs } from '@/api/system-data'
+import { toast } from 'vue-sonner'
 
 const schema = yup.object({
   visitor_name: yup.string().required('Name is required'),
@@ -17,22 +20,31 @@ const schema = yup.object({
   description: yup.string().required('Description is required'),
 })
 
-const { handleSubmit, errors } = useForm({
+const { handleSubmit, errors, resetForm } = useForm({
   validationSchema: schema,
 })
 
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
   isSubmitting.value = true
+  const params: ContactUsParams = {
+    visitor_name: values.visitor_name,
+    visitor_email: values.visitor_email,
+    title: values.title,
+    description: values.description,
+  }
 
-  // Simulate form submission
-  setTimeout(() => {
-    console.log('Form submitted:', values)
+  try {
+    await createContactUs(params)
+    resetForm();
+    toast.success('Successfully submitted')
+  } catch {
+    toast.error('Something went wrong. Please try again later.')
+  } finally {
     isSubmitting.value = false
-    isSubmitted.value = true
-  }, 1000)
+  }
 })
 </script>
 
@@ -44,9 +56,9 @@ const onSubmit = handleSubmit((values) => {
       <img
         :src="ContactUs"
         alt="University campus"
-        class="w-full h-[300px] lg:h-screen object-cover"
+        class="w-full h-[300px] hidden lg:block lg:h-screen object-cover"
       />
-      <div class="flex flex-col justify-center mx-10 mb-10 lg:mb-0 lg:mx-0 lg:mr-10 gap-10">
+      <div class="flex flex-col justify-center mx-10 my-10 lg:my-0 lg:mx-0 lg:mr-10 gap-10">
         <h3 class="text-3xl font-bold text-center">Contact Us</h3>
 
         <div
@@ -116,7 +128,7 @@ const onSubmit = handleSubmit((values) => {
           <FormElement layout="row">
             <template #label> </template>
             <template #field>
-              <Button type="submit" :disabled="isSubmitting" class="w-full">
+              <Button type="submit" :disabled="isSubmitting" class="w-full" :processing="isSubmitting">
                 {{ isSubmitting ? 'Submitting...' : 'Submit' }}
               </Button>
             </template>

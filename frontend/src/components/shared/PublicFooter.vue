@@ -32,7 +32,7 @@ import {
               target="_blank"
               class="flex items-center text-gray-600 hover:text-blue-700"
             >
-              <FacebookIcon class="h-6 w-6 mr-4" />
+              <FacebookIcon class="h-6 min-w-6 mr-4" />
               Facebook
             </a>
             <a
@@ -40,7 +40,7 @@ import {
               target="_blank"
               class="flex items-center text-gray-600 hover:text-blue-500"
             >
-              <TwitterIcon class="h-6 w-6 mr-4" />
+              <TwitterIcon class="h-6 min-w-6 mr-4" />
               Twitter
             </a>
             <a
@@ -48,7 +48,7 @@ import {
               target="_blank"
               class="flex items-center text-gray-600 hover:text-pink-500"
             >
-              <InstagramIcon class="h-6 w-6 mr-4" />
+              <InstagramIcon class="h-6 min-w-6 mr-4" />
               Instagram
             </a>
             <a
@@ -56,7 +56,7 @@ import {
               target="_blank"
               class="flex items-center text-gray-600 hover:text-red-600"
             >
-              <YoutubeIcon class="h-6 w-6 mr-4" />
+              <YoutubeIcon class="h-6 min-w-6 mr-4" />
               Youtube
             </a>
             <a
@@ -64,7 +64,7 @@ import {
               target="_blank"
               class="flex items-center text-gray-600 hover:text-blue-600"
             >
-              <LinkedinIcon class="h-6 w-6 mr-4" />
+              <LinkedinIcon class="h-6 min-w-6 mr-4" />
               LinkedIn
             </a>
           </div>

@@ -3,6 +3,9 @@ import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import { useUserStore } from '@/stores/user'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+import { getInitials } from '@/lib/utils'
 
 const searchQuery = ref('')
 const hasNotification = true
@@ -78,11 +81,10 @@ const userStore = useUserStore()
         </p>
       </div>
 
-      <img
-        :src="userStore.currentUser?.user_photo_path"
-        alt="Profile"
-        class="w-10 h-10 rounded-full border border-white hidden sm:flex"
-      />
+      <Avatar>
+        <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
+        <AvatarFallback class="text-white">{{ getInitials(userStore.currentUser?.user_name) }}</AvatarFallback>
+      </Avatar>
     </div>
   </nav>
 </template>

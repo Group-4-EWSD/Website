@@ -68,7 +68,6 @@ export function removeCookie(name: string) {
   cookies.remove(name, '/')
 }
 
-
 // Helper function to calculate age from date of birth
 export const calculateAge = (birthDate: string): number => {
   const today = new Date()
@@ -82,4 +81,11 @@ export const calculateAge = (birthDate: string): number => {
   }
 
   return age
+}
+
+export const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
 }

@@ -27,6 +27,8 @@ const AdminReports = () => import('@/views/Admin/Reports.vue')
 const AdminUsers = () => import('@/views/Admin/Users.vue')
 
 const Home = () => import('@/views/Home.vue')
+const AboutUs = () => import('@/views/AboutUs.vue')
+const ContactUs = () => import('@/views/ContactUs.vue')
 
 const studentRoutes = [
   {
@@ -103,6 +105,24 @@ const commomRoutes = [
     path: '/home',
     name: 'Home',
     component: Home,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/about',
+    name: 'About Us',
+    component: AboutUs,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/contact-us',
+    name: 'Contact Us',
+    component: ContactUs,
     meta: {
       public: true,
       roles: [],

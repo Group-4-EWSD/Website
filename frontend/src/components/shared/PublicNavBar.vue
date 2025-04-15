@@ -56,7 +56,7 @@ const toggleMenu = () => {
     <div class="hidden md:flex md:items-center space-x-6 text-sm">
       <RouterLink to="/home" class="text-white hover:text-gray-300">Home</RouterLink>
       <RouterLink to="/about" class="text-white hover:text-gray-300">About</RouterLink>
-      <RouterLink to="/contact" class="text-white hover:text-gray-300">Contact</RouterLink>
+      <RouterLink to="/contact-us" class="text-white hover:text-gray-300">Contact Us</RouterLink>
     </div>
 
     <div class="hidden md:flex text-sm">
@@ -80,14 +80,14 @@ const toggleMenu = () => {
         >Home</RouterLink
       >
       <RouterLink
-        to="/about"
+        to="/about-s"
         class="text-white hover:text-gray-300 py-4 px-6 border-b border-gray-700"
         >About</RouterLink
       >
       <RouterLink
-        to="/contact"
+        to="/contact-us"
         class="text-white hover:text-gray-300 py-4 px-6 border-b border-gray-700"
-        >Contact</RouterLink
+        >Contact Us</RouterLink
       >
       <RouterLink
         v-if="!userStore.loggedIn"

@@ -86,9 +86,9 @@ class ArticleController extends Controller
         }else if($userType == '2'){ // Marketing Coordinator
             $homePageData = $this->articleService->getCoordinatorHomePageData($userId, $facultyId, $request);
         }else if($userType == '3'){ // Marketing Manager
-            $homePageData = $this->articleService->getManagerHomePageData($userId, $request);
-        }else if($userType == '4'){ // Marketing Manager
-            $homePageData = $this->articleService->getAdminReports($userId, $request);
+            $homePageData = $this->articleService->getManagerHomePageData($userId);
+        }else if($userType == '4'){ // Admin
+            $homePageData = $this->articleService->getAdminReports();
         }else{
             return response()->json(['message'=> "User Role Missing"], 201);
         }
@@ -178,13 +178,12 @@ class ArticleController extends Controller
         return response()->json($articles);
     }
 
-    public function articleDownload($articleId)
+    public function articleDownload(Request $request, $articleId = null)
     {
-        $articleFileList = $this->articleService->getFileList($articleId);
+        $articleFileList = $this->articleService->getFileList($articleId, $request);
         if (!empty($articleFileList)) {
             return $this->fileService->downloadMultipleAsZip($articleFileList);
         }
-        // Mail::to(Auth::user()->email)->send(new UserCreatedMail(Auth::user()));
 
         return response()->json(['message' => 'No files found'], 404);
     }

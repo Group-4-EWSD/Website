@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
-import { getNotifications, changeNotiStatus } from '@/api/notification'
+import { changeNotiStatus, getNotifications } from '@/api/notification'
 import type { Notification } from '@/types/notification'
 
 export const useNotificationsStore = defineStore('notifications', () => {

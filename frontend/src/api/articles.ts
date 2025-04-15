@@ -15,6 +15,14 @@ interface ArticlesResponse {
   allArticles: Article[]
 }
 
+export enum ArticleStatus {
+  DRAFT = 0,
+  PENDING = 1,
+  APPROVED = 2,
+  REJECTED = 3,
+  PUBLISHED = 4,
+}
+
 export interface ActionParams {
   articleId: string | null
   message: string
@@ -25,14 +33,6 @@ export interface Comment {
   user_name: string
   message: string
   created_at: string
-}
-
-export const ArticleStatus = {
-  DRAFT: 0,
-  PENDING: 1,
-  APPROVED: 2,
-  REJECTED: 3,
-  PUBLISHED: 4,
 }
 
 export const getArticles = async (params: ArticleParams): Promise<ArticlesResponse> => {
@@ -77,4 +77,10 @@ export const getCategories = async (): Promise<Category[]> => {
 
 export const updateStatus = async (status: number, articleId: string) => {
   return await api.post(`articles/change-status/${articleId}`, status)
+}
+
+export const downloadArticles = async (articleIdList: string[]) => {
+  return await api.get('articles/download', {
+    params: { articleIdList }
+  });
 }

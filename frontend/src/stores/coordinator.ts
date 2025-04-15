@@ -5,8 +5,8 @@ import { toast } from 'vue-sonner'
 import { getAllArticles, getArticles } from '@/api/coordinator'
 import type {
   Article,
-  CoordinatorArticles,
   CoordinatorArticle,
+  CoordinatorArticles,
   CountData,
   GuestList,
 } from '@/types/coordinator'

@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class ContactUsService
 {
-    protected $contactUsService;
+    protected $contactUsRepository;
 
     public function __construct(ContactUsRepository $contactUsRepository) {
         $this->contactUsRepository = $contactUsRepository;

@@ -20,9 +20,16 @@ class FacultyController extends Controller
         return response()->json($this->facultyService->getAllFaculties());
     }
 
-    public function selectFacultyByID($request)
+    public function selectFacultyByID($faculty_id)
     {
-        return $selectFacultyByID = $this->facultyService->selectFacultyByID($request);
+        $result = $this->facultyService->selectFacultyByID($faculty_id);
+
+        if($result === false){
+            return response()->json([
+                'message' => 'Faculty not found'
+            ], 404);
+        }
+        return response()->json($result, 200);
     }
 
     public function createFaculty(Request $request)
@@ -60,7 +67,8 @@ class FacultyController extends Controller
 
             if ($result) {
                 return response()->json([
-                    'message' => 'Faculty updated successfully'
+                    'message' => 'Faculty updated successfully',
+                    'updated_faculty' => $result,
                 ], 200);
             }
 

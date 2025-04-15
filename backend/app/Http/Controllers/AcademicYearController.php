@@ -50,25 +50,32 @@ class AcademicYearController extends Controller
 
     public function updateAcademicYear(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'academic_year_start' => 'required|integer',
-            'academic_year_end' => 'required|integer|gt:academic_year_start',
-            'academic_year_id' => 'required',
-            'updated_at' => 'required|date_format:Y-m-d H:i:s',
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+        try
+        {
+            $validator = Validator::make($request->all(), [
+                'academic_year_id' => 'required|uuid|exists:academic_years,academic_year_id',
+                'academic_year_start' => 'required|integer',
+                'academic_year_end' => 'required|integer|gt:academic_year_start',
+                'updated_at' => 'required|date_format:Y-m-d H:i:s',
+            ]);
+        
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 400);
+            }
+        
+            $data = $request->only(['academic_year_start', 'academic_year_end', 'updated_at']);
+            $result = $this->academicYearService->updateAcademicYear($request['academic_year_id'], $data);
+        
+            if ($result === false) {
+                return response()->json(['message' => 'Update failed. The record has been modified by another process.'], 409);
+            }
+        
+            return response()->json(['message' => 'Academic Year updated successfully', 'data'=>$result], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage()
+            ], 500);
         }
-    
-        $data = $request->only(['academic_year_start', 'academic_year_end', 'updated_at']);
-        $result = $this->academicYearService->updateAcademicYear($request['academic_year_id'], $data);
-    
-        if ($result === false) {
-            return response()->json(['message' => 'Update failed. The record has been modified by another process.'], 409);
-        }
-    
-        return response()->json(['message' => 'Academic Year updated successfully'], 200);
     }
-    
 }

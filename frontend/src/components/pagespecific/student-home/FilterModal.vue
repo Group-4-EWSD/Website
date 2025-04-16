@@ -27,15 +27,13 @@ const emit = defineEmits<{
 
 const localCategory = ref(props.selectedCategory)
 const localYear = ref(props.selectedYear)
+const isDialogOpen = ref(false)
 
-// Watch for local changes and emit events to the parent
-watch(localCategory, (newVal) => {
-  emit('update:selectedCategory', newVal)
-})
-
-watch(localYear, (newVal) => {
-  emit('update:selectedYear', newVal)
-})
+const applyFilter = () => {
+  emit('update:selectedCategory', localCategory.value === 'all' ? '' : localCategory.value)
+  emit('update:selectedYear', localYear.value === 'all' ? '' : localYear.value)
+  isDialogOpen.value = false
+}
 
 const categoryOptions = [
   { label: 'All', value: 'all' },
@@ -52,15 +50,6 @@ const yearOptions = [
   { label: '2022', value: '2022' },
 ]
 
-const getLabel = (value: string) => {
-  const found = categoryOptions.find((option) => option.value === value)
-  return found ? found.label : ''
-}
-
-const applyFilter = () => {
-  console.log('Applying filter:', { category: localCategory.value, date: localYear.value })
-}
-
 const resetFilters = () => {
   localCategory.value = 'all'
   localYear.value = 'all'
@@ -71,7 +60,7 @@ const resetFilters = () => {
   <div>
     <!-- Trigger Button -->
     <TooltipWrapper text="Filter">
-      <Dialog>
+      <Dialog v-model:open="isDialogOpen">
         <DialogTrigger as-child>
           <FilterX class="w-5 h-5 cursor-pointer hover:text-black mt-2" />
         </DialogTrigger>
@@ -91,7 +80,8 @@ const resetFilters = () => {
               <Select v-model="localCategory">
                 <SelectTrigger class="w-full p-2 border rounded-md">
                   {{
-                    selectedCategory !== 'all' ? getLabel(selectedCategory) : 'Select a category'
+                    categoryOptions.find((o) => o.value === localCategory)?.label ||
+                    'Select a category'
                   }}
                 </SelectTrigger>
                 <SelectContent>
@@ -110,7 +100,7 @@ const resetFilters = () => {
               <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Year</label>
               <Select v-model="localYear">
                 <SelectTrigger class="w-full p-2 border rounded-md">
-                  {{ selectedYear !== 'all' ? selectedYear : 'Select a year' }}
+                  {{ yearOptions.find((o) => o.value === localYear)?.label || 'Select a year' }}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem

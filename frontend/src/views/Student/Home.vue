@@ -30,13 +30,10 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
-import type { Article } from '@/types/article'
 
 const router = useRouter()
 const articleStore = useArticleStore()
-const { fetchArticles, displayNumber } = articleStore
 
-const articles = ref<Article[]>([])
 const selectedCategory = ref('all')
 const selectedYear = ref('all')
 const sortedValue = ref('created asc')
@@ -55,25 +52,44 @@ const goToArticleDetails = (articleId: string) => {
 const sortBy = (option: string) => {
   sortedValue.value = option
   articleStore.sortOption = option
-  console.log('Sorting by:', option)
+  articleStore.fetchArticles({ pageNumber: 1 })
 }
 
 onMounted(() => {
   if (!articleStore.articles.length) {
-    articleStore.fetchArticles(articleStore.currentPage)
+    articleStore.fetchArticles({ pageNumber: 1 })
   }
 })
 
-watch([() => articleStore.currentPage, () => sortedValue.value], ([newPage, newSort]) => {
-  articleStore.fetchArticles(newPage)
-})
+watch(
+  () => articleStore.currentPage,
+  (newPage) => {
+    articleStore.fetchArticles({ pageNumber: newPage })
+  },
+)
+
+watch(
+  [
+    () => articleStore.sortOption,
+    () => articleStore.selectedCategory,
+    () => articleStore.selectedYear,
+  ],
+  () => {
+    articleStore.currentPage = 1
+    articleStore.fetchArticles({ pageNumber: 1 })
+  },
+)
 
 const updateCategory = (newCategory: string) => {
   selectedCategory.value = newCategory
+  articleStore.selectedCategory = newCategory
+  articleStore.fetchArticles({ pageNumber: 1 })
 }
 
 const updateYear = (newYear: string) => {
   selectedYear.value = newYear
+  articleStore.selectedYear = newYear
+  articleStore.fetchArticles({ pageNumber: 1 })
 }
 
 const goToPage = (page: number) => {
@@ -169,7 +185,7 @@ const goToPage = (page: number) => {
               variant="outline"
               size="sm"
               class="ml-2"
-              @click="articleStore.fetchArticles(articleStore.currentPage)"
+              @click="articleStore.fetchArticles({ pageNumber: 1 })"
             >
               Try Again
             </Button>
@@ -222,7 +238,7 @@ const goToPage = (page: number) => {
           <div class="flex justify-end mt-4">
             <Pagination
               v-slot=""
-              :items-per-page="displayNumber"
+              :items-per-page="articleStore.displayNumber"
               :total="24"
               :sibling-count="1"
               show-edges

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SystemDataController;
 use App\Http\Controllers\ContactUsController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -36,7 +37,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/my-articles', [ArticleController::class, 'myArticleInitial']); // Get all articles
         Route::get('/coordinator', [ArticleController::class, 'coordinatorArticles']); // Get all articles
         Route::get('/manager', [ArticleController::class, 'managerArticles']); // Get all articles
-        Route::get('/article-list', [ArticleController::class, 'articleList']); // Get all articles
         Route::get('/draft-list', [ArticleController::class, 'draftArticleList']); // draft article list
         Route::get('/download/{articleId?}', [ArticleController::class, 'articleDownload']);
         Route::post('/like', [ActionController::class, 'articleLike']);
@@ -116,4 +116,8 @@ Route::get('/test', [ArticleController::class, 'getTest']);
 
 Route::get('/testDirect', function () {
     return response()->json(['message' => 'API is working!']);
+});
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+    return 'Cache cleared';
 });

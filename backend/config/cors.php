@@ -13,9 +13,9 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'v1/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => ['http://localhost:5173'], // Change this to your allowed origins
+    'allowed_origins' => ['*'], // Change this to your allowed origins
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,

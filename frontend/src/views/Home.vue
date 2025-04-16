@@ -65,7 +65,7 @@ import PublicFooter from '@/components/shared/PublicFooter.vue'
     </div>
 
     <!-- Featured Articles -->
-    <div class="container mx-auto px-4 py-6">
+    <div class="container mx-auto px-4 py-6" id="articles">
       <h2 class="text-xl font-bold mb-4">Featured Articles</h2>
       <div class="border-b-4 border-primary w-[165px]"></div>
 
@@ -214,7 +214,7 @@ import PublicFooter from '@/components/shared/PublicFooter.vue'
     </div>
 
     <!-- Events Section -->
-    <div class="container mx-auto px-4 py-10">
+    <div class="container mx-auto px-4 py-10" id="events">
       <h2 class="text-xl font-bold mb-4">Aurora University Upcoming Events</h2>
       <div class="border-b-4 border-primary w-[335px]"></div>
 

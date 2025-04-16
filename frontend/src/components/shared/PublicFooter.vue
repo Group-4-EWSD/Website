@@ -85,5 +85,16 @@ import {
     <div class="py-4 text-center text-xs text-primary-foreground bg-primary">
       © 2025 Aurora University. All rights reserved.
     </div>
+    <div
+      class="py-4 text-center text-xs text-primary bg-accent flex items-center justify-center gap-4"
+    >
+      <RouterLink to="/home#articles" class="hover:underline">Articles</RouterLink>
+      <RouterLink to="/home#events" class="hover:underline">Events</RouterLink>
+      <RouterLink to="/about" class="hover:underline">About</RouterLink>
+      <RouterLink to="/contact-us" class="hover:underline">Contact Us</RouterLink>
+      <RouterLink to="/terms-and-conditions" class="hover:underline"
+        >Terms and Conditions</RouterLink
+      >
+    </div>
   </footer>
 </template>

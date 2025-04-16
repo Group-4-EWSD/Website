@@ -66,7 +66,9 @@ const toggleMenu = () => {
         class="text-white hover:text-gray-300 ml-4"
         >Login</RouterLink
       >
-      <RouterLink v-else to="/" class="text-white hover:text-gray-300 ml-4">Account</RouterLink>
+      <RouterLink v-else to="/" class="text-white hover:text-gray-300 ml-4">
+        Welcome, {{ userStore.currentUser?.user_name }}
+      </RouterLink>
     </div>
 
     <!-- Mobile menu -->

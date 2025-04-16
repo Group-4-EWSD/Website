@@ -31,6 +31,7 @@ const ContactUs = () => import('@/views/Admin/ContactUs.vue')
 const Home = () => import('@/views/Home.vue')
 const AboutUs = () => import('@/views/AboutUs.vue')
 const ContactUsForm = () => import('@/views/ContactUsForm.vue')
+const TermsAndConditions = () => import('@/views/TermsAndConditions.vue')
 
 const studentRoutes = [
   {
@@ -133,6 +134,15 @@ const commomRoutes = [
     },
   },
   {
+    path: '/terms-and-conditions',
+    name: 'Terms and Conditions',
+    component: TermsAndConditions,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
     path: '/articles/:id',
     name: 'getArticleDetails',
     component: ArticleDetails,
@@ -214,6 +224,16 @@ const allValidRoutes = [...studentRoutes, ...coordinatorRoutes, ...managerRoutes
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [...allValidRoutes, ...commomRoutes, ...authRoutes, ...fallbackRoutes, wildcardRoute],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+    // always scroll to top
+    return { top: 0, behavior: 'smooth' }
+  },
 })
 
 router.beforeEach((to, from, next) => {
@@ -281,22 +301,22 @@ function trackPageVisit(path: string) {
       Student: {
         '/articles/:id': 3, // Student Article Detail Page
         '/notifications': 6, // Notification Page
-        '/settings': 7,     // Setting Page
+        '/settings': 7, // Setting Page
       },
       'Marketing Coordinator': {
         '/articles/:id': 10, // Marketing Coordinator Article Detail Page
-        '/notifications': 6,  // Notification Page
-        '/settings': 7,       // Setting Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
       },
       'Marketing Manager': {
-        '/notifications': 6,  // Notification Page
-        '/settings': 7,       // Setting Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
       },
       Admin: {
-        '/settings': 7,       // Setting Page
+        '/settings': 7, // Setting Page
       },
       Guest: {
-        '/settings': 7,       // Setting Page
+        '/settings': 7, // Setting Page
       },
     }
 

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user'
 
-import Input from '../input/Input.vue'
+import { useUserStore } from '@/stores/user'
 
 const searchQuery = ref('')
 const hasNotification = true
@@ -15,7 +14,7 @@ const userStore = useUserStore()
 </script>
 
 <template>
-  <nav class="flex justify-between items-center bg-primary text-white">
+  <nav class="flex justify-between items-center bg-primary text-white h-[65px]">
     <div class="flex items-center">
       <img
         src="@/assets/nav-logo.png"
@@ -26,7 +25,7 @@ const userStore = useUserStore()
       <span class="text-md font-bold uppercase pl-[7px] name-color">University</span>
     </div>
 
-    <div class="flex flex-1 justify-center">
+    <!-- <div class="flex flex-1 justify-center">
       <div class="hidden sm:flex w-1/2 relative sm:my-4">
         <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
         <Input v-model="searchQuery" placeholder="Search..." class="pl-10" />
@@ -54,18 +53,20 @@ const userStore = useUserStore()
           <X class="w-5 h-5" />
         </button>
       </div>
-    </div>
+    </div> -->
 
     <div class="flex items-center space-x-4 pr-2 sm:pr-6">
       <div class="relative">
-        <button class="relative p-1 text-white h-[3rem]">
-          <BellDot class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
-        </button>
+        <RouterLink :to="`/notifications`">
+          <button class="relative p-1 text-white h-[3rem]">
+            <BellDot class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
+          </button>
 
-        <span
-          v-if="hasNotification"
-          class="absolute top-[0.8rem] right-[1rem] sm:top-[1rem] sm:right-[0.37rem] w-[0.7rem] h-[0.7rem] sm:w-2 sm:h-2 bg-red-500 rounded-full"
-        ></span>
+          <span
+            v-if="hasNotification"
+            class="absolute top-[0.8rem] right-[1rem] sm:top-[1rem] sm:right-[0.37rem] w-[0.7rem] h-[0.7rem] sm:w-2 sm:h-2 bg-red-500 rounded-full"
+          ></span>
+        </RouterLink>
       </div>
 
       <!-- <div class="hidden sm:flex text-white font-medium">Welcome, Username</div> -->

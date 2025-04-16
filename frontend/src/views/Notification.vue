@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-
-import Layout from '@/components/ui/Layout.vue'
 import { onMounted, ref } from 'vue'
-import { useNotificationsStore } from '@/stores/notification'
+
+import Button from '@/components/ui/button/Button.vue'
+import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
+import { useNotificationsStore } from '@/stores/notification'
 
 dayjs.extend(relativeTime)
 
@@ -50,9 +51,24 @@ const handleNotificationClick = (notification: any) => {
           </div>
         </template>
         <template v-else>
+          <div
+            v-if="!notificationsStore.notifications.length"
+            class="flex flex-col items-center justify-center"
+          >
+            <p>Oops, there is no notification.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              class="ml-2"
+              @click="notificationsStore.fetchNotification()"
+            >
+              Try Again
+            </Button>
+          </div>
           <RouterLink
+            v-else
             v-for="notification in notificationsStore.notifications"
-            :key="notification.action_id"
+            :key="notification.notification_id"
             :to="`/articles/${notification.article_id}`"
             class="block"
             @click="handleNotificationClick(notification)"
@@ -73,7 +89,7 @@ const handleNotificationClick = (notification: any) => {
                     From {{ notification.user_name }} ({{ notification.user_type_name }} -
                     {{ notification.faculty_name }})
                   </div>
-                  <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
+                  <p class="text-sm text-gray-600 mt-1">{{ notification.article_title }}</p>
                 </div>
 
                 <!-- Right side -->

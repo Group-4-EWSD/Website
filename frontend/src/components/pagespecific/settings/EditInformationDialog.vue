@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { calculateAge } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
 import type { User, UserDetailsParams } from '@/types/user'
 
@@ -38,21 +39,6 @@ const genderOptions = [
   { label: 'Female', value: 2 },
   { label: 'Prefer not to say', value: 0 },
 ]
-
-// Helper function to calculate age from date of birth
-const calculateAge = (birthDate: string): number => {
-  const today = new Date()
-  const dob = new Date(birthDate)
-  let age = today.getFullYear() - dob.getFullYear()
-  const monthDiff = today.getMonth() - dob.getMonth()
-
-  // If birth month is later in the year or same month but birth day is later, subtract one year
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--
-  }
-
-  return age
-}
 
 // Define the form schema
 const schema = yup.object({

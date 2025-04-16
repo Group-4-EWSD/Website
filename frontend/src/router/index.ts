@@ -1,21 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { visitCount } from '@/api/auth'
 import { getCookie } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
+import Unauthorized from '@/views/Unauthorized.vue'
 
 const Login = () => import('@/views/Auth/Login.vue')
 const Register = () => import('@/views/Auth/Register.vue')
+const PasswordReset = () => import('@/views/Auth/PasswordReset.vue')
+
 const StudentHome = () => import('@/views/Student/Home.vue')
-const ArticleDetails = () => import('@/views/Student/ArticleDetails.vue')
+const ArticleDetails = () => import('@/views/ArticleDetails.vue')
 const MyArticles = () => import('@/views/Student/MyArticles.vue')
 const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
-const Notification = () => import('@/views/Student/Notification.vue')
-const Settings = () => import('@/views/Settings.vue')
 
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
-const CoordinatorNotification = () => import('@/views/Coordinator/Notification.vue')
-const CoordinatorSettings = () => import('@/views/Coordinator/Settings.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
+
+const ManagerDashboard = () => import('@/views/Manager/Dashboard.vue')
+const ManagerArticles = () => import('@/views/Manager/Articles.vue')
+
+const Notification = () => import('@/views/Notification.vue')
+const Settings = () => import('@/views/Settings.vue')
+
+const AdminManagement = () => import('@/views/Admin/Management.vue')
+const AdminReports = () => import('@/views/Admin/Reports.vue')
+const AdminUsers = () => import('@/views/Admin/Users.vue')
+const ContactUs = () => import('@/views/Admin/ContactUs.vue')
 
 const studentRoutes = [
   {
@@ -23,7 +34,8 @@ const studentRoutes = [
     name: 'Student Home',
     component: StudentHome,
     meta: {
-      requiresAuth: true,
+      id: 1, // Student Dashboard Page
+      roles: ['student'],
     },
   },
   {
@@ -31,15 +43,8 @@ const studentRoutes = [
     name: 'My Articles',
     component: MyArticles,
     meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    path: '/articles/:id',
-    name: 'getArticleDetails',
-    component: ArticleDetails,
-    meta: {
-      requiresAuth: true,
+      id: 4, // Student My Articles Page
+      roles: ['student'],
     },
   },
   {
@@ -47,23 +52,8 @@ const studentRoutes = [
     name: 'Draft Articles',
     component: DraftArticles,
     meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    path: '/student/notifications',
-    name: 'Student Notifications',
-    component: Notification,
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    path: '/student/settings',
-    name: 'Settings',
-    component: Settings,
-    meta: {
-      requiresAuth: true,
+      id: 5, // Student Draft Articles Page
+      roles: ['student'],
     },
   },
 ]
@@ -74,48 +64,125 @@ const coordinatorRoutes = [
     name: 'Coordinator Dashboard',
     component: CoordinatorDashboard,
     meta: {
-      requiresAuth: true,
+      id: 8, // Marketing Coordinator Dashboard Page
+      roles: ['Marketing Coordinator'],
     },
   },
   {
     path: '/coordinator/articles',
-    name: 'Articles',
+    name: 'Coordinator Articles',
     component: CoordinatorArticles,
     meta: {
-      requiresAuth: true,
+      id: 9, // Marketing Coordinator Articles Page
+      roles: ['Marketing Coordinator'],
+    },
+  },
+]
+
+const managerRoutes = [
+  {
+    path: '/manager/dashboard',
+    name: 'Manager Dashboard',
+    component: ManagerDashboard,
+    meta: {
+      id: 11, // Marketing Manager Dashboard Page
+      roles: ['Marketing Manager'],
     },
   },
   {
-    path: '/coordinator/notifications',
-    name: 'Coordinator Notification',
-    component: CoordinatorNotification,
+    path: '/manager/articles',
+    name: 'Articles',
+    component: ManagerArticles,
     meta: {
-      requiresAuth: true,
+      id: 12, // Marketing Manager Articles Page
+      roles: ['Marketing Manager'],
+    },
+  },
+]
+
+const commomRoutes = [
+  {
+    path: '/articles/:id',
+    name: 'getArticleDetails',
+    component: ArticleDetails,
+    meta: {
+      roles: ['Student', 'Marketing Coordinator'],
     },
   },
   {
-    path: '/coordinator/settings',
-    name: 'Coordinator Settings',
-    component: CoordinatorSettings,
+    path: '/notifications',
+    name: 'Notification',
+    component: Notification,
     meta: {
-      requiresAuth: true,
+      roles: ['Student', 'Marketing Coordinator'],
+    },
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: {
+      roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
+    },
+  },
+]
+
+const adminRoutes = [
+  {
+    path: '/admin/management',
+    name: 'Management',
+    component: AdminManagement,
+    meta: {
+      id: 13, // Admin Dashboard Page
+      roles: ['Admin'],
+    },
+  },
+  {
+    path: '/admin/reports',
+    name: 'Reports',
+    component: AdminReports,
+    meta: {
+      id: 14, // Admin Reports Page
+      roles: ['Admin'],
+    },
+  },
+  {
+    path: '/admin/users',
+    name: 'Users',
+    component: AdminUsers,
+    meta: {
+      id: 17, // Admin User Page
+      roles: ['Admin'],
+    },
+  },
+  {
+    path: '/admin/contact-us',
+    name: 'Contact Us',
+    component: ContactUs,
+    meta: {
+      id: 18, // Admin Contact Us Page
+      roles: ['Admin'],
     },
   },
 ]
 
 const authRoutes = [
   { path: '/auth/login', name: 'login', component: Login },
-  { path: '/auth/forgot-password', name: 'forgot-password', component: Login },
+  { path: '/auth/forgot-password', name: 'forgot-password', component: PasswordReset },
   { path: '/auth/register', name: 'register', component: Register },
   { path: '/auth/logout', name: 'logout', component: Login },
 ]
 
+const fallbackRoutes = [{ path: '/unauthorized', name: 'Unauthorized', component: Unauthorized }]
+
 // Wildcard route to catch undefined paths and redirect to login
 const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
 
+const allValidRoutes = [...studentRoutes, ...coordinatorRoutes, ...managerRoutes, ...adminRoutes]
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...studentRoutes, ...coordinatorRoutes, ...authRoutes, wildcardRoute],
+  routes: [...allValidRoutes, ...commomRoutes, ...authRoutes, ...fallbackRoutes, wildcardRoute],
 })
 
 router.beforeEach((to, from, next) => {
@@ -124,24 +191,84 @@ router.beforeEach((to, from, next) => {
 
   const userStore = useUserStore()
   userStore.setUser(userInfo)
+  const userType = userStore.user?.user_type_name?.trim() || ''
 
   if (
     token &&
     userInfo &&
-    (to.path === '/auth/login' ||
-      to.path === '/auth/register' ||
-      to.path === '/auth/forgot-password')
+    ['/auth/login', '/auth/register', '/auth/forgot-password'].includes(to.path)
   ) {
-    // cookies.remove('token')
+    console.log(token + '' + userType)
     // If user is already authenticated and tries to access login/register, redirect to home
-    next({ path: '/student/home', replace: true })
+    const redirectRoutes: Record<string, string> = {
+      Student: '/student/home',
+      'Marketing Coordinator': '/coordinator/dashboard',
+      'Marketing Manager': '/manager/dashboard',
+      Admin: '/admin/management',
+      Guest: '/settings',
+    }
+
+    return next({ path: redirectRoutes[userType] ?? '/', replace: true })
   } else if (to.meta.requiresAuth && !token) {
     // If route requires auth and user is not authenticated, redirect to login
     next({ path: '/auth/login', replace: true })
+  } else if (Array.isArray(to.meta.roles) && !to.meta.roles.includes(userType)) {
+    console.log(userType)
+    // If user does not have permission to access the route, redirect to unauthorize page
+    // next({ path: '/unauthorized', replace: true })
+    next()
   } else {
     // Otherwise, proceed as normal
     next()
   }
 })
+
+// Add afterEach hook to track page visits after navigation is complete
+router.afterEach((to) => {
+  // Don't track visits to authentication pages
+  if (!to.path.startsWith('/auth/')) {
+    trackPageVisit(to.path)
+  }
+})
+
+// Function to track page visits
+function trackPageVisit(path: string) {
+  const pageInfo = allValidRoutes.find((route) => route.path === path)
+  if (pageInfo) {
+    visitCount(pageInfo.meta.id.toString())
+  } else if (commomRoutes.find((route) => route.path === path)) {
+    // if common route, check with role and set id accordingly
+    const userStore = useUserStore()
+    const userType = userStore.user?.user_type_name?.trim() || ''
+
+    const roleAndPageMap: Record<string, Record<string, number>> = {
+      Student: {
+        '/articles/:id': 3, // Student Article Detail Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7,     // Setting Page
+      },
+      'Marketing Coordinator': {
+        '/articles/:id': 10, // Marketing Coordinator Article Detail Page
+        '/notifications': 6,  // Notification Page
+        '/settings': 7,       // Setting Page
+      },
+      'Marketing Manager': {
+        '/notifications': 6,  // Notification Page
+        '/settings': 7,       // Setting Page
+      },
+      Admin: {
+        '/settings': 7,       // Setting Page
+      },
+      Guest: {
+        '/settings': 7,       // Setting Page
+      },
+    }
+
+    const pageId = roleAndPageMap[userType]?.[path] || 0
+    if (pageId) {
+      visitCount(pageId.toString())
+    }
+  }
+}
 
 export default router

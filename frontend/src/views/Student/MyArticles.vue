@@ -8,8 +8,6 @@ import UploadArticle from '@/components/pagespecific/my-articles/UploadArticle.v
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useMyArticlesStore } from '@/stores/my-articles'
 import {
   Pagination,
   PaginationEllipsis,
@@ -20,6 +18,8 @@ import {
   PaginationNext,
   PaginationPrev,
 } from '@/components/ui/pagination'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useMyArticlesStore } from '@/stores/my-articles'
 
 const myArticlesStore = useMyArticlesStore()
 
@@ -34,6 +34,19 @@ const formatDate = (dateString: string): string => {
   const options = { year: 'numeric' as const, month: 'short' as const, day: 'numeric' as const }
   return date.toLocaleDateString('en-US', options)
 }
+
+const isOverPreUploadDeadline = (): boolean => {
+  const preUploadDeadline = new Date(myArticlesStore.preUploadDeadline)
+  const currentDate = new Date()
+  return currentDate > preUploadDeadline
+}
+
+const isOverActualUploadDeadline = (): boolean => {
+  const actualUploadDeadline = new Date(myArticlesStore.actualUploadDeadline)
+  const currentDate = new Date()
+  return currentDate > actualUploadDeadline
+}
+
 </script>
 
 <template>
@@ -43,7 +56,13 @@ const formatDate = (dateString: string): string => {
       <div class="grid md:grid-cols-3 grid-cols-1 gap-5">
         <Card class="p-5 flex flex-col gap-5">
           <h2 class="font-semibold uppercase">Upload Articles</h2>
-          <div class="grid md:grid-cols-2 grid-cols-1 gap-3">
+          <p v-if="isOverActualUploadDeadline()" class="text-sm text-destructive">
+            The deadline for uploading articles has passed. You can no longer edit your articles.
+          </p>
+          <p v-else-if="isOverPreUploadDeadline()" class="text-sm text-secondary">
+            You cannot upload articles anymore. You can still edit your submitted articles.
+          </p>
+          <div v-else class="grid md:grid-cols-2 grid-cols-1 gap-3">
             <UploadArticle />
             <RouterLink to="/student/my-articles/draft">
               <Button variant="secondary" class="uppercase w-full">View draft</Button>

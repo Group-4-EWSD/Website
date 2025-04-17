@@ -10,7 +10,7 @@ export const logout = async () => {
 }
 
 export const visitCount = async (id: string) => {
-  return await api.get(`visit1111/${id}`)
+  return await api.get(`visit/${id}`)
 }
 
 export const register = async (user: RegisterData) => {}

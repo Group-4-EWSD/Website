@@ -116,6 +116,12 @@ class ArticleController extends Controller
         $articles = $this->articleService->getManagerArticles($request);
         return response()->json($articles);
     }
+    
+    public function guestArticles(Request $request)
+    {
+        $articles = $this->articleService->getGuestArticles($request);
+        return response()->json($articles);
+    }
 
     public function articleCreateUpdate(Request $request)
     {

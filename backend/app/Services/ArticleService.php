@@ -35,8 +35,7 @@ class ArticleService
     public function getGuestHomePageData($userId, $request){
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),
-            // 'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
-            'allArticles' => $this->articleRepository->getAllArticles(4, null, $request)->get(),
+            'allArticles' => $this->articleRepository->getAllArticles(5, null, $request)->get(),
             'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
             'facultyList' => $this->facultyRepository->getfacultyList(),
             'publishedList' => $this->articleRepository->getPublishedList()
@@ -114,6 +113,16 @@ class ArticleService
     public function getManagerArticles($request)
     {
         $articles = $this->articleRepository->getAllArticles(4, null, $request);
+        $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
+        return [
+            'articles' => $articleList,
+            'articlesCount' => $articles->get()->count(),
+        ];
+    }
+
+    public function getGuestArticles($request)
+    {
+        $articles = $this->articleRepository->getAllArticles(5, null, $request);
         $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
         return [
             'articles' => $articleList,

@@ -1,21 +1,26 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Article, CountData } from '@/types/article'
-import { getArticles } from '@/api/articles'
 import { toast } from 'vue-sonner'
+
+import { getArticles } from '@/api/articles'
+import type { Article, CountData } from '@/types/article'
 
 export const useArticleStore = defineStore('article', () => {
   const countData = ref<CountData | null>(null)
   const articles = ref<Article[]>([])
   const currentPage = ref<number>(1)
   const displayNumber = 5
-  const isLoading = ref(false)
-  const isFetched = ref(false)
   const totalPages = ref(1)
   const sortOption = ref<string>('')
 
+  const isLoading = ref(false)
+  const isFetched = ref(false)
+  const error = ref<string | null>(null)
+
   const fetchArticles = async (page: number) => {
     isLoading.value = true
+    error.value = null
+
     await getArticles({
       displayNumber,
       pageNumber: page,
@@ -30,6 +35,8 @@ export const useArticleStore = defineStore('article', () => {
       .catch((error) => {
         isLoading.value = false
         toast.error(error.response.data.message)
+        console.error('Error fetching articles:', error)
+        error.value = 'Failed to load articles. Please try again.'
       })
   }
 
@@ -42,6 +49,8 @@ export const useArticleStore = defineStore('article', () => {
     isFetched,
     totalPages,
     sortOption,
+    error,
+
     fetchArticles,
   }
 })

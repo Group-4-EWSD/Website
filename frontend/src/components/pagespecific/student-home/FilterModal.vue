@@ -2,7 +2,6 @@
 import { FilterX } from 'lucide-vue-next'
 import { ref, watch } from 'vue'
 
-import { Select, SelectContent, SelectTrigger, SelectItem } from '@/components/ui/select'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 
 const props = defineProps<{
   selectedCategory: string
@@ -73,7 +73,7 @@ const resetFilters = () => {
     <TooltipWrapper text="Filter">
       <Dialog>
         <DialogTrigger as-child>
-          <FilterX class="w-5 h-5 cursor-pointer hover:text-black" />
+          <FilterX class="w-5 h-5 cursor-pointer hover:text-black mt-2" />
         </DialogTrigger>
 
         <!-- Modal Content -->

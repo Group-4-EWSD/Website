@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { PencilIcon } from 'lucide-vue-next'
-import { Card } from '@/components/ui/card'
+import { ref } from 'vue'
+
+import { ArticleStatus } from '@/api/articles'
+import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import {
   Table,
@@ -12,11 +18,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useMyArticlesStore } from '@/stores/my-articles'
-import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+
 import UploadArticle from './UploadArticle.vue'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import { ref } from 'vue'
-import { ArticleStatus } from '@/api/articles'
+
+
+
 
 const myArticlesStore = useMyArticlesStore()
 const showDialog = ref(false)
@@ -27,6 +33,13 @@ const handleEditClick = (id: string) => {
   selectedArticleId.value = id
   showDialog.value = true
 }
+
+const isOverActualUploadDeadline = (): boolean => {
+  const actualUploadDeadline = new Date(myArticlesStore.actualUploadDeadline)
+  const currentDate = new Date()
+  return currentDate > actualUploadDeadline
+}
+
 </script>
 
 <template>
@@ -52,7 +65,7 @@ const handleEditClick = (id: string) => {
       <TableBody>
         <TableRow v-for="article in myArticlesStore.latestArticles" :key="article.article_id">
           <TableCell>{{ article.article_title }}</TableCell>
-          <TableCell>{{ article.created_at }}</TableCell>
+          <TableCell>{{ dayjs(article.created_at).format("MMM D, YYYY") }}</TableCell>
           <TableCell>
             <StatusIndicator :status="article.status" />
           </TableCell>
@@ -60,8 +73,8 @@ const handleEditClick = (id: string) => {
           <TableCell>{{ article.last_feedback }}</TableCell>
           <TableCell>
             <div class="flex gap-2">
-              <TooltipWrapper text="Edit">
-                <Button variant="ghost" size="sm" @click="handleEditClick(article.article_id)" :disabled="![ArticleStatus.DRAFT, ArticleStatus.PENDING].includes(article.status)">
+              <TooltipWrapper text="Edit" v-if="![ArticleStatus.PUBLISHED, ArticleStatus.APPROVED, ArticleStatus.REJECTED].includes(article.status) && isOverActualUploadDeadline">
+                <Button variant="ghost" size="icon" @click="handleEditClick(article.article_id)" :disabled="![ArticleStatus.DRAFT, ArticleStatus.PENDING].includes(article.status)">
                   <PencilIcon class="h-4 w-4" />
                 </Button>
               </TooltipWrapper>

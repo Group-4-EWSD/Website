@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { BadgeHelp, Bell, CircleGauge, FileText, Home, LogOut, Settings } from 'lucide-vue-next'
+import { BadgeHelp, Bell, BellIcon, Calendar, CircleGauge, FileText, Home, LogOut, Settings, User } from 'lucide-vue-next'
+import { ref } from 'vue'
 
 import {
   Sidebar,
@@ -8,17 +9,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import Button from './button/Button.vue'
 import { forceSignOut } from '@/lib/utils'
-
-import Separator from './separator/Separator.vue'
 import { useUserStore } from '@/stores/user'
-import { ref } from 'vue'
+
+import Button from './button/Button.vue'
+import Separator from './separator/Separator.vue'
 
 const loading = ref(false)
 
 const userStore = useUserStore()
 const userType = userStore.user?.user_type_name
+// const userType = 'Marketing Coordinator'
 let items = []
 
 switch (userType) {
@@ -36,12 +37,12 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/student/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/student/settings',
+        url: '/settings',
         icon: Settings,
       },
     ]
@@ -57,12 +58,58 @@ switch (userType) {
       },
       {
         title: 'Notifications',
-        url: '/coordinator/notifications',
+        url: '/notifications',
         icon: Bell,
       },
       {
         title: 'Settings',
-        url: '/coordinator/settings',
+        url: '/settings',
+        icon: Settings,
+      },
+    ]
+    break
+
+  case 'Marketing Manager':
+    items = [
+      { title: 'Dashboard', url: '/manager/dashboard', icon: CircleGauge },
+      {
+        title: 'Articles',
+        url: '/manager/articles',
+        icon: FileText,
+      },
+      {
+        title: 'Notifications',
+        url: '/notifications',
+        icon: Bell,
+      },
+      {
+        title: 'Settings',
+        url: '/settings',
+        icon: Settings,
+      },
+    ]
+    break
+  case 'Admin':
+    items = [
+      { title: 'Management', url: '/admin/management', icon: Calendar },
+      {
+        title: 'Reports',
+        url: '/admin/reports',
+        icon: FileText,
+      },
+      {
+        title: 'Users',
+        url: '/admin/users',
+        icon: User,
+      },
+      {
+        title: 'Contact Messages',
+        url: '/admin/contact-us',
+        icon: BellIcon,
+      },
+      {
+        title: 'Settings',
+        url: '/settings',
         icon: Settings,
       },
     ]

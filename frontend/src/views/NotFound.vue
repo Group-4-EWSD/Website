@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 const goHome = () => {
-  router.push('/');
-};
+  router.push('/')
+}
 </script>
 
 <template>
@@ -14,7 +14,7 @@ const goHome = () => {
     <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
       Oops! The page you are looking for doesn’t exist.
     </p>
-    
+
     <button
       @click="goHome"
       class="mt-6 px-6 py-2 text-white bg-black rounded-lg shadow-md hover:bg-gray-900 transition"
@@ -23,7 +23,3 @@ const goHome = () => {
     </button>
   </div>
 </template>
-
-<style scoped>
-/* Optional custom styling */
-</style>

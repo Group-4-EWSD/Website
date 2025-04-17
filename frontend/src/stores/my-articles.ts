@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { getMyArticles } from '@/api/articles'
-import type { ArticleParams, Article, CountData, MyArticlesResponse } from '@/types/article'
+import type { Article, ArticleParams, CountData, MyArticlesResponse } from '@/types/article'
 
 export const useMyArticlesStore = defineStore('myArticles', () => {
   // State
@@ -21,7 +21,7 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
     academicYearId: undefined,
     articleTitle: undefined,
     sorting: undefined,
-    status: undefined
+    status: undefined,
   })
 
   // Getters
@@ -29,12 +29,18 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
   const statusText = computed(() => {
     return (status: number): string => {
       switch (status) {
-        case 0: return 'Draft'
-        case 1: return 'Pending'
-        case 2: return 'Approved'
-        case 3: return 'Rejected'
-        case 4: return 'Published'
-        default: return 'Unknown'
+        case 0:
+          return 'Draft'
+        case 1:
+          return 'Pending'
+        case 2:
+          return 'Approved'
+        case 3:
+          return 'Rejected'
+        case 4:
+          return 'Published'
+        default:
+          return 'Unknown'
       }
     }
   })
@@ -48,24 +54,24 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
 
     isLoading.value = true
     error.value = null
-    
+
     try {
       const response: MyArticlesResponse = await getMyArticles({
         pageNumber: currentPage.value,
         displayNumber: pageSize.value,
-        ...filters.value
+        ...filters.value,
       })
-      
+
       // Update state with the response data
       articles.value = response.myArticles || []
       latestArticles.value = response.latestArticles || []
       preUploadDeadline.value = response.preUploadDeadline || ''
       actualUploadDeadline.value = response.actualUploadDeadline || ''
-      
+
       // Set total count based on the number of articles
       // This might need adjustment if pagination is server-side
       totalCount.value = articles.value.length
-      
+
       // Mark as loaded
       hasLoaded.value = true
     } catch (err) {
@@ -98,7 +104,7 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
       academicYearId: undefined,
       articleTitle: undefined,
       sorting: undefined,
-      status: undefined
+      status: undefined,
     }
     currentPage.value = 1
     fetchArticles(true) // Force refresh when resetting filters
@@ -112,7 +118,7 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: '2-digit',
-      day: '2-digit'
+      day: '2-digit',
     })
   }
 
@@ -140,6 +146,6 @@ export const useMyArticlesStore = defineStore('myArticles', () => {
     setPageSize,
     setFilters,
     resetFilters,
-    formatDate
+    formatDate,
   }
 })

@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-import { ref, onMounted, watch } from 'vue'
-import { computed } from 'vue'
 import dayjs from 'dayjs'
-import { useArticleStore } from '@/stores/articles'
-import type { Article } from '@/types/article'
+import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+import { onMounted, ref, watch } from 'vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { getArticles } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import Button from '@/components/ui/button/Button.vue'
 import { Card } from '@/components/ui/card'
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Pagination,
   PaginationEllipsis,
@@ -28,11 +30,10 @@ import {
   PaginationPrev,
 } from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
-
-import Layout from '@/components/ui/Layout.vue'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import Button from '@/components/ui/button/Button.vue'
-import { useRouter } from 'vue-router'
+import { useArticleStore } from '@/stores/articles'
+import type { Article } from '@/types/article'
+
 
 const router = useRouter()
 const articleStore = useArticleStore()
@@ -140,12 +141,14 @@ const goToPage = (page: number) => {
 
           <!-- Sorting -->
           <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <SlidersHorizontal
-                class="w-5 h-5 cursor-pointer hover:text-black transition-all"
-                aria-label="Sort items"
-              />
-            </DropdownMenuTrigger>
+            <TooltipWrapper text="Sort">
+              <DropdownMenuTrigger as-child>
+                <SlidersHorizontal
+                  class="w-5 h-5 cursor-pointer hover:text-black transition-all"
+                  aria-label="Sort items"
+                />
+              </DropdownMenuTrigger>
+            </TooltipWrapper>
 
             <DropdownMenuContent align="end" class="w-48 z-50">
               <DropdownMenuLabel>Sort By</DropdownMenuLabel>
@@ -163,9 +166,18 @@ const goToPage = (page: number) => {
       </div>
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
         <div class="max-h-[400px] overflow-y-auto">
-          <div v-if="!articleStore.articles">
-            <p>No articles found.</p>
+          <div v-if="articleStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
+            {{ articleStore.error }}
+            <Button
+              variant="outline"
+              size="sm"
+              class="ml-2"
+              @click="articleStore.fetchArticles(articleStore.currentPage)"
+            >
+              Try Again
+            </Button>
           </div>
+
           <Table v-else class="w-full">
             <TableBody>
               <TableRow
@@ -184,12 +196,12 @@ const goToPage = (page: number) => {
                     <div class="flex-1">
                       <router-link
                         :to="`/articles/${article.article_id}`"
-                        class="text-blue-600 font-semibold hover:underline py-1"
+                        class="text-primary font-semibold py-1"
                       >
                         {{ article.article_title }}
                       </router-link>
                       <p class="text-sm text-gray-500 py-1">
-                        {{ article.article_title }}
+                        {{ article.article_description }}
                       </p>
                     </div>
                     <span class="text-gray-600 text-sm">

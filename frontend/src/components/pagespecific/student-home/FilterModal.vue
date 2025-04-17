@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 const props = defineProps<{
   selectedCategory: string
   selectedYear: string
+  categoryOptions: { label: string; value: string }[]
+  yearOptions: { label: string; value: string }[]
 }>()
 
 const emit = defineEmits<{
@@ -35,20 +37,23 @@ const applyFilter = () => {
   isDialogOpen.value = false
 }
 
-const categoryOptions = [
-  { label: 'All', value: 'all' },
-  { label: 'Mathematics', value: 'mathematics' },
-  { label: 'Physics', value: 'physics' },
-  { label: 'Chemistry', value: 'chemistry' },
-]
+// const categoryOptions = [
+//   { label: 'All', value: 'all' },
+//   { label: 'Science', value: 'science' },
+//   { label: 'Mathematics', value: 'mathematics' },
+//   { label: 'Engineering', value: 'engineering' },
+//   { label: 'Art', value: 'art' },
+//   { label: 'IT', value: 'it' },
+//   { label: 'Business', value: 'business' },
+// ]
 
-const yearOptions = [
-  { label: 'All', value: 'all' },
-  { label: '2025', value: '2025' },
-  { label: '2024', value: '2024' },
-  { label: '2023', value: '2023' },
-  { label: '2022', value: '2022' },
-]
+// const yearOptions = [
+//   { label: 'All', value: 'all' },
+//   { label: '2025', value: '2025' },
+//   { label: '2024', value: '2024' },
+//   { label: '2023', value: '2023' },
+//   { label: '2022', value: '2022' },
+// ]
 
 const resetFilters = () => {
   localCategory.value = 'all'
@@ -75,13 +80,13 @@ const resetFilters = () => {
           <div class="space-y-4">
             <div>
               <label for="category" class="block text-sm font-medium text-gray-700 mb-2"
-                >Category</label
+                >Faculty</label
               >
               <Select v-model="localCategory">
                 <SelectTrigger class="w-full p-2 border rounded-md">
                   {{
                     categoryOptions.find((o) => o.value === localCategory)?.label ||
-                    'Select a category'
+                    'Select a faculty'
                   }}
                 </SelectTrigger>
                 <SelectContent>

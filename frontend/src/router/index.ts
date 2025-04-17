@@ -16,6 +16,7 @@ const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
+const CoordinatorPublish = () => import('@/views/Coordinator/Publish.vue')
 
 const ManagerDashboard = () => import('@/views/Manager/Dashboard.vue')
 const ManagerArticles = () => import('@/views/Manager/Articles.vue')
@@ -75,6 +76,15 @@ const coordinatorRoutes = [
     path: '/coordinator/articles',
     name: 'Coordinator Articles',
     component: CoordinatorArticles,
+    meta: {
+      id: 9, // Marketing Coordinator Articles Page
+      roles: ['Marketing Coordinator'],
+    },
+  },
+  {
+    path: '/coordinator/articles/publish',
+    name: 'Coordinator Publish',
+    component: CoordinatorPublish,
     meta: {
       id: 9, // Marketing Coordinator Articles Page
       roles: ['Marketing Coordinator'],

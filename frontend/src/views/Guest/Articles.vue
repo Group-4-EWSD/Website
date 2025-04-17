@@ -9,11 +9,27 @@ import {
 import Layout from '@/components/ui/Layout.vue'
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import { useGuestStore } from '@/stores/guest'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import { getFilterItems } from '@/api/articles'
 
 const guestStore = useGuestStore()
 
-onMounted(() => {
+const categoryOptions = ref<{ label: string; value: string }[]>([])
+const yearOptions = ref<{ label: string; value: string }[]>([])
+
+onMounted(async () => {
+  const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
+
+  categoryOptions.value = articleTypes.map((item: any) => ({
+    label: item.article_type_name,
+    value: item.article_type_id,
+  }))
+
+  yearOptions.value = academicYears.map((item: any) => ({
+    label: item.academic_year_description,
+    value: item.academic_year_id,
+  }))
+
   if (!guestStore.articles.length) {
     guestStore.fetchDashboardData()
   }
@@ -30,13 +46,27 @@ onMounted(() => {
           <!-- Feedback Filter -->
           <Select>
             <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="Filter by feedback" />
+              <SelectValue placeholder="Filter by Faculty" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="given">Feedback Given</SelectItem>
-              <SelectItem value="not_given">Not Given</SelectItem>
-              <SelectItem value="within_14_days">Given Within 14 Days</SelectItem>
+              <SelectItem
+                v-for="option in categoryOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select>
+            <SelectTrigger class="w-[180px]">
+              <SelectValue placeholder="Filter by Year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="option in yearOptions" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>

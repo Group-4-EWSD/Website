@@ -30,19 +30,22 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
+import { getFilterItems } from '@/api/articles'
 
 const router = useRouter()
 const articleStore = useArticleStore()
 
+const categoryOptions = ref<{ label: string; value: string }[]>([])
+const yearOptions = ref<{ label: string; value: string }[]>([])
 const selectedCategory = ref('all')
 const selectedYear = ref('all')
 const sortedValue = ref('created asc')
 
 const sortOptions = ref([
-  { value: 'created asc', label: 'Newest First' },
-  { value: 'created desc', label: 'Oldest First' },
-  { value: 'title asc', label: 'Name (A → Z)' },
-  { value: 'title-desc', label: 'Name (Z → A)' },
+  { value: 'created_at ASC', label: 'Newest First' },
+  { value: 'created_at DESC', label: 'Oldest First' },
+  { value: 'title ASC', label: 'Name (A → Z)' },
+  { value: 'title DESC', label: 'Name (Z → A)' },
 ])
 
 const goToArticleDetails = (articleId: string) => {
@@ -55,7 +58,19 @@ const sortBy = (option: string) => {
   articleStore.fetchArticles({ pageNumber: 1 })
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
+
+  categoryOptions.value = articleTypes.map((item: any) => ({
+    label: item.article_type_name,
+    value: item.article_type_id,
+  }))
+
+  yearOptions.value = academicYears.map((item: any) => ({
+    label: item.academic_year_description,
+    value: item.academic_year_id,
+  }))
+
   if (!articleStore.articles.length) {
     articleStore.fetchArticles({ pageNumber: 1 })
   }
@@ -146,6 +161,8 @@ const goToPage = (page: number) => {
         <div class="flex gap-3 text-gray-600 pr-[10px] relative">
           <!-- Filter -->
           <FilterModal
+            :category-options="categoryOptions"
+            :year-options="yearOptions"
             :selected-category="selectedCategory"
             :selected-year="selectedYear"
             @update:selectedCategory="updateCategory"

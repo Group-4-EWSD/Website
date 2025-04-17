@@ -30,7 +30,7 @@ export const useArticleStore = defineStore('article', () => {
         status: 4,
         sorting: sortOption.value,
         academicYearId: selectedYear.value,
-        articleTitle: selectedCategory.value,
+        faculty: selectedCategory.value,
       })
 
       countData.value = response.countData

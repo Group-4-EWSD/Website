@@ -45,6 +45,7 @@ export interface ArticleParams {
   articleTitle?: string
   sorting?: string
   status?: number
+  feedback?: number
 }
 
 export interface CoordinatorArticle {

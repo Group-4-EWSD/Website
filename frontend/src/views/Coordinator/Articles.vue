@@ -11,8 +11,9 @@ import {
 } from '@/components/ui/select'
 import Card from '@/components/ui/card/Card.vue'
 import Layout from '@/components/ui/Layout.vue'
+import Button from '@/components/ui/button/Button.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useCoordinatorStore } from '@/stores/coordinator'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import {
@@ -23,15 +24,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import router from '@/router'
 
 const coordinatorStore = useCoordinatorStore()
 
 const selectedStatusFilter = ref('all')
 const selectedFeedbackFilter = ref('all')
+const currentSort = ref('')
 
 const filteredArticles = computed(() => {
-  if (selectedStatusFilter.value === 'all') return coordinatorStore.magazineArticles.articles
-  return coordinatorStore.magazineArticles.articles.filter((article) => {
+  if (selectedStatusFilter.value === 'all') return coordinatorStore.coordinatorArticles.articles
+  return coordinatorStore.coordinatorArticles.articles.filter((article) => {
     if (selectedStatusFilter.value === 'pending') return article.status === 1
     if (selectedStatusFilter.value === 'approved') return article.status === 2
     if (selectedStatusFilter.value === 'rejected') return article.status === 3
@@ -41,20 +44,40 @@ const filteredArticles = computed(() => {
 })
 
 const sortOptions = [
-  { label: 'Date Created', value: 'created_at' },
-  { label: 'Title A-Z', value: 'title_asc' },
-  { label: 'Title Z-A', value: 'title_desc' },
+  { label: 'Recently Submitted', value: 'created_at DESC' },
+  { label: 'Oldest Submission', value: 'created_at ASC' },
+  { label: 'Title A-Z', value: 'title ASC' },
+  { label: 'Title Z-A', value: 'title DESC' },
 ]
 
 const sortBy = (value: string) => {
-  console.log('Sort by:', value)
+  currentSort.value = value
 }
 
 onMounted(() => {
-  if (!coordinatorStore.magazineArticles.articles.length) {
+  if (!coordinatorStore.coordinatorArticles.articles.length) {
     coordinatorStore.fetchCoordinatorArticles()
   }
 })
+
+const updateArticles = () => {
+  const params: any = {
+    sorting: currentSort.value || undefined,
+  }
+
+  if (selectedFeedbackFilter.value !== 'all') {
+    params.feedback = Number(selectedFeedbackFilter.value)
+  }
+
+  coordinatorStore.fetchCoordinatorArticles(params)
+}
+
+watch(selectedFeedbackFilter, updateArticles)
+watch(currentSort, updateArticles)
+
+const goToPublishPage = () => {
+  router.push({ name: 'Coordinator Publish' })
+}
 </script>
 
 <template>
@@ -67,7 +90,7 @@ onMounted(() => {
           <h2 class="font-semibold">Total Submission</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.totalSubmissions }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.totalSubmissions }}</p>
         </div>
       </Card>
       <Card class="p-5 flex flex-row gap-5 items-center">
@@ -76,7 +99,7 @@ onMounted(() => {
           <h2 class="font-semibold">Pending Review</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.pendingReview }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.pendingReview }}</p>
         </div>
       </Card>
       <Card class="p-5 flex flex-row gap-5 items-center">
@@ -85,7 +108,7 @@ onMounted(() => {
           <h2 class="font-semibold">Approved Articles</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.approvedArticles }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.approvedArticles }}</p>
         </div>
       </Card>
       <Card class="p-5 flex flex-row gap-5 items-center">
@@ -94,7 +117,7 @@ onMounted(() => {
           <h2 class="font-semibold">Rejected Articles</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.rejectedArticles }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.rejectedArticles }}</p>
         </div>
       </Card>
     </div>
@@ -148,11 +171,14 @@ onMounted(() => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="given">Feedback Given</SelectItem>
-              <SelectItem value="not_given">Not Given</SelectItem>
-              <SelectItem value="within_14_days">Given Within 14 Days</SelectItem>
+              <SelectItem value="1">Given Within 14 days</SelectItem>
+              <SelectItem value="2">Given After 14 days</SelectItem>
+              <SelectItem value="3">Not Given</SelectItem>
             </SelectContent>
           </Select>
+
+          <!-- Navigate to Article Publish Page -->
+          <Button @click="goToPublishPage">Publish Articles</Button>
         </div>
       </div>
 

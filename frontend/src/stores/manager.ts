@@ -1,16 +1,17 @@
-import { getDashboardData } from '@/api/guest'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-import type { Article, ChartData, publishedYear, facultyList } from '@/types/guest'
 import { toast } from 'vue-sonner'
 
-export const useGuestStore = defineStore('guest', () => {
-  const articles = ref<Article[]>([])
+import { getDashboardData } from '@/api/manager'
+import type { AuroraMember, CountData, ChartData, GuestList } from '@/types/manager'
+
+export const useManagerStore = defineStore('manager', () => {
+  const countData = ref<CountData | null>(null)
+  const members = ref<AuroraMember[]>([])
+  const guestList = ref<GuestList[]>([])
   const chartData = ref<ChartData[]>([])
-  const publishedYear = ref<publishedYear[]>([])
-  const facultyList = ref<facultyList[]>([])
   const prevLogin = ref('')
+
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -20,30 +21,29 @@ export const useGuestStore = defineStore('guest', () => {
 
     await getDashboardData()
       .then((response) => {
-        articles.value = response.allArticles
+        countData.value = response.countData
+        guestList.value = response.guestList
         prevLogin.value = response.prev_login
         chartData.value = response.articlesPerYear
-        publishedYear.value = response.publishedList
-        facultyList.value = response.facultyList
+        members.value = response.memberList
 
         isLoading.value = false
       })
       .catch((error) => {
         isLoading.value = false
         toast.error(error.response.data.message)
-        console.error('Error fetching articles:', error)
-        error.value = 'Failed to load articles. Please try again.'
+        console.error('Error fetching dashboard data:', error)
+        error.value = 'Failed to load data. Please try again.'
       })
   }
 
   return {
-    articles,
+    countData,
     chartData,
+    guestList,
+    members,
     prevLogin,
-    publishedYear,
-    facultyList,
     isLoading,
-    error,
 
     fetchDashboardData,
   }

@@ -16,9 +16,13 @@ const DraftArticles = () => import('@/views/Student/DraftArticles.vue')
 
 const CoordinatorDashboard = () => import('@/views/Coordinator/Dashboard.vue')
 const CoordinatorArticles = () => import('@/views/Coordinator/Articles.vue')
+const CoordinatorPublish = () => import('@/views/Coordinator/Publish.vue')
 
 const ManagerDashboard = () => import('@/views/Manager/Dashboard.vue')
 const ManagerArticles = () => import('@/views/Manager/Articles.vue')
+
+const GuestDashboard = () => import('@/views/Guest/Dashboard.vue')
+const GuestArticles = () => import('@/views/Guest/Articles.vue')
 
 const Notification = () => import('@/views/Notification.vue')
 const Settings = () => import('@/views/Settings.vue')
@@ -27,6 +31,11 @@ const AdminManagement = () => import('@/views/Admin/Management.vue')
 const AdminReports = () => import('@/views/Admin/Reports.vue')
 const AdminUsers = () => import('@/views/Admin/Users.vue')
 const ContactUs = () => import('@/views/Admin/ContactUs.vue')
+
+const Home = () => import('@/views/Home.vue')
+const AboutUs = () => import('@/views/AboutUs.vue')
+const ContactUsForm = () => import('@/views/ContactUsForm.vue')
+const TermsAndConditions = () => import('@/views/TermsAndConditions.vue')
 
 const studentRoutes = [
   {
@@ -77,6 +86,15 @@ const coordinatorRoutes = [
       roles: ['Marketing Coordinator'],
     },
   },
+  {
+    path: '/coordinator/articles/publish',
+    name: 'Coordinator Publish',
+    component: CoordinatorPublish,
+    meta: {
+      id: 9, // Marketing Coordinator Articles Page
+      roles: ['Marketing Coordinator'],
+    },
+  },
 ]
 
 const managerRoutes = [
@@ -91,7 +109,7 @@ const managerRoutes = [
   },
   {
     path: '/manager/articles',
-    name: 'Articles',
+    name: 'Manager Articles',
     component: ManagerArticles,
     meta: {
       id: 12, // Marketing Manager Articles Page
@@ -100,7 +118,62 @@ const managerRoutes = [
   },
 ]
 
+const guestRoutes = [
+  {
+    path: '/guest/dashboard',
+    name: 'Guest Dashboard',
+    component: GuestDashboard,
+    meta: {
+      roles: ['Guest'],
+    },
+  },
+  {
+    path: '/guest/articles',
+    name: 'Guest Articles',
+    component: GuestArticles,
+    meta: {
+      roles: ['Guest'],
+    },
+  },
+]
+
 const commomRoutes = [
+  {
+    path: '/home',
+    name: 'Home',
+    component: Home,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/about',
+    name: 'About Us',
+    component: AboutUs,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/contact-us',
+    name: 'Contact Us Form',
+    component: ContactUsForm,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/terms-and-conditions',
+    name: 'Terms and Conditions',
+    component: TermsAndConditions,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
   {
     path: '/articles/:id',
     name: 'getArticleDetails',
@@ -114,7 +187,8 @@ const commomRoutes = [
     name: 'Notification',
     component: Notification,
     meta: {
-      roles: ['Student', 'Marketing Coordinator'],
+      // requiresAuth: true,
+      roles: ['Student', 'Marketing Coordinator', 'Marketing Manager'],
     },
   },
   {
@@ -182,7 +256,27 @@ const allValidRoutes = [...studentRoutes, ...coordinatorRoutes, ...managerRoutes
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...allValidRoutes, ...commomRoutes, ...authRoutes, ...fallbackRoutes, wildcardRoute],
+  routes: [
+    ...studentRoutes,
+    ...coordinatorRoutes,
+    ...adminRoutes,
+    ...managerRoutes,
+    ...guestRoutes,
+    ...commomRoutes,
+    ...authRoutes,
+    ...fallbackRoutes,
+    wildcardRoute,
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+    // always scroll to top
+    return { top: 0, behavior: 'smooth' }
+  },
 })
 
 router.beforeEach((to, from, next) => {
@@ -192,6 +286,11 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   userStore.setUser(userInfo)
   const userType = userStore.user?.user_type_name?.trim() || ''
+
+  if (to.meta.public) {
+    // If the route is public, allow access
+    return next()
+  }
 
   if (
     token &&
@@ -205,7 +304,7 @@ router.beforeEach((to, from, next) => {
       'Marketing Coordinator': '/coordinator/dashboard',
       'Marketing Manager': '/manager/dashboard',
       Admin: '/admin/management',
-      Guest: '/settings',
+      Guest: '/guest/dashboard',
     }
 
     return next({ path: redirectRoutes[userType] ?? '/', replace: true })
@@ -245,22 +344,22 @@ function trackPageVisit(path: string) {
       Student: {
         '/articles/:id': 3, // Student Article Detail Page
         '/notifications': 6, // Notification Page
-        '/settings': 7,     // Setting Page
+        '/settings': 7, // Setting Page
       },
       'Marketing Coordinator': {
         '/articles/:id': 10, // Marketing Coordinator Article Detail Page
-        '/notifications': 6,  // Notification Page
-        '/settings': 7,       // Setting Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
       },
       'Marketing Manager': {
-        '/notifications': 6,  // Notification Page
-        '/settings': 7,       // Setting Page
+        '/notifications': 6, // Notification Page
+        '/settings': 7, // Setting Page
       },
       Admin: {
-        '/settings': 7,       // Setting Page
+        '/settings': 7, // Setting Page
       },
       Guest: {
-        '/settings': 7,       // Setting Page
+        '/settings': 7, // Setting Page
       },
     }
 

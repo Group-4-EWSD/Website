@@ -2,7 +2,7 @@ export interface ArticleParams {
   displayNumber?: number
   pageNumber?: number
   academicYearId?: string
-  articleTitle?: string
+  faculty?: string
   sorting?: string
   status?: number
 }

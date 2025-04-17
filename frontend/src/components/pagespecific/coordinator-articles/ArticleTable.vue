@@ -11,8 +11,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import router from '@/router'
+import { useRouter } from 'vue-router'
 import type { CoordinatorArticle } from '@/types/coordinator'
+
+const router = useRouter()
 
 interface Column {
   key: string
@@ -34,6 +36,7 @@ const props = defineProps<{
 }>()
 
 const goToArticleDetails = (articleId: string) => {
+  if (!articleId) return
   router.push({ name: 'getArticleDetails', params: { id: articleId } })
 }
 </script>
@@ -51,28 +54,48 @@ const goToArticleDetails = (articleId: string) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow
-            v-for="article in props.articles"
-            :key="article.article_id"
-            class="cursor-pointer"
-            @click="goToArticleDetails(article.article_id || '')"
-          >
-            <TableCell>{{ article.article_title }}</TableCell>
-            <TableCell>{{ article.submission_date }}</TableCell>
-            <TableCell>{{ article.submission_deadline }}</TableCell>
-            <TableCell>
-              <StatusIndicator :status="article.status" />
-            </TableCell>
-            <TableCell>{{ article.article_type_name }}</TableCell>
-            <TableCell>{{ article.user_name }}</TableCell>
-            <TableCell>
-              <div class="flex gap-2">
-                <TooltipWrapper text="View the article">
-                  <Button variant="outline" size="sm" @click=""> View </Button>
-                </TooltipWrapper>
-              </div>
-            </TableCell>
-          </TableRow>
+          <template v-if="!isLoading">
+            <template v-if="props.articles.length">
+              <TableRow
+                v-for="article in props.articles"
+                :key="article.article_id"
+                class="cursor-pointer"
+                @click="goToArticleDetails(article.article_id || '')"
+              >
+                <TableCell>{{ article.article_title }}</TableCell>
+                <TableCell>{{ article.submission_date }}</TableCell>
+                <TableCell>{{ article.submission_deadline }}</TableCell>
+                <TableCell>
+                  <StatusIndicator :status="article.status" />
+                </TableCell>
+                <TableCell>{{ article.article_type_name }}</TableCell>
+                <TableCell>{{ article.user_name }}</TableCell>
+                <TableCell>
+                  <div class="flex gap-2">
+                    <TooltipWrapper text="View the article">
+                      <Button variant="outline" size="sm" @click.stop> View </Button>
+                    </TooltipWrapper>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </template>
+            <template v-else>
+              <TableRow>
+                <TableCell colspan="7" class="text-center text-gray-500 py-6">
+                  No articles match your filter.
+                </TableCell>
+              </TableRow>
+            </template>
+          </template>
+
+          <!-- Loading skeleton rows -->
+          <template v-else>
+            <TableRow v-for="n in 6" :key="n">
+              <TableCell colspan="7" class="py-4">
+                <div class="h-4 w-full bg-gray-200 animate-pulse rounded"></div>
+              </TableCell>
+            </TableRow>
+          </template>
         </TableBody>
       </Table>
     </div>

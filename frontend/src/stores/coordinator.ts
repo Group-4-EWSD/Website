@@ -5,7 +5,8 @@ import { toast } from 'vue-sonner'
 import { getAllArticles, getArticles } from '@/api/coordinator'
 import type {
   Article,
-  CoordinatorArticle,
+  ArticleParams,
+  ChartData,
   CoordinatorArticles,
   CountData,
   GuestList,
@@ -15,10 +16,19 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
   const countData = ref<CountData | null>(null)
   const articles = ref<Article[]>([])
   const guestList = ref<GuestList[]>([])
+  const chartData = ref<ChartData[]>([])
   const prevLogin = ref('')
   const publicDate = ref(0)
 
-  const magazineArticles = ref<CoordinatorArticles>({
+  const coordinatorArticles = ref<CoordinatorArticles>({
+    totalSubmissions: 0,
+    pendingReview: 0,
+    approvedArticles: 0,
+    rejectedArticles: 0,
+    articles: [],
+  })
+
+  const approvedArticles = ref<CoordinatorArticles>({
     totalSubmissions: 0,
     pendingReview: 0,
     approvedArticles: 0,
@@ -40,6 +50,7 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
         guestList.value = response.guestList
         prevLogin.value = response.prev_login
         publicDate.value = response.remaining_final_publish
+        chartData.value = response.articlesPerYear
 
         isLoading.value = false
       })
@@ -51,15 +62,36 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
       })
   }
 
-  const fetchMagazineArticles = async () => {
+  const fetchCoordinatorArticles = async (params: ArticleParams = {}) => {
     isLoading.value = true
     error.value = null
 
-    await getArticles({
-      status: 4,
-    })
+    try {
+      const response = await getArticles(params)
+
+      coordinatorArticles.value = {
+        totalSubmissions: response.totalSubmissions,
+        pendingReview: response.pendingReview,
+        approvedArticles: response.approvedArticles,
+        rejectedArticles: response.rejectedArticles,
+        articles: response.articles,
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Error fetching articles')
+      console.error('Error fetching articles:', err)
+      error.value = 'Failed to load articles. Please try again.'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const fetchApprovedArticles = async () => {
+    isLoading.value = true
+    error.value = null
+
+    await getArticles({ status: 2 })
       .then((response) => {
-        magazineArticles.value = {
+        approvedArticles.value = {
           totalSubmissions: response.totalSubmissions,
           pendingReview: response.pendingReview,
           approvedArticles: response.approvedArticles,
@@ -79,14 +111,17 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
 
   return {
     countData,
+    chartData,
     guestList,
     articles,
     prevLogin,
     publicDate,
     isLoading,
-    magazineArticles,
+    coordinatorArticles,
+    approvedArticles,
 
     fetchAllArticles,
-    fetchMagazineArticles,
+    fetchCoordinatorArticles,
+    fetchApprovedArticles,
   }
 })

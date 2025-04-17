@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
-import { ref } from 'vue'
 
-import ArticleChart from '@/components/pagespecific/coordinator-home/ArticleChart.vue'
+import ArticleChart from '@/components/shared/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
-import MagazineArticles from '@/components/pagespecific/coordinator-home/MagazineArticles.vue'
-import Badge from '@/components/ui/badge/Badge.vue'
+import AuroraMembers from '@/components/pagespecific/manager-dashboard/AuroraMembers.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
+import { useManagerStore } from '@/stores/manager'
+import { onMounted } from 'vue'
 
-const daysLeft = ref(4)
+const managerStore = useManagerStore()
 
-const articleStats = [
-  { label1: 'Total Articles', value1: '132 nos', label2: 'Published Articles', value2: '100 nos' },
-  { label1: 'Reviewed Articles', value1: '32 nos', label2: 'Approved', value2: '100 nos' },
-  { label1: 'Pending Review', value1: '100 nos', label2: 'Reject', value2: '32 nos' },
-]
+onMounted(() => {
+  managerStore.fetchDashboardData()
+  console.log(managerStore.chartData)
+})
 </script>
 
 <template>
@@ -24,21 +23,8 @@ const articleStats = [
       <div class="flex items-center justify-between mb-4">
         <!-- Dashboard Title and Previous Login Time Section -->
         <div class="flex flex-col">
-          <h2 class="text-xl font-bold uppercase">Coordinator Dashboard</h2>
-          <p class="text-sm text-gray-500">Previous Login 09/03/2025 9:20 AM</p>
-        </div>
-        <!-- Top Badges -->
-        <div class="flex justify-between">
-          <Badge variant="secondary" class="px-4 py-2 mr-2 cursor-pointer">IN PROGRESS</Badge>
-          <Badge
-            variant="outline"
-            :class="{
-              'bg-red-500 text-white': daysLeft < 10,
-              'bg-transparent text-gray-700': daysLeft >= 10,
-            }"
-            class="px-4 py-2"
-            >TOTAL DAYS LEFT UNTIL PUBLICATIONS: {{ daysLeft }} Days</Badge
-          >
+          <h2 class="text-xl font-bold uppercase">Manager Dashboard</h2>
+          <p class="text-sm text-gray-500">Previous Login {{ managerStore.prevLogin }}</p>
         </div>
       </div>
 
@@ -51,33 +37,33 @@ const articleStats = [
             <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="text-accent">Total Articles</div>
-                <div class="text-lg">132</div>
+                <div class="text-lg">{{ managerStore.countData?.total_articles }}</div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Review Articles</div>
-                <div class="text-lg">100</div>
+                <div class="text-lg">{{ managerStore.countData?.reviewed_articles }}</div>
               </div>
 
               <div class="flex items-center justify-between">
-                <div class="text-accent">Under Review</div>
-                <div class="text-lg">32</div>
+                <div class="text-accent">Pending Review</div>
+                <div class="text-lg">{{ managerStore.countData?.pending_articles }}</div>
               </div>
             </div>
             <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="text-accent">Published Articles</div>
-                <div class="text-lg">100</div>
+                <div class="text-lg">{{ managerStore.countData?.published_articles }}</div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Approved</div>
-                <div class="text-lg">100</div>
+                <div class="text-lg">{{ managerStore.countData?.approved_articles }}</div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Rejected</div>
-                <div class="text-lg">100</div>
+                <div class="text-lg">{{ managerStore.countData?.rejected_articles }}</div>
               </div>
             </div>
           </CardContent>
@@ -88,33 +74,41 @@ const articleStats = [
             <CardTitle class="font-primary text-lg">Current Academic Year</CardTitle>
           </CardHeader>
           <CardContent class="font-primary flex flex-col gap-3">
-            
             <div class="flex items-center justify-between">
-              <div class="text-accent">Participate </div>
-              <div class="text-lg">20% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+              <div class="text-accent">Participate</div>
+              <div class="text-lg">
+                {{ managerStore.countData?.deri_participate_rate }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
 
             <div class="flex items-center justify-between">
-              <div class="text-accent">Interest Rate </div>
-              <div class="text-lg">10% <ArrowUp class="inline w-4 h-4 text-green-500" /></div>
+              <div class="text-accent">Active Rate</div>
+              <div class="text-lg">
+                {{ managerStore.countData?.deriActiveUser }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
 
             <div class="flex items-center justify-between">
-              <div class="text-accent">In Time Rate </div>
+              <div class="text-accent">In Time Rate</div>
               <div class="text-lg">10% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
             </div>
-
           </CardContent>
         </Card>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <ArticleChart />
-          <!-- <GuestListTable class="mt-6" /> -->
-        </div>
+        <ArticleChart :data="managerStore.chartData" class="h-full" />
 
-        <!-- <MagazineArticles /> -->
+        <GuestListTable
+          :guests="managerStore.guestList"
+          :isLoading="managerStore.isLoading"
+          class="h-full"
+        />
+      </div>
+      <div>
+        <AuroraMembers :members="managerStore.members" :isLoading="managerStore.isLoading" />
       </div>
     </div>
   </Layout>

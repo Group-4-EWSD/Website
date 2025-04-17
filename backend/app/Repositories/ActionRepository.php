@@ -101,19 +101,27 @@ class actionRepository
             'action_id' => Str::uuid(),
             'article_id' => $articleId,
             'user_id' => Auth::id(), // Get authenticated user's ID
-            'react' => 0
+            'react' => 0,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
     }
 
-    public function currentReaction($request){
-        $reaction = $this->model()::where('article_id', $request->articleId)
-                ->where('user_id', Auth::id())->first()->react;
-        return $reaction;
+    public function currentReaction($request)
+    {
+        $reactionData = $this->model()::where('article_id', $request->articleId)
+            ->where('user_id', Auth::id())
+            ->first();
+        return $reactionData ? $reactionData->react : 0;
     }
+
     public function makeAction($reaction, $request){
         $this->model()::where('article_id', $request->articleId)
                 ->where('user_id', Auth::id())  // Get authenticated user's ID
-                ->update(['react' => $reaction]);
+                ->update([
+                    'react' => $reaction,
+                    'updated_at' => now()
+                ]);
         $reactionCount = $this->model()::where('article_id', $request->articleId)->where('react','=','1')->count();
         return $reactionCount;
     }
@@ -126,7 +134,7 @@ class actionRepository
             'message' => $request->message,
             'delete_flag' => 0,
             'created_at' => now(),
-            'updated_at' => now(),
+            'updated_at' => now()
         ]);
     }
 

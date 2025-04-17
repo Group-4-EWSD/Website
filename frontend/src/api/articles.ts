@@ -76,11 +76,16 @@ export const getCategories = async (): Promise<Category[]> => {
 }
 
 export const updateStatus = async (status: number, articleId: string) => {
-  return await api.post(`articles/change-status/${articleId}`, status)
+  return await api.post(`articles/change-status/${articleId}`, { status })
 }
 
 export const downloadArticles = async (articleIdList: string[]) => {
   return await api.get('articles/download', {
-    params: { articleIdList }
-  });
+    params: { articleIdList },
+  })
+}
+
+export const getFilterItems = async (item: number) => {
+  const { data } = await api.get('item-list', { params: { item } })
+  return data
 }

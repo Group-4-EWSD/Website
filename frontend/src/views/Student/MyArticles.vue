@@ -46,7 +46,6 @@ const isOverActualUploadDeadline = (): boolean => {
   const currentDate = new Date()
   return currentDate > actualUploadDeadline
 }
-
 </script>
 
 <template>

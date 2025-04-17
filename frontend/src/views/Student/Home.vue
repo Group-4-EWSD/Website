@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { ArrowUpToLine, Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
+import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 import { onMounted, ref, watch } from 'vue'
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getArticles } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -32,23 +30,22 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
-import type { Article } from '@/types/article'
-
+import { getFilterItems } from '@/api/articles'
 
 const router = useRouter()
 const articleStore = useArticleStore()
-const { fetchArticles, displayNumber } = articleStore
 
-const articles = ref<Article[]>([])
+const categoryOptions = ref<{ label: string; value: string }[]>([])
+const yearOptions = ref<{ label: string; value: string }[]>([])
 const selectedCategory = ref('all')
 const selectedYear = ref('all')
 const sortedValue = ref('created asc')
 
 const sortOptions = ref([
-  { value: 'created asc', label: 'Newest First' },
-  { value: 'created desc', label: 'Oldest First' },
-  { value: 'title asc', label: 'Name (A → Z)' },
-  { value: 'title-desc', label: 'Name (Z → A)' },
+  { value: 'created_at ASC', label: 'Newest First' },
+  { value: 'created_at DESC', label: 'Oldest First' },
+  { value: 'title ASC', label: 'Name (A → Z)' },
+  { value: 'title DESC', label: 'Name (Z → A)' },
 ])
 
 const goToArticleDetails = (articleId: string) => {
@@ -58,25 +55,56 @@ const goToArticleDetails = (articleId: string) => {
 const sortBy = (option: string) => {
   sortedValue.value = option
   articleStore.sortOption = option
-  console.log('Sorting by:', option)
+  articleStore.fetchArticles({ pageNumber: 1 })
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
+
+  categoryOptions.value = articleTypes.map((item: any) => ({
+    label: item.article_type_name,
+    value: item.article_type_id,
+  }))
+
+  yearOptions.value = academicYears.map((item: any) => ({
+    label: item.academic_year_description,
+    value: item.academic_year_id,
+  }))
+
   if (!articleStore.articles.length) {
-    articleStore.fetchArticles(articleStore.currentPage)
+    articleStore.fetchArticles({ pageNumber: 1 })
   }
 })
 
-watch([() => articleStore.currentPage, () => sortedValue.value], ([newPage, newSort]) => {
-  articleStore.fetchArticles(newPage)
-})
+watch(
+  () => articleStore.currentPage,
+  (newPage) => {
+    articleStore.fetchArticles({ pageNumber: newPage })
+  },
+)
+
+watch(
+  [
+    () => articleStore.sortOption,
+    () => articleStore.selectedCategory,
+    () => articleStore.selectedYear,
+  ],
+  () => {
+    articleStore.currentPage = 1
+    articleStore.fetchArticles({ pageNumber: 1 })
+  },
+)
 
 const updateCategory = (newCategory: string) => {
   selectedCategory.value = newCategory
+  articleStore.selectedCategory = newCategory
+  articleStore.fetchArticles({ pageNumber: 1 })
 }
 
 const updateYear = (newYear: string) => {
   selectedYear.value = newYear
+  articleStore.selectedYear = newYear
+  articleStore.fetchArticles({ pageNumber: 1 })
 }
 
 const goToPage = (page: number) => {
@@ -133,6 +161,8 @@ const goToPage = (page: number) => {
         <div class="flex gap-3 text-gray-600 pr-[10px] relative">
           <!-- Filter -->
           <FilterModal
+            :category-options="categoryOptions"
+            :year-options="yearOptions"
             :selected-category="selectedCategory"
             :selected-year="selectedYear"
             @update:selectedCategory="updateCategory"
@@ -172,7 +202,7 @@ const goToPage = (page: number) => {
               variant="outline"
               size="sm"
               class="ml-2"
-              @click="articleStore.fetchArticles(articleStore.currentPage)"
+              @click="articleStore.fetchArticles({ pageNumber: 1 })"
             >
               Try Again
             </Button>
@@ -225,7 +255,7 @@ const goToPage = (page: number) => {
           <div class="flex justify-end mt-4">
             <Pagination
               v-slot=""
-              :items-per-page="displayNumber"
+              :items-per-page="articleStore.displayNumber"
               :total="24"
               :sibling-count="1"
               show-edges

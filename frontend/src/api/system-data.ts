@@ -1,4 +1,4 @@
-import type { ContactUsInfo, SubmissionDate, SubmissionDateParams, SubmissionDateUpdateParams } from "@/types/system-data";
+import type { ContactUsInfo, ContactUsParams, SubmissionDate, SubmissionDateParams, SubmissionDateUpdateParams } from "@/types/system-data";
 
 import api from "./axios"
 
@@ -20,5 +20,10 @@ export const updateSubmissionDate = async (submissionDate: SubmissionDateUpdateP
 
 export const getContactUsData = async (): Promise<ContactUsInfo[]> => {
   const response = await api.get(`contact-us/get-all-list`);
+  return response.data;
+}
+
+export const createContactUs = async (data: ContactUsParams): Promise<ContactUsInfo[]> => {
+  const response = await api.post(`contact-us/create`, data);
   return response.data;
 }

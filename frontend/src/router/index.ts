@@ -32,6 +32,11 @@ const AdminReports = () => import('@/views/Admin/Reports.vue')
 const AdminUsers = () => import('@/views/Admin/Users.vue')
 const ContactUs = () => import('@/views/Admin/ContactUs.vue')
 
+const Home = () => import('@/views/Home.vue')
+const AboutUs = () => import('@/views/AboutUs.vue')
+const ContactUsForm = () => import('@/views/ContactUsForm.vue')
+const TermsAndConditions = () => import('@/views/TermsAndConditions.vue')
+
 const studentRoutes = [
   {
     path: '/student/home',
@@ -134,6 +139,42 @@ const guestRoutes = [
 
 const commomRoutes = [
   {
+    path: '/home',
+    name: 'Home',
+    component: Home,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/about',
+    name: 'About Us',
+    component: AboutUs,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/contact-us',
+    name: 'Contact Us Form',
+    component: ContactUsForm,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
+    path: '/terms-and-conditions',
+    name: 'Terms and Conditions',
+    component: TermsAndConditions,
+    meta: {
+      public: true,
+      roles: [],
+    },
+  },
+  {
     path: '/articles/:id',
     name: 'getArticleDetails',
     component: ArticleDetails,
@@ -226,6 +267,16 @@ const router = createRouter({
     ...fallbackRoutes,
     wildcardRoute,
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth',
+      }
+    }
+    // always scroll to top
+    return { top: 0, behavior: 'smooth' }
+  },
 })
 
 router.beforeEach((to, from, next) => {
@@ -235,6 +286,11 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   userStore.setUser(userInfo)
   const userType = userStore.user?.user_type_name?.trim() || ''
+
+  if (to.meta.public) {
+    // If the route is public, allow access
+    return next()
+  }
 
   if (
     token &&

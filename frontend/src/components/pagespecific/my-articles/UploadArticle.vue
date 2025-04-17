@@ -366,7 +366,7 @@ onMounted(async () => {
                   "
                 />
                 <Label :for="field.name" class="text-sm cursor-pointer">
-                  I agree to the terms and conditions
+                  I agree to the <a href="/terms-and-conditions" target="_blank" class="text-blue-500">terms and conditions</a>
                 </Label>
               </div>
             </Field>

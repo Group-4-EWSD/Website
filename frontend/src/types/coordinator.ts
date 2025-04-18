@@ -1,3 +1,12 @@
+export interface ArticleResponse {
+  countData: CountData | null
+  articlesPerYear: ChartData[]
+  guestList: GuestList[]
+  allArticles: Article[]
+  prev_login: string
+  remaining_final_publish: number
+}
+
 export interface CountData {
   total_articles: number
   total_previous_articles: number
@@ -11,8 +20,8 @@ export interface CountData {
 }
 
 export interface ChartData {
-  article_count: []
-  academic_year: []
+  article_count: number
+  academic_year: string
 }
 
 export interface GuestList {
@@ -29,15 +38,6 @@ export interface Article {
   user_photo_path: string
 }
 
-export interface ArticleResponse {
-  countData: CountData | null
-  chart_data: ChartData | null
-  guestList: GuestList[]
-  allArticles: Article[]
-  prev_login: string
-  remaining_final_publish: number
-}
-
 export interface ArticleParams {
   displayNumber?: number
   pageNumber?: number
@@ -45,6 +45,7 @@ export interface ArticleParams {
   articleTitle?: string
   sorting?: string
   status?: number
+  feedback?: number
 }
 
 export interface CoordinatorArticle {

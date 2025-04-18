@@ -1,5 +1,16 @@
 <script setup lang="ts">
-import { BadgeHelp, Bell, BellIcon, Calendar, CircleGauge, FileText, Home, LogOut, Settings, User } from 'lucide-vue-next'
+import {
+  BadgeHelp,
+  Bell,
+  BellIcon,
+  Calendar,
+  CircleGauge,
+  FileText,
+  Home,
+  LogOut,
+  Settings,
+  User,
+} from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import {
@@ -14,6 +25,7 @@ import { useUserStore } from '@/stores/user'
 
 import Button from './button/Button.vue'
 import Separator from './separator/Separator.vue'
+import { toast } from 'vue-sonner'
 
 const loading = ref(false)
 
@@ -114,7 +126,21 @@ switch (userType) {
       },
     ]
     break
-
+  case 'Guest':
+    items = [
+      { title: 'Dashboard', url: '/guest/dashboard', icon: CircleGauge },
+      {
+        title: 'Articles',
+        url: '/guest/articles',
+        icon: FileText,
+      },
+      {
+        title: 'Settings',
+        url: '/settings',
+        icon: Settings,
+      },
+    ]
+    break
   default:
     items = [{ title: 'Help', url: '/help', icon: BadgeHelp }]
     break
@@ -122,7 +148,14 @@ switch (userType) {
 
 const handleLogout = async () => {
   loading.value = true
-  await forceSignOut(true)
+  try {
+    await forceSignOut(true)
+  } catch (error) {
+    console.error('Logout failed:', error)
+    toast.error('Failed to logout.')
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 <template>

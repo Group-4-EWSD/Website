@@ -1,20 +1,83 @@
 <script setup lang="ts">
-import { ArchiveX, CircleCheckBig, FilePenLine, FileText } from 'lucide-vue-next'
-import { onMounted } from 'vue'
+import { ArchiveX, CircleCheckBig, FilePenLine, FileText, SlidersHorizontal } from 'lucide-vue-next'
 
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
+import {
+  Select,
+  SelectItem,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+} from '@/components/ui/select'
 import Card from '@/components/ui/card/Card.vue'
 import Layout from '@/components/ui/Layout.vue'
+import Button from '@/components/ui/button/Button.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useCoordinatorStore } from '@/stores/coordinator'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import router from '@/router'
 
 const coordinatorStore = useCoordinatorStore()
 
+const selectedStatusFilter = ref('all')
+const selectedFeedbackFilter = ref('all')
+const currentSort = ref('')
+
+const filteredArticles = computed(() => {
+  if (selectedStatusFilter.value === 'all') return coordinatorStore.coordinatorArticles.articles
+  return coordinatorStore.coordinatorArticles.articles.filter((article) => {
+    if (selectedStatusFilter.value === 'pending') return article.status === 1
+    if (selectedStatusFilter.value === 'approved') return article.status === 2
+    if (selectedStatusFilter.value === 'rejected') return article.status === 3
+    if (selectedStatusFilter.value === 'published') return article.status === 4
+    return true
+  })
+})
+
+const sortOptions = [
+  { label: 'Recently Submitted', value: 'created_at DESC' },
+  { label: 'Oldest Submission', value: 'created_at ASC' },
+  { label: 'Title A-Z', value: 'title ASC' },
+  { label: 'Title Z-A', value: 'title DESC' },
+]
+
+const sortBy = (value: string) => {
+  currentSort.value = value
+}
+
 onMounted(() => {
-  if (!coordinatorStore.magazineArticles.articles.length) {
-    coordinatorStore.fetchMagazineArticles()
+  if (!coordinatorStore.coordinatorArticles.articles.length) {
+    coordinatorStore.fetchCoordinatorArticles()
   }
 })
+
+const updateArticles = () => {
+  const params: any = {
+    sorting: currentSort.value || undefined,
+  }
+
+  if (selectedFeedbackFilter.value !== 'all') {
+    params.feedback = Number(selectedFeedbackFilter.value)
+  }
+
+  coordinatorStore.fetchCoordinatorArticles(params)
+}
+
+watch(selectedFeedbackFilter, updateArticles)
+watch(currentSort, updateArticles)
+
+const goToPublishPage = () => {
+  router.push({ name: 'Coordinator Publish' })
+}
 </script>
 
 <template>
@@ -27,7 +90,7 @@ onMounted(() => {
           <h2 class="font-semibold">Total Submission</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.totalSubmissions }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.totalSubmissions }}</p>
         </div>
       </Card>
       <Card class="p-5 flex flex-row gap-5 items-center">
@@ -36,7 +99,7 @@ onMounted(() => {
           <h2 class="font-semibold">Pending Review</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.pendingReview }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.pendingReview }}</p>
         </div>
       </Card>
       <Card class="p-5 flex flex-row gap-5 items-center">
@@ -45,7 +108,7 @@ onMounted(() => {
           <h2 class="font-semibold">Approved Articles</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.approvedArticles }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.approvedArticles }}</p>
         </div>
       </Card>
       <Card class="p-5 flex flex-row gap-5 items-center">
@@ -54,16 +117,72 @@ onMounted(() => {
           <h2 class="font-semibold">Rejected Articles</h2>
 
           <Skeleton v-if="false" class="w-20 h-5" />
-          <p v-if="true">{{ coordinatorStore.magazineArticles.rejectedArticles }}</p>
+          <p v-if="true">{{ coordinatorStore.coordinatorArticles.rejectedArticles }}</p>
         </div>
       </Card>
     </div>
     <div class="flex flex-col gap-3">
-      <h2 class="text-xl font-bold mb-2 mt-4 uppercase">List of Articles</h2>
-      <ArticleTable
-        :articles="coordinatorStore.magazineArticles.articles"
-        :isLoading="coordinatorStore.isLoading"
-      />
+      <div class="flex justify-between items-center mt-4 mb-2">
+        <h2 class="text-xl font-bold uppercase">List of Articles</h2>
+
+        <div class="flex items-center gap-4">
+          <!-- Sort Dropdown Menu -->
+          <DropdownMenu>
+            <TooltipWrapper text="Sort">
+              <DropdownMenuTrigger as-child>
+                <SlidersHorizontal
+                  class="w-5 h-5 cursor-pointer hover:text-black transition-all"
+                  aria-label="Sort items"
+                />
+              </DropdownMenuTrigger>
+            </TooltipWrapper>
+
+            <DropdownMenuContent align="end" class="w-48 z-50">
+              <DropdownMenuLabel>Sort By</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                v-for="option in sortOptions"
+                :key="option.value"
+                @click="sortBy(option.value)"
+              >
+                {{ option.label }}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <!-- Filter Dropdown -->
+          <Select v-model="selectedStatusFilter">
+            <SelectTrigger class="w-[160px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <!-- Feedback Filter -->
+          <Select v-model="selectedFeedbackFilter">
+            <SelectTrigger class="w-[180px]">
+              <SelectValue placeholder="Filter by feedback" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="1">Given Within 14 days</SelectItem>
+              <SelectItem value="2">Given After 14 days</SelectItem>
+              <SelectItem value="3">Not Given</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <!-- Navigate to Article Publish Page -->
+          <Button @click="goToPublishPage">Publish Articles</Button>
+        </div>
+      </div>
+
+      <ArticleTable :articles="filteredArticles" :isLoading="coordinatorStore.isLoading" />
     </div>
   </Layout>
 </template>

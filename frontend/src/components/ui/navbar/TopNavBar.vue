@@ -3,6 +3,9 @@ import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import { useUserStore } from '@/stores/user'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+import { getInitials } from '@/lib/utils'
 
 const searchQuery = ref('')
 const hasNotification = true
@@ -15,7 +18,7 @@ const userStore = useUserStore()
 
 <template>
   <nav class="flex justify-between items-center bg-primary text-white h-[65px]">
-    <div class="flex items-center">
+    <RouterLink class="flex items-center" to="/home">
       <img
         src="@/assets/nav-logo.png"
         alt="University magazine logo"
@@ -23,7 +26,7 @@ const userStore = useUserStore()
       />
       <span class="text-xl font-bold uppercase pl-[18px] uni-color">Aurora</span>
       <span class="text-md font-bold uppercase pl-[7px] name-color">University</span>
-    </div>
+    </RouterLink>
 
     <!-- <div class="flex flex-1 justify-center">
       <div class="hidden sm:flex w-1/2 relative sm:my-4">
@@ -78,11 +81,10 @@ const userStore = useUserStore()
         </p>
       </div>
 
-      <img
-        :src="userStore.currentUser?.user_photo_path"
-        alt="Profile"
-        class="w-10 h-10 rounded-full border border-white hidden sm:flex"
-      />
+      <Avatar>
+        <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
+        <AvatarFallback class="text-white">{{ getInitials(userStore.currentUser?.user_name) }}</AvatarFallback>
+      </Avatar>
     </div>
   </nav>
 </template>

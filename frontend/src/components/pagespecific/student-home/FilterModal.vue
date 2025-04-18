@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/u
 const props = defineProps<{
   selectedCategory: string
   selectedYear: string
+  categoryOptions: { label: string; value: string }[]
+  yearOptions: { label: string; value: string }[]
 }>()
 
 const emit = defineEmits<{
@@ -27,39 +29,31 @@ const emit = defineEmits<{
 
 const localCategory = ref(props.selectedCategory)
 const localYear = ref(props.selectedYear)
-
-// Watch for local changes and emit events to the parent
-watch(localCategory, (newVal) => {
-  emit('update:selectedCategory', newVal)
-})
-
-watch(localYear, (newVal) => {
-  emit('update:selectedYear', newVal)
-})
-
-const categoryOptions = [
-  { label: 'All', value: 'all' },
-  { label: 'Mathematics', value: 'mathematics' },
-  { label: 'Physics', value: 'physics' },
-  { label: 'Chemistry', value: 'chemistry' },
-]
-
-const yearOptions = [
-  { label: 'All', value: 'all' },
-  { label: '2025', value: '2025' },
-  { label: '2024', value: '2024' },
-  { label: '2023', value: '2023' },
-  { label: '2022', value: '2022' },
-]
-
-const getLabel = (value: string) => {
-  const found = categoryOptions.find((option) => option.value === value)
-  return found ? found.label : ''
-}
+const isDialogOpen = ref(false)
 
 const applyFilter = () => {
-  console.log('Applying filter:', { category: localCategory.value, date: localYear.value })
+  emit('update:selectedCategory', localCategory.value === 'all' ? '' : localCategory.value)
+  emit('update:selectedYear', localYear.value === 'all' ? '' : localYear.value)
+  isDialogOpen.value = false
 }
+
+// const categoryOptions = [
+//   { label: 'All', value: 'all' },
+//   { label: 'Science', value: 'science' },
+//   { label: 'Mathematics', value: 'mathematics' },
+//   { label: 'Engineering', value: 'engineering' },
+//   { label: 'Art', value: 'art' },
+//   { label: 'IT', value: 'it' },
+//   { label: 'Business', value: 'business' },
+// ]
+
+// const yearOptions = [
+//   { label: 'All', value: 'all' },
+//   { label: '2025', value: '2025' },
+//   { label: '2024', value: '2024' },
+//   { label: '2023', value: '2023' },
+//   { label: '2022', value: '2022' },
+// ]
 
 const resetFilters = () => {
   localCategory.value = 'all'
@@ -71,7 +65,7 @@ const resetFilters = () => {
   <div>
     <!-- Trigger Button -->
     <TooltipWrapper text="Filter">
-      <Dialog>
+      <Dialog v-model:open="isDialogOpen">
         <DialogTrigger as-child>
           <FilterX class="w-5 h-5 cursor-pointer hover:text-black mt-2" />
         </DialogTrigger>
@@ -86,12 +80,13 @@ const resetFilters = () => {
           <div class="space-y-4">
             <div>
               <label for="category" class="block text-sm font-medium text-gray-700 mb-2"
-                >Category</label
+                >Faculty</label
               >
               <Select v-model="localCategory">
                 <SelectTrigger class="w-full p-2 border rounded-md">
                   {{
-                    selectedCategory !== 'all' ? getLabel(selectedCategory) : 'Select a category'
+                    categoryOptions.find((o) => o.value === localCategory)?.label ||
+                    'Select a faculty'
                   }}
                 </SelectTrigger>
                 <SelectContent>
@@ -110,7 +105,7 @@ const resetFilters = () => {
               <label for="year" class="block text-sm font-medium text-gray-700 mb-2">Year</label>
               <Select v-model="localYear">
                 <SelectTrigger class="w-full p-2 border rounded-md">
-                  {{ selectedYear !== 'all' ? selectedYear : 'Select a year' }}
+                  {{ yearOptions.find((o) => o.value === localYear)?.label || 'Select a year' }}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem

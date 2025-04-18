@@ -179,12 +179,14 @@ class ArticleService
                         }
                         // Save article details
                         $this->articleRepository->createArticleDetail($articleId, $filePath, $fileName, $file->getClientOriginalExtension());
-                        $this->notificationRepository->setNotification('4', $request->articleId);
+                        
                     }
                 }
             }
             if (empty($request->article_id)) {
                 $this->articleRepository->createActivity($articleId, $userId, $request);
+                $this->notificationRepository->setNotification('4', $articleId);
+            }else{
                 $this->notificationRepository->setNotification('5', $request->articleId);
             }
 

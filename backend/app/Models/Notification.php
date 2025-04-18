@@ -10,9 +10,8 @@ class Notification extends Model
         'notification_id',
         'notification_type',
         'user_id',
-        'message',
         'article_id',
-        'seen',
+        'status',
         'created_at',
         'updated_at'
     ];

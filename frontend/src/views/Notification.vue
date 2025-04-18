@@ -32,11 +32,7 @@ const handleNotificationClick = (notification: any) => {
     <!-- Notification Cards -->
     <div class="space-y-4">
       <template v-if="notificationsStore.isLoading">
-        <div
-          v-for="n in 5"
-          :key="n"
-          class="flex items-start p-4 border rounded-lg bg-white"
-        >
+        <div v-for="n in 5" :key="n" class="flex items-start p-4 border rounded-lg bg-white">
           <Skeleton class="w-12 h-12 rounded-full" />
 
           <div class="flex-1 flex justify-between ml-4">
@@ -89,7 +85,7 @@ const handleNotificationClick = (notification: any) => {
               <!-- Left side -->
               <div>
                 <div class="text-lg font-semibold text-gray-800">
-                  From {{ notification.user_name }} ({{ notification.user_type_name }} -
+                  From {{ notification.user_name }} ({{ notification.user_type }} -
                   {{ notification.faculty_name }})
                 </div>
                 <p class="text-sm text-gray-600 mt-1">{{ notification.article_title }}</p>

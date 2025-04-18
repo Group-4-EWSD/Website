@@ -7,13 +7,17 @@ import {
   SelectContent,
 } from '@/components/ui/select'
 import Layout from '@/components/ui/Layout.vue'
+import Button from '@/components/ui/button/Button.vue'
+
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import { useGuestStore } from '@/stores/guest'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { getFilterItems } from '@/api/articles'
 
 const guestStore = useGuestStore()
 
+const selectedCategory = ref<string | null>(null)
+const selectedYear = ref<string | null>(null)
 const categoryOptions = ref<{ label: string; value: string }[]>([])
 const yearOptions = ref<{ label: string; value: string }[]>([])
 
@@ -34,6 +38,19 @@ onMounted(async () => {
     guestStore.fetchDashboardData()
   }
 })
+
+watch([selectedCategory, selectedYear], ([newCategory, newYear]) => {
+  console.log(newCategory, newYear)
+  guestStore.fetchDashboardData({
+    ...(newCategory && { facultyId: newCategory }),
+    ...(newYear && { academicYearId: newYear }),
+  })
+})
+
+const resetFilters = () => {
+  selectedCategory.value = ''
+  selectedYear.value = ''
+}
 </script>
 
 <template>
@@ -44,7 +61,7 @@ onMounted(async () => {
 
         <div class="flex items-center gap-4">
           <!-- Feedback Filter -->
-          <Select>
+          <Select v-model="selectedCategory">
             <SelectTrigger class="w-[180px]">
               <SelectValue placeholder="Filter by Faculty" />
             </SelectTrigger>
@@ -59,7 +76,7 @@ onMounted(async () => {
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select v-model="selectedYear">
             <SelectTrigger class="w-[180px]">
               <SelectValue placeholder="Filter by Year" />
             </SelectTrigger>
@@ -69,6 +86,8 @@ onMounted(async () => {
               </SelectItem>
             </SelectContent>
           </Select>
+
+          <Button class="btn btn-outline" @click="resetFilters"> Reset Filters </Button>
         </div>
       </div>
 

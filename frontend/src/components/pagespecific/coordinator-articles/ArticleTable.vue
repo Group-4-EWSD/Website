@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { useRouter } from 'vue-router'
 import type { CoordinatorArticle } from '@/types/coordinator'
+import type { GuestArticle } from '@/types/guest'
 
 const router = useRouter()
 
@@ -29,9 +30,10 @@ const columns: Column[] = [
   { key: 'category', label: 'Category' },
   { key: 'submission_by', label: 'Submission By' },
 ]
+type Article = CoordinatorArticle | GuestArticle
 
 const props = defineProps<{
-  articles: CoordinatorArticle[]
+  articles: Article[]
   isLoading: boolean
 }>()
 

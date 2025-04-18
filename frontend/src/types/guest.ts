@@ -6,11 +6,17 @@ export interface DashboardResponse {
   publishedList: []
 }
 
-export interface Article {
+export interface GuestArticle {
   article_id: string
   article_title: string
   article_description: string
   user_photo_path: string
+  submission_date: string
+  submission_deadline: string
+  status: number
+  article_type_name: string
+  user_name: string
+  final_submission_deadline: string
 }
 
 export interface ChartData {
@@ -29,4 +35,9 @@ export interface facultyList {
   created_at: string
   updated_at: string
   articleCount: number
+}
+
+export interface GuestParams {
+  facultyId?: string
+  academicYearId?: string
 }

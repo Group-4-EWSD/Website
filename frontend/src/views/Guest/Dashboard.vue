@@ -18,7 +18,25 @@ onMounted(() => {
   }
 })
 
-const articles = computed(() => {})
+const articles = computed(() => {
+  return guestStore.articles.filter((article) => {
+    const year = new Date(article.final_submission_deadline).getFullYear().toString()
+    return year === selectedYear.value
+  })
+})
+
+const sortedPublishedYears = computed(() => {
+  const targetYear = '2025'
+  const years = [...guestStore.publishedYear]
+
+  years.sort((a, b) => {
+    if (a.academic_year_start === targetYear) return -1
+    if (b.academic_year_start === targetYear) return 1
+    return 0
+  })
+
+  return years
+})
 </script>
 
 <template>
@@ -36,7 +54,7 @@ const articles = computed(() => {})
           <h3 class="text-lg font-medium mb-3">View Reports</h3>
           <div class="flex flex-wrap gap-4">
             <div
-              v-for="year in guestStore.publishedYear"
+              v-for="year in sortedPublishedYears"
               :key="year.academic_year_start"
               class="flex flex-col items-center"
             >
@@ -72,7 +90,7 @@ const articles = computed(() => {})
       </div>
 
       <MagazineArticles
-        :articles="guestStore.articles"
+        :articles="articles"
         :isLoading="guestStore.isLoading"
         :year="selectedYear"
       />

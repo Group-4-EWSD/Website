@@ -119,7 +119,7 @@ class actionRepository
         $this->model()::where('article_id', $request->articleId)
                 ->where('user_id', Auth::id())  // Get authenticated user's ID
                 ->update([
-                    'react' => $reaction,
+                    'react' => $reaction == 0 ? 1 : 0,
                     'updated_at' => now()
                 ]);
         $reactionCount = $this->model()::where('article_id', $request->articleId)->where('react','=','1')->count();

@@ -10,7 +10,7 @@ class Activity extends Model
         'activity_id',
         'article_id',
         'user_id',
-        'status',
+        'article_status',
         'created_at',
         'updated_at'
     ];

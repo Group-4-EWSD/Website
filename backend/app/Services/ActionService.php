@@ -46,9 +46,11 @@ class ActionService
         ];
     }
 
-    public function likeArticle($request){
-        $currentReaction = $this->actionRepository->currentReaction($request);
-        $currentReaction = $currentReaction == 0 ? 1 : 0;
+    public function currentReaction($request){
+        return $this->actionRepository->currentReaction($request);
+    }
+
+    public function likeArticle($currentReaction, $request){
         return $this->actionRepository->makeAction($currentReaction, $request);
     }
 

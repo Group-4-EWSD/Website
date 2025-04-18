@@ -348,9 +348,10 @@ class ArticleRepository
                 "));
                 if ($state == 3) {
                     $articles->where('sd.faculty_id', '=', $primaryKey);
-                } else if ($state == 0){
-                    $articles->where('u.id', '=', $primaryKey);
-                }
+                } 
+                // else if ($state == 0){
+                    // $articles->where('u.id', '=', $primaryKey);
+                // }
             } else {
                 $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
                 $articles->havingRaw("status IN (2, 4)");

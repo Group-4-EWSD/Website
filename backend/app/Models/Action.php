@@ -12,6 +12,8 @@ class Action extends Model
         'action_id',
         'article_id',
         'user_id',
-        'react'
+        'react',
+        'created_at',
+        'updated_at'
     ];
 }

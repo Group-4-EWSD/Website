@@ -4,7 +4,7 @@ import api from "./axios"
 
 export const updateUserDetail = async (params: UserDetailsParams): Promise<User> => {
   const response = await api.post('user/edit-detail', params);
-  return response.data.user;
+  return response.data.updated_user;
 }
 
 export const updateProfilePhoto = async (params: ProfilePhotoParams): Promise<ProfilePhotoResponse> => {

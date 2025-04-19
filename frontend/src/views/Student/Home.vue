@@ -210,6 +210,12 @@ const goToPage = (page: number) => {
 
           <Table v-else class="w-full">
             <TableBody>
+              <TableRow v-if="!articleStore.isLoading && articleStore.articles.length === 0">
+                <TableCell colspan="100%" class="text-center py-6 text-gray-500">
+                  No articles found with the current filters.
+                </TableCell>
+              </TableRow>
+
               <TableRow
                 v-if="!articleStore.isLoading"
                 v-for="article in articleStore.articles.slice(0, 6)"

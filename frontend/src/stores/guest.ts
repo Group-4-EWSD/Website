@@ -2,11 +2,17 @@ import { getDashboardData } from '@/api/guest'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-import type { Article, ChartData, publishedYear, facultyList } from '@/types/guest'
+import type {
+  GuestArticle,
+  ChartData,
+  publishedYear,
+  facultyList,
+  GuestParams,
+} from '@/types/guest'
 import { toast } from 'vue-sonner'
 
 export const useGuestStore = defineStore('guest', () => {
-  const articles = ref<Article[]>([])
+  const articles = ref<GuestArticle[]>([])
   const chartData = ref<ChartData[]>([])
   const publishedYear = ref<publishedYear[]>([])
   const facultyList = ref<facultyList[]>([])
@@ -14,11 +20,11 @@ export const useGuestStore = defineStore('guest', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (params?: { facultyId?: string; academicYearId?: string }) => {
     isLoading.value = true
     error.value = null
 
-    await getDashboardData()
+    await getDashboardData(params)
       .then((response) => {
         articles.value = response.allArticles
         prevLogin.value = response.prev_login

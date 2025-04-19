@@ -19,6 +19,7 @@ import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUserStore } from '@/stores/user'
+import { updateReact } from '@/api/articles'
 import type { ArticleResponse } from '@/types/article'
 import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 
@@ -34,6 +35,7 @@ const article = ref<ArticleResponse>({
   feedbackList: [],
 })
 const isLiked = ref(false)
+const likeCount = ref(0)
 const newComment = ref('')
 const newFeedback = ref('')
 const articleId = ref('')
@@ -58,12 +60,14 @@ const fetchArticleDetails = async (articleId: string) => {
 
   try {
     const response = await getArticleDetails(articleId)
-    article.value = response.data
 
+    article.value = response.data
     articleContent.value = article.value.articleContent
     articlePhotos.value = article.value.articlePhotos
     comments.value = article.value.commentList
     feedbacks.value = article.value.feedbackList
+    isLiked.value = article.value.articleDetail?.current_user_react === 1
+    likeCount.value = article.value.articleDetail?.like_count || 0
 
     isLoading.value = false
   } catch (error) {
@@ -119,8 +123,17 @@ const addFeedback = async () => {
   }
 }
 
-const updateLike = () => {
+const updateLike = async () => {
   isLiked.value = !isLiked.value
+  likeCount.value += isLiked.value ? 1 : -1
+
+  try {
+    await updateReact(articleId.value)
+  } catch (error) {
+    console.error('Failed to toggle like:', error)
+    isLiked.value = !isLiked.value
+    likeCount.value += isLiked.value ? 1 : -1
+  }
 }
 
 onMounted(() => {
@@ -136,6 +149,10 @@ const feedbackAction = ref<'approve' | 'reject' | null>(null)
 
 const triggerFeedback = (action: 'approve' | 'reject') => {
   feedbackAction.value = action
+  if (isApproved.value || isRejected.value) {
+    return
+  }
+
   showFeedbackModal.value = true
 }
 
@@ -218,15 +235,21 @@ const isOwnArticle = computed(() => {
 
 const articleStatus = computed(() => article.value.articleDetail?.article_status)
 
+const isDraft = computed(() => articleStatus.value === 0)
 const isApproved = computed(() => articleStatus.value === 2)
 const isRejected = computed(() => articleStatus.value === 3)
 const isPublished = computed(() => articleStatus.value === 4)
+
+const downloadArticle = () => {
+  alert(`This is an upcoming feature.`)
+}
 </script>
 
 <template>
   <Layout>
     <template v-if="isLoading">
       <div class="space-y-6">
+        <!-- skeleton elements -->
         <!-- top title & like count & view count -->
         <div class="flex items-center justify-between">
           <Skeleton class="w-32 h-6" />
@@ -267,15 +290,17 @@ const isPublished = computed(() => articleStatus.value === 4)
       <div v-if="article.articleDetail && !isLoading">
         <div class="flex justify-between items-center pb-2">
           <h2 class="text-2xl font-bold uppercase">{{ article.articleDetail.article_title }}</h2>
-          <div v-if="isStudent" class="flex gap-2 text-gray-600">
+          <div v-if="isStudent || isGuest" class="flex gap-2 text-gray-600">
             <button @click="updateLike">
               <Heart
                 class="w-6 h-6 cursor-pointer transition-colors duration-200"
                 :class="{ 'text-red-500 fill-red-500': isLiked, 'hover:text-black': !isLiked }"
               />
             </button>
-            {{ article.articleDetail.like_count }}
-            <span class="hidden sm:inline">Likes</span>
+            <span>
+              {{ likeCount }}
+              <span class="hidden sm:inline"> Like<span v-if="likeCount !== 1">s</span> </span>
+            </span>
             <Eye class="w-6 h-6 cursor-pointer hover:text-black" />{{
               article.articleDetail.view_count
             }}
@@ -299,7 +324,7 @@ const isPublished = computed(() => articleStatus.value === 4)
             />
             <!-- Approve -->
             <Button
-              v-if="isCoordinator && !isPublished && !isRejected"
+              v-if="isCoordinator && !isPublished && !isRejected && !isDraft"
               :disabled="false"
               class="px-4 py-2 rounded-md border bg-green-100 text-gray-800 hover:bg-green-200 text-sm font-medium"
               @click="triggerFeedback('approve')"
@@ -309,7 +334,7 @@ const isPublished = computed(() => articleStatus.value === 4)
 
             <!-- Reject -->
             <Button
-              v-if="isCoordinator && !isPublished && !isApproved"
+              v-if="isCoordinator && !isPublished && !isApproved && !isDraft"
               :disabled="false"
               class="px-4 py-2 rounded-md border bg-red-100 text-gray-800 hover:bg-red-200 text-sm font-medium"
               @click="triggerFeedback('reject')"
@@ -322,14 +347,23 @@ const isPublished = computed(() => articleStatus.value === 4)
               v-if="isCoordinator && isPublished"
               :disabled="false"
               class="px-4 py-2 rounded-md border bg-blue-100 text-gray-800 hover:bg-blue-200 text-sm font-medium"
-              @click="triggerFeedback('reject')"
+              @click=""
             >
               Published
+            </Button>
+
+            <Button
+              v-if="isCoordinator && isDraft"
+              :disabled="false"
+              class="px-4 py-2 rounded-md text-sm font-medium"
+            >
+              Draft
             </Button>
 
             <!-- Download -->
             <Button
               class="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
+              @click="downloadArticle"
             >
               <Download class="w-4 h-4 text-gray-700" />
               <span class="hidden sm:inline text-sm">Download Doc</span>

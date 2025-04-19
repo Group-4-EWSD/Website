@@ -3,7 +3,7 @@ export interface Notification {
   article_id: string | undefined
   article_title: string
   user_name: string
-  user_type_name: string
+  user_type: string
   gender: string
   faculty_name: string
   message: string

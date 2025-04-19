@@ -89,3 +89,7 @@ export const getFilterItems = async (item: number) => {
   const { data } = await api.get('item-list', { params: { item } })
   return data
 }
+
+export const updateReact = async (articleId: string) => {
+  return await api.post(`articles/like`, { articleId })
+}

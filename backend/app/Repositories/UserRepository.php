@@ -38,8 +38,8 @@ class UserRepository
             DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', users.user_photo_path) AS user_photo_path"),
         ])
             ->where('users.user_email', $email)
-            ->join('user_types as ut', 'ut.user_type_id', '=', 'users.user_type_id')
-            ->join('faculties as f', 'f.faculty_id', '=', 'users.faculty_id')
+            ->leftJoin('user_types as ut', 'ut.user_type_id', '=', 'users.user_type_id')
+            ->leftJoin('faculties as f', 'f.faculty_id', '=', 'users.faculty_id')
             ->first();
     }
 

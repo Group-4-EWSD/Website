@@ -4,6 +4,7 @@ import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { getFilterItems } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -30,7 +31,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
-import { getFilterItems } from '@/api/articles'
 
 const router = useRouter()
 const articleStore = useArticleStore()

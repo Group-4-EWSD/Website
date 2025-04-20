@@ -2,10 +2,9 @@
 import { BellDot, Search, X } from 'lucide-vue-next'
 import { ref } from 'vue'
 
-import { useUserStore } from '@/stores/user'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-
 import { getInitials } from '@/lib/utils'
+import { useUserStore } from '@/stores/user'
 
 const searchQuery = ref('')
 const hasNotification = true

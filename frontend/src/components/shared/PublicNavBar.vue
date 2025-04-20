@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
+
+import { useUserStore } from '@/stores/user'
 
 const isMenuOpen = ref(false)
 

@@ -83,7 +83,7 @@ const userStore = useUserStore()
 
       <Avatar>
         <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
-        <AvatarFallback class="text-white">{{ getInitials(userStore.currentUser?.user_name) }}</AvatarFallback>
+        <AvatarFallback class="text-white">{{ getInitials(userStore.currentUser?.user_name || "") }}</AvatarFallback>
       </Avatar>
     </div>
   </nav>

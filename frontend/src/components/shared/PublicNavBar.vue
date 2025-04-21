@@ -67,7 +67,7 @@ const toggleMenu = () => {
         class="text-white hover:text-gray-300 ml-4"
         >Login</RouterLink
       >
-      <RouterLink v-else to="/" class="text-white hover:text-gray-300 ml-4">
+      <RouterLink v-else to="/auth/login" class="text-white hover:text-gray-300 ml-4">
         Welcome, {{ userStore.currentUser?.user_name }}
       </RouterLink>
     </div>
@@ -98,7 +98,7 @@ const toggleMenu = () => {
         class="text-white hover:text-gray-300 py-4 px-6"
         >Login</RouterLink
       >
-      <RouterLink v-else to="/" class="text-white hover:text-gray-300 py-4 px-6"
+      <RouterLink v-else to="/auth/login" class="text-white hover:text-gray-300 py-4 px-6"
         >Account</RouterLink
       >
     </div>

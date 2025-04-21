@@ -138,7 +138,8 @@ class UserService
         return $this->userRepository->editUser($data);
     }
 
-    public function getActiveUserList($request= null){
+    public function getActiveUserList($request = null)
+    {
         return $this->userRepository->getActiveUserList($request);
     }
 
@@ -171,30 +172,28 @@ class UserService
     }
 
 
-    public function pageVisitInitial($userId, $pageId){
-        if(!$this->userRepository->isUserVisitExist($userId, $pageId)){
-            $this->userRepository->addUserVisit($userId, $pageId);
-            return true;
-        }else{
-            return false;
-        }
+    public function pageVisitInitial($userId, $pageId)
+    {
+        $this->userRepository->addUserVisit($userId, $pageId);
     }
 
-    public function userRegister($data){
-        $data['user_id']= $this->userRepository->generateUserId();
-        $data['user_password']=Str::random(12);
+    public function userRegister($data)
+    {
+        $data['user_id'] = $this->userRepository->generateUserId();
+        $data['user_password'] = Str::random(12);
 
         $coordinatorEmail = DB::table('users')
             ->where('faculty_id', Auth::user()->faculty_id)
             ->where('user_type_id', 2)
             ->value('user_email');
-        
+
         Mail::to($coordinatorEmail)->send(new AccountCreateMail($data));
 
         return $this->userRepository->userRegister($data);
     }
 
-    public function userLastLogin($userId){
+    public function userLastLogin($userId)
+    {
         return $this->userRepository->userLastLogin($userId);
     }
 }

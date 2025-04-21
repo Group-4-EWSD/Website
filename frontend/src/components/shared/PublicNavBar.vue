@@ -62,7 +62,7 @@ const toggleMenu = () => {
 
     <div class="hidden md:flex text-sm">
       <RouterLink
-        v-if="!userStore.loggedIn"
+        v-if="!userStore.currentUser"
         to="/auth/login"
         class="text-white hover:text-gray-300 ml-4"
         >Login</RouterLink
@@ -93,7 +93,7 @@ const toggleMenu = () => {
         >Contact Us</RouterLink
       >
       <RouterLink
-        v-if="!userStore.loggedIn"
+        v-if="!userStore.currentUser"
         to="/auth/login"
         class="text-white hover:text-gray-300 py-4 px-6"
         >Login</RouterLink

@@ -83,7 +83,7 @@ const handleRemovePhoto = () => {
               <SettingsRow label="Name" :value="userStore.currentUser?.user_name || ''" />
               <SettingsRow label="Nick Name" :value="userStore.currentUser?.nickname || ''" />
               <SettingsRow label="Email" :value="userStore.currentUser?.user_email || ''" />
-              <SettingsRow label="Faculty" :value="userStore.currentUser?.faculty_name || ''" />
+              <SettingsRow v-if="userStore.currentUser?.user_type_name !== 'Admin' && userStore.currentUser?.user_type_name !== 'Marketing Manager'" label="Faculty" :value="userStore.currentUser?.faculty_name || ''" />
               <SettingsRow label="Date of Birth" :value="userStore.currentUser?.date_of_birth || ''" />
               <SettingsRow label="Gender" :value="GenderOptions[Number(userStore.currentUser?.gender || '3')]" />
               <SettingsRow label="Phone Number" :value="userStore.currentUser?.phone_number || ''" />

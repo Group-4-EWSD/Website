@@ -58,8 +58,11 @@ class ActionController extends Controller
      * )
      */
     public function articleLike(Request $request){
-        $reactionCount = $this->actionService->likeArticle($request);
-        $this->notificationService->setNotification('1', $request->articleId);
+        $currentReaction = $this->actionService->currentReaction($request);
+        if($currentReaction == 0){
+            $this->notificationService->setNotification('1', $request->articleId);
+        }
+        $reactionCount = $this->actionService->likeArticle($currentReaction, $request);
         return response()->json(['likeCount' => $reactionCount]);
     }
 

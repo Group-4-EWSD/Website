@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { ChevronRight } from 'lucide-vue-next'
+
 import HeroLeft from '@/assets/hero-left.png'
 import HeroRight from '@/assets/hero-right.png'
 import Math from '@/assets/math.png'
-import Science from '@/assets/science.png'
 import Quote from '@/assets/quote.png'
-
-import { Button } from '@/components/ui/button'
-import { ChevronRight } from 'lucide-vue-next'
-import PublicNavBar from '@/components/shared/PublicNavBar.vue'
+import Science from '@/assets/science.png'
 import PublicFooter from '@/components/shared/PublicFooter.vue'
+import PublicNavBar from '@/components/shared/PublicNavBar.vue'
+import { Button } from '@/components/ui/button'
 </script>
 <template>
   <div class="min-h-screen bg-white">

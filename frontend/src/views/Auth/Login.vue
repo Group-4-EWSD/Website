@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import * as yup from 'yup'
-
+import { VueReCaptcha, useReCaptcha } from 'vue-recaptcha-v3'
 import { login } from '@/api/auth'
 import Logo from '@/assets/logo.png'
 import AuthBaseLayout from '@/components/shared/AuthBaseLayout.vue'
@@ -19,6 +19,7 @@ import type { User } from '@/types/user'
 
 const router = useRouter()
 const loading = ref(false)
+const useRecaptcha = useReCaptcha()
 
 const schema = yup.object({
   email: yup.string().email('Invalid email').required('Please enter your email'),
@@ -39,57 +40,61 @@ const { handleSubmit, errors } = useForm<loginForm>({
 
 const onSubmit = handleSubmit(async (values: loginForm) => {
   loading.value = true
-
-  login(values as Credentials)
-    .then((response) => {
-      console.log(response)
-
-      if (!response.data) {
-        toast.error('Invalid credentials')
-      } else {
-        setCookie('token', response.data.token)
-
-        const userStore = useUserStore()
-
-        const user = response.data.user as User
-        userStore.setUser(user)
-
-        const userRole = user.user_type_name
-
-        // Role-based redirection
-        switch (userRole) {
-          case 'Student':
-            router.push('/student/home')
-            break
-          case 'Guest':
-            router.push('/guest/dashboard')
-            break
-          case 'Marketing Coordinator':
-            router.push('/coordinator/dashboard')
-            break
-          case 'Admin':
-            router.push('/admin/management')
-            break
-          case 'Marketing Manager':
-            router.push('/manager/dashboard')
-            break
-          default:
-            router.push('/')
-        }
+  
+  try {
+    // Execute reCAPTCHA with login action
+    const recaptchaToken = await useRecaptcha?.executeRecaptcha('login')
+    
+    // Add recaptchaToken to credentials
+    const credentials = {
+      ...values,
+      recaptchaToken
+    }
+    
+    const response = await login(credentials as Credentials)
+    
+    if (!response.data) {
+      toast.error('Invalid credentials')
+    } else {
+      setCookie('token', response.data.token)
+      const userStore = useUserStore()
+      const user = response.data.user as User
+      userStore.setUser(user)
+      const userRole = user.user_type_name
+      
+      // Role-based redirection
+      switch (userRole) {
+        case 'Student':
+          router.push('/student/home')
+          break
+        case 'Guest':
+          router.push('/guest/dashboard')
+          break
+        case 'Marketing Coordinator':
+          router.push('/coordinator/dashboard')
+          break
+        case 'Admin':
+          router.push('/admin/management')
+          break
+        case 'Marketing Manager':
+          router.push('/manager/dashboard')
+          break
+        default:
+          router.push('/')
       }
-      loading.value = false
-    })
-    .catch((error) => {
-      loading.value = false
-      toast.error(error.response.data.message)
-    })
+    }
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || 'An error occurred during login')
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
 <template>
   <AuthBaseLayout>
     <div class="h-40 w-40 mx-auto md:mx-0">
-      <img :src="Logo" alt="Aurora University'g Logo" class="object-cover h-full w-full" />
+      <img :src="Logo" alt="Aurora University's Logo" class="object-cover h-full w-full" />
     </div>
     <h1 class="text-3xl text-center md:text-left">Welcome to AURORA University</h1>
     <form @submit="onSubmit" class="space-y-4">
@@ -115,7 +120,6 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
           />
         </template>
       </FormElement>
-
       <Button type="submit" :disabled="loading" :processing="loading" class="w-full">
         {{ loading ? 'Logging in...' : 'Login' }}
       </Button>

@@ -241,6 +241,7 @@ class ArticleRepository
         //$state = 2; // Student My Draft Articles
         //$state = 3; // Coordinator Common Dashboard, Coordinator My Articles
         //$state = 4; // All Articles By Manager
+        //$state = 5; // All Articles By Guest (Only published status)
         $articles = DB::table('articles as art')
             ->select([
                 'art.article_id',
@@ -263,12 +264,17 @@ class ArticleRepository
             ])
             ->join('users as u', 'u.id', '=', 'art.user_id')
             ->join('system_datas as sd', 'sd.system_id', '=', 'art.system_id')
+            ->join('faculties as f', 'f.faculty_id', '=', 'sd.faculty_id')
             ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
             ->join('article_types as at', 'at.article_type_id', '=', 'art.article_type_id');
 
         // Apply search filter if `articleTitle` exists in the request
         if (!empty($request->academicYearId)) {
             $articles->where('ay.academic_year_id', '=', $request->academicYearId);
+        }
+        
+        if (!empty($request->facultyId)) {
+            $articles->where('f.faculty_id', '=', $request->facultyId);
         }
 
         if (!empty($request->articleTitle)) {
@@ -342,13 +348,17 @@ class ArticleRepository
                 "));
                 if ($state == 3) {
                     $articles->where('sd.faculty_id', '=', $primaryKey);
-                } else if ($state == 0){
-                    $articles->where('u.id', '=', $primaryKey);
-                }
+                } 
+                // else if ($state == 0){
+                    // $articles->where('u.id', '=', $primaryKey);
+                // }
             } else {
                 $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
                 $articles->havingRaw("status IN (2, 4)");
             }
+        }
+        else if ($state == 5){
+            $articles->havingRaw("status = 4 ");
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([
@@ -452,7 +462,9 @@ class ArticleRepository
     {
         $deadlines = DB::table('system_datas as sd')
             ->select('sd.pre_submission_date', 'sd.actual_submission_date')
-            // ->where('faculty_id', $facultyId)
+            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->where('ay.academic_year_start', date('Y'))
+            ->where('sd.faculty_id', $facultyId)
             ->first();
         return $deadlines;
     }
@@ -573,4 +585,17 @@ class ArticleRepository
 
         return $publishedList;
     }
+    public function getTopArticles()
+    {
+        $topArticles = DB::table('articles as a')
+            ->join('actions as act', 'a.article_id', '=', 'act.article_id')
+            ->select('a.article_id', 'a.article_title', 'a.article_description')
+            ->groupBy('a.article_id', 'a.article_title', 'a.article_description')
+            ->orderByRaw('COUNT(act.react) DESC')
+            ->limit(3)
+            ->get();
+    
+        return $topArticles;
+    }
+    
 }

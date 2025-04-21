@@ -1,18 +1,20 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
+
+import { getFilterItems } from '@/api/articles'
+import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
+import Button from '@/components/ui/button/Button.vue'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
   SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
-import Layout from '@/components/ui/Layout.vue'
-import Button from '@/components/ui/button/Button.vue'
-
-import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import { useGuestStore } from '@/stores/guest'
-import { onMounted, ref, watch } from 'vue'
-import { getFilterItems } from '@/api/articles'
+
+
 
 const guestStore = useGuestStore()
 

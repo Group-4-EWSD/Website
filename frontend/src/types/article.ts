@@ -5,6 +5,7 @@ export interface ArticleParams {
   faculty?: string
   sorting?: string
   status?: number
+  articleTitle?: string
 }
 
 export type ArticleList = {

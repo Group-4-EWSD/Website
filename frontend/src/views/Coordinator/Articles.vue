@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArchiveX, CircleCheckBig, FilePenLine, FileText, SlidersHorizontal } from 'lucide-vue-next'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import {
@@ -13,7 +14,6 @@ import Card from '@/components/ui/card/Card.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import { computed, onMounted, ref, watch } from 'vue'
 import { useCoordinatorStore } from '@/stores/coordinator'
 import { getFilterItems } from '@/api/articles'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'

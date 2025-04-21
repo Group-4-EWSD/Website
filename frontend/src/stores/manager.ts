@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 
 import { getDashboardData } from '@/api/manager'
-import type { AuroraMember, CountData, ChartData, GuestList } from '@/types/manager'
+import type { AuroraMember, ChartData, CountData, GuestList } from '@/types/manager'
 
 export const useManagerStore = defineStore('manager', () => {
   const countData = ref<CountData | null>(null)

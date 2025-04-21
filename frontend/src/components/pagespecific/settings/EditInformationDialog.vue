@@ -204,7 +204,7 @@ const closeModal = () => {
           </template>
         </FormElement>
 
-        <FormElement :errors="errors" layout="row">
+        <FormElement :errors="errors" layout="row" v-if="userStore.currentUser?.user_type_name !== 'Admin' && userStore.currentUser?.user_type_name !== 'Marketing Manager'">
           <template #label>
             <Label for="faculty_name">Faculty</Label>
           </template>

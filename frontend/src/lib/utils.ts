@@ -27,13 +27,12 @@ export async function forceSignOut(clearToken: boolean = true) {
   resetAllStores()
 
   if (clearToken) {
-    logout().then(() => {
-      // Remove token from cookies
-      removeCookie('token')
-      removeCookie('user')
-      // Redirect to login
-      router.push('/auth/login')
-    })
+    await logout()
+    // Remove token from cookies
+    removeCookie('token')
+    removeCookie('user')
+    // Redirect to login
+    router.push('/auth/login')
   } else {
     // Remove token from cookies
     removeCookie('token')

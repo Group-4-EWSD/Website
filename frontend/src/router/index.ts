@@ -250,7 +250,7 @@ const authRoutes = [
 const fallbackRoutes = [{ path: '/unauthorized', name: 'Unauthorized', component: Unauthorized }]
 
 // Wildcard route to catch undefined paths and redirect to login
-const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
+const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/home' }
 
 const allValidRoutes = [...studentRoutes, ...coordinatorRoutes, ...managerRoutes, ...adminRoutes]
 

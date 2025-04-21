@@ -1,15 +1,15 @@
-import { getDashboardData } from '@/api/guest'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-import type {
-  GuestArticle,
-  ChartData,
-  publishedYear,
-  facultyList,
-  GuestParams,
-} from '@/types/guest'
 import { toast } from 'vue-sonner'
+
+import { getDashboardData } from '@/api/guest'
+import type {
+  ChartData,
+  facultyList,
+  GuestArticle,
+  GuestParams,
+  publishedYear,
+} from '@/types/guest'
 
 export const useGuestStore = defineStore('guest', () => {
   const articles = ref<GuestArticle[]>([])

@@ -32,12 +32,11 @@ class ArticleService
         $this->notificationRepository = $notificationRepository;
     }
 
-    public function getGuestHomePageData($userId, $request){
+    public function getGuestHomePageData($userId, $facultyId, $request){
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),
-            // 'countData' => $this->articleRepository->getCoordinatorManagerHomeCountData(),
-            'allArticles' => $this->articleRepository->getAllArticles(4, null, $request)->get(),
-            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'allArticles' => $this->articleRepository->getAllArticles(5, null, $request)->get(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear($facultyId),
             'facultyList' => $this->facultyRepository->getfacultyList(),
             'publishedList' => $this->articleRepository->getPublishedList()
         ];
@@ -121,6 +120,16 @@ class ArticleService
         ];
     }
 
+    public function getGuestArticles($request)
+    {
+        $articles = $this->articleRepository->getAllArticles(5, null, $request);
+        $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
+        return [
+            'articles' => $articleList,
+            'articlesCount' => $articles->get()->count(),
+        ];
+    }
+
     public function createUpdateArticle($userId, $request)
     {
         
@@ -170,12 +179,14 @@ class ArticleService
                         }
                         // Save article details
                         $this->articleRepository->createArticleDetail($articleId, $filePath, $fileName, $file->getClientOriginalExtension());
-                        $this->notificationRepository->setNotification('4', $request->articleId);
+                        
                     }
                 }
             }
             if (empty($request->article_id)) {
                 $this->articleRepository->createActivity($articleId, $userId, $request);
+                $this->notificationRepository->setNotification('4', $articleId);
+            }else{
                 $this->notificationRepository->setNotification('5', $request->articleId);
             }
 
@@ -207,5 +218,9 @@ class ArticleService
 
     public function getItemList($item){
         return $this->articleRepository->getItemList($item);
+    }
+
+    public function getTopArticles(){
+        return $this->articleRepository->getTopArticles();
     }
 }

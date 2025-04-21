@@ -18,7 +18,7 @@ const showEditDialog = ref(false)
 const showRemoveDialog = ref(false)
 
 const userStore = useUserStore()
-const user = userStore.currentUser!
+// const user = userStore.currentUser!
 
 const getAvatarFallBack = (name: string): string => {
   return name
@@ -50,7 +50,7 @@ const handleRemovePhoto = () => {
                 }}</AvatarFallback>
               </Avatar>
               <div class="flex flex-row flex-wrap gap-2">
-                <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white" @click="showRemoveDialog = true">
+                <Button variant="outline" class="bg-accent hover:bg-secondary/80 hover:text-white" @click="showRemoveDialog = true" :disabled="!userStore.profilePhotoUrl">
                   Remove
                 </Button>
 
@@ -66,7 +66,7 @@ const handleRemovePhoto = () => {
 
               <EditInformationDialog
                 :isOpen="showEditDialog"
-                :initialData="user"
+                :initialData="userStore.currentUser"
                 @update:isOpen="showEditDialog = $event"
               >
                 <template #trigger>
@@ -80,13 +80,13 @@ const handleRemovePhoto = () => {
               </EditInformationDialog>
             </div>
             <div class="flex flex-col">
-              <SettingsRow label="Name" :value="user?.user_name" />
-              <SettingsRow label="Nick Name" :value="user?.nickname" />
-              <SettingsRow label="Email" :value="user?.user_email" />
-              <SettingsRow label="Faculty" :value="user?.faculty_name" />
-              <SettingsRow label="Date of Birth" :value="user?.date_of_birth || ''" />
-              <SettingsRow label="Gender" :value="GenderOptions[Number(user?.gender || '3')]" />
-              <SettingsRow label="Phone Number" :value="user?.phone_number || ''" />
+              <SettingsRow label="Name" :value="userStore.currentUser?.user_name || ''" />
+              <SettingsRow label="Nick Name" :value="userStore.currentUser?.nickname || ''" />
+              <SettingsRow label="Email" :value="userStore.currentUser?.user_email || ''" />
+              <SettingsRow v-if="userStore.currentUser?.user_type_name !== 'Admin' && userStore.currentUser?.user_type_name !== 'Marketing Manager'" label="Faculty" :value="userStore.currentUser?.faculty_name || ''" />
+              <SettingsRow label="Date of Birth" :value="userStore.currentUser?.date_of_birth || ''" />
+              <SettingsRow label="Gender" :value="GenderOptions[Number(userStore.currentUser?.gender || '3')]" />
+              <SettingsRow label="Phone Number" :value="userStore.currentUser?.phone_number || ''" />
             </div>
           </CardContent>
         </Card>

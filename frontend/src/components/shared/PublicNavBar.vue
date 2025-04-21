@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
+
+import { useUserStore } from '@/stores/user'
 
 const isMenuOpen = ref(false)
 
@@ -61,12 +62,12 @@ const toggleMenu = () => {
 
     <div class="hidden md:flex text-sm">
       <RouterLink
-        v-if="!userStore.loggedIn"
+        v-if="!userStore.currentUser"
         to="/auth/login"
         class="text-white hover:text-gray-300 ml-4"
         >Login</RouterLink
       >
-      <RouterLink v-else to="/" class="text-white hover:text-gray-300 ml-4">
+      <RouterLink v-else to="/auth/login" class="text-white hover:text-gray-300 ml-4">
         Welcome, {{ userStore.currentUser?.user_name }}
       </RouterLink>
     </div>
@@ -92,12 +93,12 @@ const toggleMenu = () => {
         >Contact Us</RouterLink
       >
       <RouterLink
-        v-if="!userStore.loggedIn"
+        v-if="!userStore.currentUser"
         to="/auth/login"
         class="text-white hover:text-gray-300 py-4 px-6"
         >Login</RouterLink
       >
-      <RouterLink v-else to="/" class="text-white hover:text-gray-300 py-4 px-6"
+      <RouterLink v-else to="/auth/login" class="text-white hover:text-gray-300 py-4 px-6"
         >Account</RouterLink
       >
     </div>

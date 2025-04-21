@@ -59,7 +59,7 @@ const userStore = useUserStore()
     </div> -->
 
     <div class="flex items-center space-x-4 pr-2 sm:pr-6">
-      <div class="relative">
+      <div class="relative hidden sm:block">
         <RouterLink :to="`/notifications`">
           <button class="relative p-1 text-white h-[3rem]">
             <BellDot class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
@@ -83,7 +83,9 @@ const userStore = useUserStore()
 
       <Avatar>
         <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
-        <AvatarFallback class="text-white">{{ getInitials(userStore.currentUser?.user_name) }}</AvatarFallback>
+        <AvatarFallback class="text-white">{{
+          getInitials(userStore.currentUser?.user_name)
+        }}</AvatarFallback>
       </Avatar>
     </div>
   </nav>

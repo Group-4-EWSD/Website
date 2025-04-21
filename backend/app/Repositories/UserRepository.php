@@ -226,10 +226,12 @@ class UserRepository
                 'u.date_of_birth',
                 'u.phone_number',
                 'u.user_photo_path',
-                'u.created_at'
+                'u.created_at',
+                'lh.last_login_datetime',
             ])
             ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id') 
             ->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id') 
+            ->leftJoin(DB::raw('(SELECT user_id, MAX(login_datetime) as last_login_datetime FROM login_histories GROUP BY user_id) as lh'), 'lh.user_id', '=', 'u.id')
             ->get();
     }
 
@@ -249,10 +251,12 @@ class UserRepository
                 'u.date_of_birth',
                 'u.phone_number',
                 'u.user_photo_path',
-                'u.created_at'
+                'u.created_at',
+                'lh.last_login_datetime',
             ])
             ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
             ->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
+            ->leftJoin(DB::raw('(SELECT user_id, MAX(login_datetime) as last_login_datetime FROM login_histories GROUP BY user_id) as lh'), 'lh.user_id', '=', 'u.id')
             ->where('u.user_type_id', '=', $userType)
             ->get();
     }

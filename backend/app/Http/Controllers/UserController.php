@@ -8,6 +8,7 @@ use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
@@ -64,6 +65,30 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
+        // reCAPTCHA Secret Key
+        $secretKey = '6LewtB4rAAAAABB_FzpDSJeglriK-ZVnFnhFUWOZ';
+
+        // Validate reCAPTCHA token first
+        $recaptchaToken = $request->input('recaptchaToken');
+
+        if (!$recaptchaToken) {
+            return response()->json(['message' => 'reCAPTCHA token is missing.'], 422);
+        }
+
+        // Verify token with Google
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => $secretKey,
+            'response' => $recaptchaToken,
+            'remoteip' => $request->ip(),
+        ]);
+
+        $recaptchaResult = $response->json();
+
+        if (!isset($recaptchaResult['success']) || $recaptchaResult['success'] !== true) {
+            return response()->json(['message' => 'reCAPTCHA verification failed.'], 403);
+        }
+
+        // Continue with login validation
         $validatedData = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string|min:6',
@@ -78,6 +103,7 @@ class UserController extends Controller
 
         return response()->json($response, $response['status']);
     }
+
 
     public function logout(Request $request)
     {

@@ -6,6 +6,7 @@ import { useCookies } from 'vue3-cookies'
 
 import { logout } from '@/api/auth'
 import router from '@/router' // Import the router instance directly
+import { getActivePinia, type Store } from 'pinia'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,13 +22,12 @@ export function valueUpdater<T extends Updater<unknown>>(updaterOrValue: T, ref:
 export async function forceSignOut(clearToken: boolean = true) {
   console.log('forceSignOut')
   if (clearToken) {
-    logout().then(() => {
-      // Remove token from cookies
-      removeCookie('token')
-      removeCookie('user')
-      // Redirect to login
-      router.push('/auth/login')
-    })
+    await logout()
+    // Remove token from cookies
+    removeCookie('token')
+    removeCookie('user')
+    // Redirect to login
+    router.push('/auth/login')
   } else {
     // Remove token from cookies
     removeCookie('token')

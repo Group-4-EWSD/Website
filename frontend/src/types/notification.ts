@@ -4,6 +4,7 @@ export interface Notification {
   article_title: string
   user_name: string
   user_type: string
+  notification_type: number
   gender: string
   faculty_name: string
   message: string

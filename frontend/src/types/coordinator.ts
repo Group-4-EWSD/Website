@@ -16,7 +16,7 @@ export interface CountData {
   rejected_articles: number
   published_articles: number
   deri_participate_rate: number
-  deriActiveUser: number
+  deri_active_user: number
 }
 
 export interface ChartData {

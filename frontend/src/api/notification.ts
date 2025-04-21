@@ -5,5 +5,5 @@ export const getNotifications = async () => {
 }
 
 export const changeNotiStatus = async (noti: string) => {
-  return await api.post(`notifications`, { notification_id: noti })
+  return await api.post(`notifications`, { notificationId: noti })
 }

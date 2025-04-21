@@ -102,14 +102,14 @@ onMounted(() => {
             <div class="flex items-center justify-between">
               <div class="text-accent">Interest Rate</div>
               <div class="text-lg">
-                {{ coordinatorStore.countData?.deriActiveUser }}
+                {{ coordinatorStore.countData?.deri_active_user }}
                 <ArrowUp class="inline w-4 h-4 text-green-500" />
               </div>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="text-accent">In Time Rate</div>
-              <div class="text-lg">10% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
+              <div class="text-lg">100% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
             </div>
           </CardContent>
         </Card>

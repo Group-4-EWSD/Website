@@ -39,6 +39,7 @@ const articleStore = useArticleStore()
 
 const categoryOptions = ref<{ label: string; value: string }[]>([])
 const yearOptions = ref<{ label: string; value: string }[]>([])
+const filtersInitialized = ref(false)
 const selectedCategory = ref('all')
 const selectedYear = ref('all')
 const sortedValue = ref('created asc')
@@ -61,6 +62,11 @@ const sortBy = (option: string) => {
 }
 
 onMounted(async () => {
+  if (!articleStore.articles.length) {
+    articleStore.fetchArticles({ pageNumber: 1 })
+  }
+  console.log(filtersInitialized.value)
+  if (filtersInitialized.value) return
   const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
 
   categoryOptions.value = articleTypes.map((item: any) => ({
@@ -73,9 +79,7 @@ onMounted(async () => {
     value: item.academic_year_id,
   }))
 
-  if (!articleStore.articles.length) {
-    articleStore.fetchArticles({ pageNumber: 1 })
-  }
+  filtersInitialized.value = true
 })
 
 watch(
@@ -198,7 +202,7 @@ const goToPage = (page: number) => {
         </div>
       </div>
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
-        <div class="max-h-[400px] overflow-y-auto">
+        <div class="max-h-[420px] overflow-y-auto">
           <div v-if="articleStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
             {{ articleStore.error }}
             <Button
@@ -226,7 +230,17 @@ const goToPage = (page: number) => {
               </TableRow>
 
               <TableRow
-                v-if="!articleStore.isLoading"
+                v-if="articleStore.isLoading"
+                v-for="n in 5"
+                :key="n"
+                class="border-b hover:bg-gray-50 transition-all"
+              >
+                <TableCell>
+                  <Skeleton class="h-12" animate-pulse />
+                </TableCell>
+              </TableRow>
+              <TableRow
+                v-else
                 v-for="article in articleStore.articles.slice(0, 5)"
                 :key="article.article_id"
                 class="border-b hover:bg-gray-50 transition-all cursor-pointer"
@@ -236,7 +250,9 @@ const goToPage = (page: number) => {
                   <div class="flex items-center gap-4">
                     <Avatar>
                       <AvatarImage :src="article.user_photo_path" />
-                      <AvatarFallback class="text-white">{{ getInitials(article.user_name || 'U') }}</AvatarFallback>
+                      <AvatarFallback class="text-white">{{
+                        getInitials(article.user_name || 'U')
+                      }}</AvatarFallback>
                     </Avatar>
                     <div class="flex-1">
                       <router-link
@@ -253,16 +269,6 @@ const goToPage = (page: number) => {
                       {{ dayjs(article.created_at).format('MMM D, YYYY') }}
                     </span>
                   </div>
-                </TableCell>
-              </TableRow>
-              <TableRow
-                v-else
-                v-for="n in 5"
-                :key="n"
-                class="border-b hover:bg-gray-50 transition-all"
-              >
-                <TableCell>
-                  <Skeleton class="h-12" animate-pulse />
                 </TableCell>
               </TableRow>
             </TableBody>

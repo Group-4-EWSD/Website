@@ -22,6 +22,7 @@ export const useArticleStore = defineStore('article', () => {
 
   const fetchArticles = async (params: ArticleParams = {}) => {
     isLoading.value = true
+    articles.value = []
     error.value = null
 
     try {

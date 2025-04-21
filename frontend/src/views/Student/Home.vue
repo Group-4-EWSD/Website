@@ -31,6 +31,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getInitials } from '@/lib/utils'
 
 const router = useRouter()
 const articleStore = useArticleStore()
@@ -225,10 +227,10 @@ const goToPage = (page: number) => {
               >
                 <TableCell>
                   <div class="flex items-center gap-4">
-                    <img
-                      :src="article.user_photo_path"
-                      class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white"
-                    />
+                    <Avatar>
+                      <AvatarImage :src="article.user_photo_path" />
+                      <AvatarFallback class="text-white">{{ getInitials(article.user_name || 'U') }}</AvatarFallback>
+                    </Avatar>
                     <div class="flex-1">
                       <router-link
                         :to="`/articles/${article.article_id}`"

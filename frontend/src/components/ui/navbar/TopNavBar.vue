@@ -27,36 +27,6 @@ const userStore = useUserStore()
       <span class="text-md font-bold uppercase pl-[7px] name-color">University</span>
     </RouterLink>
 
-    <!-- <div class="flex flex-1 justify-center">
-      <div class="hidden sm:flex w-1/2 relative sm:my-4">
-        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-        <Input v-model="searchQuery" placeholder="Search..." class="pl-10" />
-      </div>
-
-      <button
-        v-if="!isSearchActive"
-        @click="toggleSearch"
-        class="sm:hidden p-2 rounded-full bg-primary absolute right-[4.5rem] top-1/2 transform -translate-y-1/2"
-      >
-        <Search class="w-8 h-8 bg-primary text-white" />
-      </button>
-
-      <div
-        v-else
-        class="absolute top-3 sm:left-0 w-[45vw] sm:w-[90vw] flex items-center bg-white border rounded-lg px-3 py-1 shadow-md"
-      >
-        <Search class="text-black w-5 h-5" />
-        <Input
-          v-model="searchQuery"
-          placeholder="Search..."
-          class="flex-1 pl-2 outline-none border-none"
-        />
-        <button @click="toggleSearch" class="ml-2 text-gray-700">
-          <X class="w-5 h-5" />
-        </button>
-      </div>
-    </div> -->
-
     <div class="flex items-center space-x-4 pr-2 sm:pr-6">
       <div class="relative">
         <RouterLink :to="`/notifications`">
@@ -76,7 +46,7 @@ const userStore = useUserStore()
       <div class="hidden sm:flex flex-col text-white font-medium">
         <p>Welcome, {{ userStore.currentUser?.user_name }}</p>
         <p class="text-sm text-gray-300">
-          {{ userStore.currentUser?.faculty_name }} - {{ userStore.currentUser?.user_type_name }}
+          <span v-if="userStore.currentUser?.user_type_name !== 'Admin' && userStore.currentUser?.user_type_name !== 'Marketing Manager'">{{ userStore.currentUser?.faculty_name }} - </span>{{ userStore.currentUser?.user_type_name }}
         </p>
       </div>
 

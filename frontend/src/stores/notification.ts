@@ -12,18 +12,18 @@ export const useNotificationsStore = defineStore('notifications', () => {
   const fetchNotification = async () => {
     isLoading.value = true
 
-    await getNotifications()
-      .then((response) => {
-        console.log(response.data)
-        notifications.value = response.data
-        isLoading.value = false
-      })
-      .catch((error) => {
-        isLoading.value = false
-        toast.error(error)
-        console.error('Error fetching articles:', error)
-      })
+    try {
+      const response = await getNotifications()
+      console.log(response.data)
+      notifications.value = response.data
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to fetch notifications.')
+      console.error('Error fetching notifications:', error)
+    } finally {
+      isLoading.value = false
+    }
   }
+
   const changeNotiSeen = async (notification_id: string) => {
     const noti = notifications.value.find((n) => n.notification_id === notification_id)
     if (noti) {
@@ -35,10 +35,17 @@ export const useNotificationsStore = defineStore('notifications', () => {
     }
   }
 
+  function reset() {
+    notifications.value = []
+    isLoading.value = false
+  }
+
   return {
     notifications,
     isLoading,
+
     fetchNotification,
     changeNotiSeen,
+    reset,
   }
 })

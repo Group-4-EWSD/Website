@@ -43,23 +43,23 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
     isLoading.value = true
     error.value = null
 
-    await getAllArticles()
-      .then((response) => {
-        countData.value = response.countData
-        articles.value = response.allArticles
-        guestList.value = response.guestList
-        prevLogin.value = response.prev_login
-        publicDate.value = response.remaining_final_publish
-        chartData.value = response.articlesPerYear
+    try {
+      const response = await getAllArticles()
 
-        isLoading.value = false
-      })
-      .catch((error) => {
-        isLoading.value = false
-        toast.error(error.response.data.message)
-        console.error('Error fetching articles:', error)
-        error.value = 'Failed to load articles. Please try again.'
-      })
+      countData.value = response.countData
+      articles.value = response.allArticles
+      guestList.value = response.guestList
+      prevLogin.value = response.prev_login
+      publicDate.value = response.remaining_final_publish
+      chartData.value = response.articlesPerYear
+
+      isLoading.value = false
+    } catch (error: any) {
+      isLoading.value = false
+      toast.error(error?.response?.data?.message || 'An error occurred.')
+      console.error('Error fetching articles:', error)
+      error.value = 'Failed to load articles. Please try again.'
+    }
   }
 
   const fetchCoordinatorArticles = async (params: ArticleParams = {}) => {
@@ -95,7 +95,7 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
           totalSubmissions: response.totalSubmissions,
           pendingReview: response.pendingReview,
           approvedArticles: response.approvedArticles,
-          rejectedArticles: response.approvedArticles,
+          rejectedArticles: response.rejectedArticles,
           articles: response.articles,
         }
 
@@ -107,6 +107,30 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
         console.error('Error fetching articles:', error)
         error.value = 'Failed to load articles. Please try again.'
       })
+  }
+
+  function reset() {
+    countData.value = null
+    articles.value = []
+    guestList.value = []
+    prevLogin.value = ''
+    publicDate.value = 0
+    chartData.value = []
+    coordinatorArticles.value = {
+      totalSubmissions: 0,
+      pendingReview: 0,
+      approvedArticles: 0,
+      rejectedArticles: 0,
+      articles: [],
+    }
+
+    approvedArticles.value = {
+      totalSubmissions: 0,
+      pendingReview: 0,
+      approvedArticles: 0,
+      rejectedArticles: 0,
+      articles: [],
+    }
   }
 
   return {
@@ -123,5 +147,6 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
     fetchAllArticles,
     fetchCoordinatorArticles,
     fetchApprovedArticles,
+    reset,
   }
 })

@@ -19,22 +19,30 @@ export const useManagerStore = defineStore('manager', () => {
     isLoading.value = true
     error.value = null
 
-    await getDashboardData()
-      .then((response) => {
-        countData.value = response.countData
-        guestList.value = response.guestList
-        prevLogin.value = response.prev_login
-        chartData.value = response.articlesPerYear
-        members.value = response.memberList
+    try {
+      const response = await getDashboardData()
+      countData.value = response.countData
+      guestList.value = response.guestList
+      prevLogin.value = response.prev_login
+      chartData.value = response.articlesPerYear
+      members.value = response.memberList
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'An unexpected error occurred.')
+      console.error('Error fetching dashboard data:', error)
+      error.value = 'Failed to load data. Please try again.'
+    } finally {
+      isLoading.value = false
+    }
+  }
 
-        isLoading.value = false
-      })
-      .catch((error) => {
-        isLoading.value = false
-        toast.error(error.response.data.message)
-        console.error('Error fetching dashboard data:', error)
-        error.value = 'Failed to load data. Please try again.'
-      })
+  function reset() {
+    countData.value = null
+    guestList.value = []
+    prevLogin.value = ''
+    chartData.value = []
+    members.value = []
+    error.value = null
+    isLoading.value = false
   }
 
   return {
@@ -46,5 +54,6 @@ export const useManagerStore = defineStore('manager', () => {
     isLoading,
 
     fetchDashboardData,
+    reset,
   }
 })

@@ -17,6 +17,7 @@ export const useArticleStore = defineStore('article', () => {
 
   const isLoading = ref(false)
   const isFetched = ref(false)
+  const hasFiltered = ref(false)
   const error = ref<string | null>(null)
 
   const fetchArticles = async (params: ArticleParams = {}) => {
@@ -45,6 +46,11 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  const reset = () => {
+    articles.value = []
+    countData.value = null
+  }
+
   return {
     countData,
     articles,
@@ -52,6 +58,7 @@ export const useArticleStore = defineStore('article', () => {
     currentPage,
     displayNumber,
     isFetched,
+    hasFiltered,
     totalPages,
     sortOption,
     selectedYear,
@@ -59,5 +66,6 @@ export const useArticleStore = defineStore('article', () => {
     error,
 
     fetchArticles,
+    reset,
   }
 })

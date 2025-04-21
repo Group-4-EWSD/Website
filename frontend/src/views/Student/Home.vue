@@ -94,6 +94,7 @@ watch(
   () => {
     articleStore.currentPage = 1
     articleStore.fetchArticles({ pageNumber: 1 })
+    articleStore.hasFiltered = true
   },
 )
 
@@ -212,7 +213,13 @@ const goToPage = (page: number) => {
 
           <Table v-else class="w-full">
             <TableBody>
-              <TableRow v-if="!articleStore.isLoading && articleStore.articles.length === 0">
+              <TableRow
+                v-if="
+                  !articleStore.isLoading &&
+                  articleStore.articles.length === 0 &&
+                  articleStore.hasFiltered
+                "
+              >
                 <TableCell colspan="100%" class="text-center py-6 text-gray-500">
                   No articles found with the current filters.
                 </TableCell>
@@ -220,7 +227,7 @@ const goToPage = (page: number) => {
 
               <TableRow
                 v-if="!articleStore.isLoading"
-                v-for="article in articleStore.articles.slice(0, 6)"
+                v-for="article in articleStore.articles.slice(0, 5)"
                 :key="article.article_id"
                 class="border-b hover:bg-gray-50 transition-all cursor-pointer"
                 @click="goToArticleDetails(article.article_id || '')"

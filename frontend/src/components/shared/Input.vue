@@ -48,7 +48,7 @@ const type = ref(props.type)
           <EyeOff class="h-5 w-5" />
         </span>
         <span v-else>
-          <Eye class="h-5 w-5"/>
+          <Eye class="h-5 w-5" />
         </span>
       </button>
     </div>
@@ -60,3 +60,10 @@ const type = ref(props.type)
     class="text-sm text-red-500"
   />
 </template>
+
+<style lang="css" scoped>
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+</style>

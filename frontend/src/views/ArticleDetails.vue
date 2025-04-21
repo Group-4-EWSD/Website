@@ -14,14 +14,14 @@ import {
   getArticleDetails,
   updateStatus,
 } from '@/api/articles'
+import { updateReact } from '@/api/articles'
+import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUserStore } from '@/stores/user'
-import { updateReact } from '@/api/articles'
 import type { ArticleResponse } from '@/types/article'
-import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 
 const route = useRoute()
 const userStore = useUserStore()

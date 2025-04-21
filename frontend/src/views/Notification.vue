@@ -7,9 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
+import { getInitials } from '@/lib/utils'
 import { useNotificationsStore } from '@/stores/notification'
 
-import { getInitials } from '@/lib/utils'
 
 dayjs.extend(relativeTime)
 

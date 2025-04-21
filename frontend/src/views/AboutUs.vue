@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import AboutUs from '@/assets/about-us.png'
-
-import { Button } from '@/components/ui/button'
-import PublicNavBar from '@/components/shared/PublicNavBar.vue'
 import PublicFooter from '@/components/shared/PublicFooter.vue'
+import PublicNavBar from '@/components/shared/PublicNavBar.vue'
+import { Button } from '@/components/ui/button'
 </script>
 <template>
   <div class="min-h-screen bg-white">

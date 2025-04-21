@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import Layout from '@/components/ui/Layout.vue'
+import { computed, onMounted, ref } from 'vue'
+
 import ArticleChart from '@/components/shared/ArticleChart.vue'
 import MagazineArticles from '@/components/shared/MagazineArticles.vue'
+import Layout from '@/components/ui/Layout.vue'
 import { useGuestStore } from '@/stores/guest'
-import { computed, onMounted, ref } from 'vue'
+
 
 const guestStore = useGuestStore()
 const selectedYear = ref<string>('2025')

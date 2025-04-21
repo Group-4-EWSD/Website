@@ -1,21 +1,11 @@
 <script setup lang="ts">
 import { ArchiveX, CircleCheckBig, FilePenLine, FileText, SlidersHorizontal } from 'lucide-vue-next'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
-import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-} from '@/components/ui/select'
-import Card from '@/components/ui/card/Card.vue'
-import Layout from '@/components/ui/Layout.vue'
-import Button from '@/components/ui/button/Button.vue'
-import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useCoordinatorStore } from '@/stores/coordinator'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
+import Button from '@/components/ui/button/Button.vue'
+import Card from '@/components/ui/card/Card.vue'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +14,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import Layout from '@/components/ui/Layout.vue'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import router from '@/router'
+import { useCoordinatorStore } from '@/stores/coordinator'
 
 const coordinatorStore = useCoordinatorStore()
 

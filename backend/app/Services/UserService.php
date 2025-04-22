@@ -12,14 +12,17 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordResetMail;
 use App\Mail\AccountCreateMail;
+use App\Repositories\ArticleRepository;
 
 class UserService
 {
     protected $userRepository;
+    protected $articleRepository;
     protected $fileService;
 
-    public function __construct(UserRepository $userRepository, FileService $fileService)
+    public function __construct(UserRepository $userRepository, FileService $fileService, ArticleRepository $articleRepository)
     {
+        $this->articleRepository = $articleRepository;
         $this->userRepository = $userRepository;
         $this->fileService = $fileService;
     }
@@ -42,6 +45,7 @@ class UserService
 
         // Detect browser (now directly returns browser_id)
         $browser = $this->detectBrowser($userAgent);
+        $lastLogin = $this->articleRepository->getPreviousLogin($user->id);
 
         // Insert login history with optimized browser_id retrieval
         DB::table('login_histories')->insert([
@@ -57,7 +61,9 @@ class UserService
             'status' => 200,
             'message' => 'Login successful',
             'token' => $token,
-            'user' => $user
+            'user' => array_merge($user, [
+                'prev_login' => $lastLogin,
+            ]),
         ];
     }
 
@@ -172,9 +178,9 @@ class UserService
     }
 
 
-    public function pageVisitInitial($userId, $pageId)
-    {
+    public function pageVisitInitial($userId, $pageId){
         $this->userRepository->addUserVisit($userId, $pageId);
+        return true;
     }
 
     public function userRegister($data)

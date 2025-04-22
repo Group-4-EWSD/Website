@@ -45,6 +45,7 @@ class ArticleService
     public function getStudentHomePageData($userId, $request)
     {
         return [
+            'prev_login' => $this->articleRepository->getPreviousLogin($userId),
             'countData' => $this->articleRepository->getStudentHomeCountData(),
             'allArticles' => $this->articleRepository->getAllArticles(0, $userId, $request)->get()
         ];
@@ -200,8 +201,16 @@ class ArticleService
     }
 
     public function changeArticleStatus($userId, $articleId, $request){
-        $this->notificationRepository->setNotification('6', $request->articleId);
-        return $this->articleRepository->createActivity( $articleId, $userId,$request);
+        if($articleId != null){
+            $this->notificationRepository->setNotification('6', $articleId);
+            $this->articleRepository->createActivity( $articleId, $userId,$request);
+        }else{
+            foreach ($request->articleIdList as $eachArticleId) {
+                $this->notificationRepository->setNotification('6', $eachArticleId);
+                $this->articleRepository->createActivity($eachArticleId, $userId,$request);
+            }
+        }
+        return true;
     }
 
     public function draftArticleList($userId){

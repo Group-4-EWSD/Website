@@ -10,6 +10,8 @@ use App\Models\Feedback;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+
 //use Your Model
 
 /**
@@ -33,6 +35,31 @@ class actionRepository
             ->get();
         return $pair;
     }
+    public function formatTimeAgo($seconds)
+    {
+        if ($seconds < 60) {
+            return $seconds . ' second' . ($seconds > 1 ? 's' : '') . ' ago';
+        } elseif ($seconds < 3600) {
+            $minutes = floor($seconds / 60);
+            return $minutes . ' minute' . ($minutes > 1 ? 's' : '') . ' ago';
+        } elseif ($seconds < 86400) {
+            $hours = floor($seconds / 3600);
+            return $hours . ' hour' . ($hours > 1 ? 's' : '') . ' ago';
+        } elseif ($seconds < 604800) {
+            $days = floor($seconds / 86400);
+            return $days . ' day' . ($days > 1 ? 's' : '') . ' ago';
+        } elseif ($seconds < 2592000) {
+            $weeks = floor($seconds / 604800);
+            return $weeks . ' week' . ($weeks > 1 ? 's' : '') . ' ago';
+        } elseif ($seconds < 31536000) {
+            $months = floor($seconds / 2592000);
+            return $months . ' month' . ($months > 1 ? 's' : '') . ' ago';
+        } else {
+            $years = floor($seconds / 31536000);
+            return $years . ' year' . ($years > 1 ? 's' : '') . ' ago';
+        }
+    }
+
 
     public function getArticleDetail($articleId){
         $userId = Auth::id();
@@ -41,6 +68,7 @@ class actionRepository
                 'articles.article_description',
                 'at.article_type_id',
                 'at.article_type_name',
+                DB::raw('TIMESTAMPDIFF(SECOND, articles.created_at, NOW()) as time_diff'),
                 'articles.created_at',
                 'articles.updated_at',
                 'users.user_name as creator_name',
@@ -55,6 +83,10 @@ class actionRepository
             ->leftJoin('article_types as at', 'at.article_type_id', '=', 'articles.article_type_id')
             ->where('articles.article_id', '=', $articleId)
             ->first();
+            // Format the time_diff to a readable "time ago" format
+        if ($article) {
+            $article->time_diff = $this->formatTimeAgo($article->time_diff);
+        }
         return $article;
     }
     
@@ -69,6 +101,7 @@ class actionRepository
                     'comments.comment_id',
                     'comments.message',
                     'comments.created_at',
+                    DB::raw('TIMESTAMPDIFF(SECOND, comments.created_at, NOW()) as time_diff'),
                     'comments.user_id',
                     DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
@@ -76,7 +109,12 @@ class actionRepository
                 ])
                 ->join('users as u', 'u.id', '=', 'comments.user_id')
                 ->where('comments.article_id', '=', $articleId)
-                ->get();
+                ->get()
+                ->map(function ($comment) {
+                    // Call the formatTimeAgo function to format the time difference
+                    $comment->time_diff = $this->formatTimeAgo($comment->time_diff);
+                    return $comment;
+                });
         return $comments;
     }
 
@@ -86,13 +124,19 @@ class actionRepository
                 ->select([
                     'f.message',
                     'f.created_at',
+                    DB::raw('TIMESTAMPDIFF(SECOND, f.created_at, NOW()) as time_diff'),
                     'f.user_id',
                     DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                     'u.gender',
                     'u.user_name'
                 ])
                 ->where('f.article_id', $articleId)
-                ->get();
+                ->get()
+                ->map(function ($feedback) {
+                    // Call the formatTimeAgo function to format the time difference
+                    $feedback->time_diff = $this->formatTimeAgo($feedback->time_diff);
+                    return $feedback;
+                });
         return $feedbacks;
     }
 

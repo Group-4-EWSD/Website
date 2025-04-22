@@ -427,6 +427,7 @@ class ArticleRepository
                 // Apply OFFSET only if `pageNumber` > 1
                 if ($request->pageNumber > 1) {
                     $offset = ($request->pageNumber - 1) * $request->displayNumber;
+                    // dd($offset);
                     $articleList->offset($offset);
                 }
             }

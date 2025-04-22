@@ -272,6 +272,12 @@ class ArticleRepository
         if (!empty($request->academicYearId)) {
             $articles->where('ay.academic_year_id', '=', $request->academicYearId);
         }
+
+        if (!empty($request->currentYear)) {
+            if($request->currentYear == 1){
+                $articles->where('ay.academic_year_id', '=', $request->academicYearId);
+            }
+        }
         
         if (!empty($request->facultyId)) {
             $articles->where('f.faculty_id', '=', $request->facultyId);
@@ -298,17 +304,7 @@ class ArticleRepository
 
         if (!empty($request->status)) {
             $status = $request->status;
-            if ($status == '0') {
-                $articles->havingRaw(" status IN (0, 1, 2, 3) ");
-            } else if ($status == '1') {
-                $articles->havingRaw(" status IN (1, 2, 3) ");
-            } else if ($status == '2') {
-                $articles->havingRaw(" status IN (2, 3) ");
-            } else if ($status == '3') {
-                $articles->havingRaw(" status = 3 ");
-            } else {
-                $articles->havingRaw(" status IN (2, 3) ");
-            }
+            $articles->havingRaw(" status = ".$status);
         }
 
         if ($state == 3 || $state == 4 || $state == 0) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4

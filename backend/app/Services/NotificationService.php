@@ -27,6 +27,6 @@ class NotificationService
     }
 
     public function viewNotification($notificationId){
-        $this->notificationRepository->viewNotification($notificationId);
+        return $this->notificationRepository->viewNotification($notificationId);
     }
 }

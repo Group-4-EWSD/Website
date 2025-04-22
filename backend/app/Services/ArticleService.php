@@ -45,6 +45,7 @@ class ArticleService
     public function getStudentHomePageData($userId, $request)
     {
         return [
+            'prev_login' => $this->articleRepository->getPreviousLogin($userId),
             'countData' => $this->articleRepository->getStudentHomeCountData(),
             'allArticles' => $this->articleRepository->getAllArticles(0, $userId, $request)->get()
         ];

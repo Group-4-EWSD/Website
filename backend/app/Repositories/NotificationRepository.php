@@ -78,5 +78,6 @@ class NotificationRepository
             ->update([
                 'status' => 1
             ]); // seen
+        return true;
     }
 }

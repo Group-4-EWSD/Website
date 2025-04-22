@@ -608,9 +608,19 @@ class ArticleRepository
     public function getTopArticles()
     {
         $topArticles = DB::table('articles as a')
+            ->leftJoin(DB::raw('(
+                SELECT ad.article_id, CONCAT("https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/",ad.file_path) as photo_path
+                FROM (
+                    SELECT *,
+                        ROW_NUMBER() OVER (PARTITION BY article_id ORDER BY article_detail_id ASC) as rn
+                    FROM article_details
+                    WHERE file_type IN ("png", "jpg", "jpeg", "gif", "webp")
+                ) ad
+                WHERE ad.rn = 1
+            ) as ad'), 'a.article_id', '=', 'ad.article_id')
             ->join('actions as act', 'a.article_id', '=', 'act.article_id')
-            ->select('a.article_id', 'a.article_title', 'a.article_description')
-            ->groupBy('a.article_id', 'a.article_title', 'a.article_description')
+            ->select('a.article_id', 'a.article_title', 'a.article_description', 'ad.photo_path')
+            ->groupBy('a.article_id', 'a.article_title', 'a.article_description', 'ad.photo_path')
             ->orderByRaw('COUNT(act.react) DESC')
             ->limit(3)
             ->get();

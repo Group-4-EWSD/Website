@@ -14,7 +14,7 @@ const toggleMenu = () => {
 
 <template>
   <nav
-    class="flex justify-between items-center bg-primary text-white h-[65px] px-4 sm:px-6 lg:px-10"
+    class="relative flex justify-between items-center bg-primary text-white h-[65px] px-4 sm:px-6 lg:px-10"
   >
     <!-- Logo and brand name -->
     <RouterLink class="flex items-center" to="/home">
@@ -54,7 +54,7 @@ const toggleMenu = () => {
     </button>
 
     <!-- Desktop navigation -->
-    <div class="hidden md:flex md:items-center space-x-6 text-sm">
+    <div class="hidden absolute left-0 w-full justify-center md:flex md:items-center space-x-6 text-sm">
       <RouterLink to="/home" class="text-white hover:text-gray-300">Home</RouterLink>
       <RouterLink to="/about" class="text-white hover:text-gray-300">About</RouterLink>
       <RouterLink to="/contact-us" class="text-white hover:text-gray-300">Contact Us</RouterLink>

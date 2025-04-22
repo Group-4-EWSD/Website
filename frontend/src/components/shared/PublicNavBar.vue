@@ -17,7 +17,7 @@ const toggleMenu = () => {
     class="relative flex justify-between items-center bg-primary text-white h-[65px] px-4 sm:px-6 lg:px-10"
   >
     <!-- Logo and brand name -->
-    <RouterLink class="flex items-center" to="/home">
+    <RouterLink class="flex items-center z-[1]" to="/home">
       <img
         src="@/assets/nav-logo.png"
         alt="University magazine logo"
@@ -60,7 +60,7 @@ const toggleMenu = () => {
       <RouterLink to="/contact-us" class="text-white hover:text-gray-300">Contact Us</RouterLink>
     </div>
 
-    <div class="hidden md:flex text-sm">
+    <div class="hidden md:flex text-sm z-[1]">
       <RouterLink
         v-if="!userStore.currentUser"
         to="/auth/login"

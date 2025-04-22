@@ -61,17 +61,17 @@ const isLoading = ref(false)
 // })
 
 // Watch for changes in isOpen and emit events
-// watch(isOpen, (value) => {
-//   emit('update:modelValue', value)
-// })
+watch(isOpen, (value) => {
+  emit('update:modelValue', value)
+})
 
 // Watch for changes in props.modelValue
-// watch(
-//   () => props.modelValue,
-//   (value) => {
-//     isOpen.value = value || false
-//   },
-// )
+watch(
+  () => props.modelValue,
+  (value) => {
+    isOpen.value = value || false
+  },
+)
 
 // Watch for changes in props.article
 watch(
@@ -231,6 +231,7 @@ const saveAsDraft = async () => {
 // Function to close the modal
 const closeModal = () => {
   isOpen.value = false
+  emit('update:modelValue', false)
   resetForm()
 }
 

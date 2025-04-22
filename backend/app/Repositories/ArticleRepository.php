@@ -478,7 +478,7 @@ class ArticleRepository
             ->select('sd.pre_submission_date', 'sd.actual_submission_date')
             ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
             ->where('ay.academic_year_start', date('Y'))
-            ->where('faculty_id', $facultyId)
+            ->where('sd.faculty_id', $facultyId)
             ->first();
         return $deadlines;
     }
@@ -599,4 +599,17 @@ class ArticleRepository
 
         return $publishedList;
     }
+    public function getTopArticles()
+    {
+        $topArticles = DB::table('articles as a')
+            ->join('actions as act', 'a.article_id', '=', 'act.article_id')
+            ->select('a.article_id', 'a.article_title', 'a.article_description')
+            ->groupBy('a.article_id', 'a.article_title', 'a.article_description')
+            ->orderByRaw('COUNT(act.react) DESC')
+            ->limit(3)
+            ->get();
+    
+        return $topArticles;
+    }
+    
 }

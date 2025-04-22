@@ -73,7 +73,7 @@ class ArticleController extends Controller
         $userType = $user->user_type_id;
         $facultyId = $user->faculty_id;
         if($userType == '0'){ // Guest
-            $homePageData = $this->articleService->getGuestHomePageData($userId, $request);
+            $homePageData = $this->articleService->getGuestHomePageData($userId, $facultyId, $request);
         }else if($userType == '1'){ // Student
             // dd(Auth::id());
             $homePageData = $this->articleService->getStudentHomePageData($userId, $request);
@@ -200,5 +200,11 @@ class ArticleController extends Controller
         $notificationData = $this->notificationService->getNotificationList($user);
         return response()->json($notificationData);
         // return $user;
+    }
+
+    public function topArticles()
+    {
+        $topArticles = $this->articleService->getTopArticles();
+        return response()->json($topArticles);
     }
 }

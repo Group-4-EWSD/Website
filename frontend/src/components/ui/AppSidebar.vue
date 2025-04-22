@@ -12,6 +12,7 @@ import {
   User,
 } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { toast } from 'vue-sonner'
 
 import {
   Sidebar,
@@ -25,7 +26,6 @@ import { useUserStore } from '@/stores/user'
 
 import Button from './button/Button.vue'
 import Separator from './separator/Separator.vue'
-import { toast } from 'vue-sonner'
 
 const loading = ref(false)
 

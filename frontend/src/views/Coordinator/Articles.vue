@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArchiveX, CircleCheckBig, FilePenLine, FileText, SlidersHorizontal } from 'lucide-vue-next'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import ArticleTable from '@/components/pagespecific/coordinator-articles/ArticleTable.vue'
 import {
@@ -13,8 +14,8 @@ import Card from '@/components/ui/card/Card.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import { computed, onMounted, ref, watch } from 'vue'
 import { useCoordinatorStore } from '@/stores/coordinator'
+import { getFilterItems } from '@/api/articles'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import {
   DropdownMenu,
@@ -31,6 +32,8 @@ const coordinatorStore = useCoordinatorStore()
 const selectedStatusFilter = ref('all')
 const selectedFeedbackFilter = ref('all')
 const currentSort = ref('')
+const selectedYear = ref<string>('all')
+const yearOptions = ref<{ label: string; value: string }[]>([])
 
 const filteredArticles = computed(() => {
   if (selectedStatusFilter.value === 'all') return coordinatorStore.coordinatorArticles.articles
@@ -54,7 +57,13 @@ const sortBy = (value: string) => {
   currentSort.value = value
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const [academicYears] = await Promise.all([getFilterItems(4)])
+
+  yearOptions.value = academicYears.map((item: any) => ({
+    label: item.academic_year_description,
+    value: item.academic_year_id,
+  }))
   if (!coordinatorStore.coordinatorArticles.articles.length) {
     coordinatorStore.fetchCoordinatorArticles()
   }
@@ -74,6 +83,11 @@ const updateArticles = () => {
 
 watch(selectedFeedbackFilter, updateArticles)
 watch(currentSort, updateArticles)
+watch(selectedYear, (newYear) => {
+  return coordinatorStore.fetchCoordinatorArticles({
+    ...(newYear !== 'all' ? { academicYearId: newYear } : {}),
+  })
+})
 
 const goToPublishPage = () => {
   router.push({ name: 'Coordinator Publish' })
@@ -82,7 +96,7 @@ const goToPublishPage = () => {
 
 <template>
   <Layout>
-    <h2 class="text-xl font-bold mb-4 uppercase">Articles</h2>
+    <h2 class="text-xl font-bold mb-4 uppercase">Articles (2025-2026)</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card class="p-5 flex flex-row gap-5 items-center">
         <FileText class="h-14 w-14 text-blue-500" />
@@ -122,10 +136,14 @@ const goToPublishPage = () => {
       </Card>
     </div>
     <div class="flex flex-col gap-3">
-      <div class="flex justify-between items-center mt-4 mb-2">
-        <h2 class="text-xl font-bold uppercase">List of Articles</h2>
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mt-4 mb-2">
+        <h2 class="text-xl font-bold uppercase">
+          List of Articles <br />
+          (TOTAL UP TO 2025–2026)
+        </h2>
 
-        <div class="flex items-center gap-4">
+        <!-- Controls -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-4">
           <!-- Sort Dropdown Menu -->
           <DropdownMenu>
             <TooltipWrapper text="Sort">
@@ -150,13 +168,13 @@ const goToPublishPage = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <!-- Filter Dropdown -->
+          <!-- Status Filter -->
           <Select v-model="selectedStatusFilter">
             <SelectTrigger class="w-[160px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
@@ -170,14 +188,27 @@ const goToPublishPage = () => {
               <SelectValue placeholder="Filter by feedback" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All Feedback</SelectItem>
               <SelectItem value="1">Given Within 14 days</SelectItem>
               <SelectItem value="2">Given After 14 days</SelectItem>
               <SelectItem value="3">Not Given</SelectItem>
             </SelectContent>
           </Select>
 
-          <!-- Navigate to Article Publish Page -->
+          <!-- Year Filter -->
+          <Select v-model="selectedYear">
+            <SelectTrigger class="w-[160px]">
+              <SelectValue placeholder="Filter by year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Years</SelectItem>
+              <SelectItem v-for="option in yearOptions" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <!-- Publish Action -->
           <Button @click="goToPublishPage">Publish Articles</Button>
         </div>
       </div>

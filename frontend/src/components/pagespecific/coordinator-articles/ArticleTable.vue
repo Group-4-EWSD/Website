@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
 import StatusIndicator from '@/components/shared/StatusIndicator.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -11,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useRouter } from 'vue-router'
 import type { CoordinatorArticle } from '@/types/coordinator'
 import type { GuestArticle } from '@/types/guest'
 

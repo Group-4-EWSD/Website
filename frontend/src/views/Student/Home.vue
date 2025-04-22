@@ -4,6 +4,7 @@ import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { getFilterItems } from '@/api/articles'
 import FilterModal from '@/components/pagespecific/student-home/FilterModal.vue'
 import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -30,7 +31,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { useArticleStore } from '@/stores/articles'
-import { getFilterItems } from '@/api/articles'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getInitials } from '@/lib/utils'
 
 const router = useRouter()
 const articleStore = useArticleStore()
@@ -92,6 +94,7 @@ watch(
   () => {
     articleStore.currentPage = 1
     articleStore.fetchArticles({ pageNumber: 1 })
+    articleStore.hasFiltered = true
   },
 )
 
@@ -210,7 +213,13 @@ const goToPage = (page: number) => {
 
           <Table v-else class="w-full">
             <TableBody>
-              <TableRow v-if="!articleStore.isLoading && articleStore.articles.length === 0">
+              <TableRow
+                v-if="
+                  !articleStore.isLoading &&
+                  articleStore.articles.length === 0 &&
+                  articleStore.hasFiltered
+                "
+              >
                 <TableCell colspan="100%" class="text-center py-6 text-gray-500">
                   No articles found with the current filters.
                 </TableCell>
@@ -218,17 +227,17 @@ const goToPage = (page: number) => {
 
               <TableRow
                 v-if="!articleStore.isLoading"
-                v-for="article in articleStore.articles.slice(0, 6)"
+                v-for="article in articleStore.articles.slice(0, 5)"
                 :key="article.article_id"
                 class="border-b hover:bg-gray-50 transition-all cursor-pointer"
                 @click="goToArticleDetails(article.article_id || '')"
               >
                 <TableCell>
                   <div class="flex items-center gap-4">
-                    <img
-                      :src="article.user_photo_path"
-                      class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-white"
-                    />
+                    <Avatar>
+                      <AvatarImage :src="article.user_photo_path" />
+                      <AvatarFallback class="text-white">{{ getInitials(article.user_name || 'U') }}</AvatarFallback>
+                    </Avatar>
                     <div class="flex-1">
                       <router-link
                         :to="`/articles/${article.article_id}`"

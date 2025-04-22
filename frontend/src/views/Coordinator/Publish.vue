@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import Layout from '@/components/ui/Layout.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+
+import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Card from '@/components/ui/card/Card.vue'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
-import StatusIndicator from '@/components/shared/StatusIndicator.vue'
+import Layout from '@/components/ui/Layout.vue'
 import {
   Table,
   TableBody,

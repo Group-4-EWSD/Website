@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
-
 import { onMounted, ref } from 'vue'
 
-import ArticleChart from '@/components/shared/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
+import ArticleChart from '@/components/shared/ArticleChart.vue'
 import MagazineArticles from '@/components/shared/MagazineArticles.vue'
 import Badge from '@/components/ui/badge/Badge.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

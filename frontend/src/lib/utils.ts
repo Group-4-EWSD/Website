@@ -6,6 +6,9 @@ import { useCookies } from 'vue3-cookies'
 
 import { logout } from '@/api/auth'
 import router from '@/router' // Import the router instance directly
+import { setActivePinia } from 'pinia'
+import { pinia } from '@/main'
+import { resetAllStores } from '@/stores/resetStore'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -20,14 +23,16 @@ export function valueUpdater<T extends Updater<unknown>>(updaterOrValue: T, ref:
  */
 export async function forceSignOut(clearToken: boolean = true) {
   console.log('forceSignOut')
+  setActivePinia(pinia)
+  resetAllStores()
+
   if (clearToken) {
-    logout().then(() => {
-      // Remove token from cookies
-      removeCookie('token')
-      removeCookie('user')
-      // Redirect to login
-      router.push('/auth/login')
-    })
+    await logout()
+    // Remove token from cookies
+    removeCookie('token')
+    removeCookie('user')
+    // Redirect to login
+    router.push('/auth/login')
   } else {
     // Remove token from cookies
     removeCookie('token')
@@ -83,7 +88,8 @@ export const calculateAge = (birthDate: string): number => {
   return age
 }
 
-export const getInitials = (name: string): string => {
+export const getInitials = (name?: string): string => {
+  if (!name) return ''
   return name
     .split(' ')
     .map((part) => part[0])

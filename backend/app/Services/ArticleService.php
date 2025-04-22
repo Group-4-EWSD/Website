@@ -32,11 +32,11 @@ class ArticleService
         $this->notificationRepository = $notificationRepository;
     }
 
-    public function getGuestHomePageData($userId, $request){
+    public function getGuestHomePageData($userId, $facultyId, $request){
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),
             'allArticles' => $this->articleRepository->getAllArticles(5, null, $request)->get(),
-            'articlesPerYear' => $this->articleRepository->getArticlePerYear(),
+            'articlesPerYear' => $this->articleRepository->getArticlePerYear($facultyId),
             'facultyList' => $this->facultyRepository->getfacultyList(),
             'publishedList' => $this->articleRepository->getPublishedList()
         ];
@@ -226,5 +226,9 @@ class ArticleService
 
     public function getItemList($item){
         return $this->articleRepository->getItemList($item);
+    }
+
+    public function getTopArticles(){
+        return $this->articleRepository->getTopArticles();
     }
 }

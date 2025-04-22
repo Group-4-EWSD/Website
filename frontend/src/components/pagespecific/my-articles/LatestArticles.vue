@@ -30,6 +30,9 @@ const selectedArticleId = ref<string>('')
 
 // Function to handle edit button click
 const handleEditClick = (id: string) => {
+
+  console.log('---heree?')
+
   selectedArticleId.value = id
   showDialog.value = true
 }
@@ -73,7 +76,7 @@ const isOverActualUploadDeadline = (): boolean => {
           <TableCell>{{ article.last_feedback }}</TableCell>
           <TableCell>
             <div class="flex gap-2">
-              <TooltipWrapper text="Edit" v-if="![ArticleStatus.PUBLISHED, ArticleStatus.APPROVED, ArticleStatus.REJECTED].includes(article.status) && isOverActualUploadDeadline">
+              <TooltipWrapper text="Edit" v-if="![ArticleStatus.PUBLISHED, ArticleStatus.APPROVED, ArticleStatus.REJECTED].includes(article.status) && !isOverActualUploadDeadline()">
                 <Button variant="ghost" size="icon" @click="handleEditClick(article.article_id)" :disabled="![ArticleStatus.DRAFT, ArticleStatus.PENDING].includes(article.status)">
                   <PencilIcon class="h-4 w-4" />
                 </Button>

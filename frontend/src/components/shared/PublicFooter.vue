@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Logo from '@/assets/logo.png'
 import {
   ChevronRight,
   FacebookIcon,
@@ -8,6 +7,8 @@ import {
   TwitterIcon,
   YoutubeIcon,
 } from 'lucide-vue-next'
+
+import Logo from '@/assets/logo.png'
 </script>
 <template>
   <footer class="bg-gray-100 pt-10">

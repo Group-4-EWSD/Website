@@ -44,7 +44,7 @@ const studentRoutes = [
     component: StudentHome,
     meta: {
       id: 1, // Student Dashboard Page
-      roles: ['student'],
+      roles: ['Student'],
     },
   },
   {
@@ -53,7 +53,7 @@ const studentRoutes = [
     component: MyArticles,
     meta: {
       id: 4, // Student My Articles Page
-      roles: ['student'],
+      roles: ['Student'],
     },
   },
   {
@@ -62,7 +62,7 @@ const studentRoutes = [
     component: DraftArticles,
     meta: {
       id: 5, // Student Draft Articles Page
-      roles: ['student'],
+      roles: ['Student'],
     },
   },
 ]
@@ -250,7 +250,7 @@ const authRoutes = [
 const fallbackRoutes = [{ path: '/unauthorized', name: 'Unauthorized', component: Unauthorized }]
 
 // Wildcard route to catch undefined paths and redirect to login
-const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/auth/login' }
+const wildcardRoute = { path: '/:pathMatch(.*)*', redirect: '/home' }
 
 const allValidRoutes = [...studentRoutes, ...coordinatorRoutes, ...managerRoutes, ...adminRoutes]
 
@@ -314,8 +314,8 @@ router.beforeEach((to, from, next) => {
   } else if (Array.isArray(to.meta.roles) && !to.meta.roles.includes(userType)) {
     console.log(userType)
     // If user does not have permission to access the route, redirect to unauthorize page
-    // next({ path: '/unauthorized', replace: true })
-    next()
+    next({ path: '/unauthorized', replace: true })
+    // next()
   } else {
     // Otherwise, proceed as normal
     next()

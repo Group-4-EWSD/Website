@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
 import type { AuroraMember } from '@/types/manager'
-import { ref, computed } from 'vue'
 
 const props = defineProps<{
   members: AuroraMember[]

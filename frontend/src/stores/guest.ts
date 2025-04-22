@@ -1,15 +1,15 @@
-import { getDashboardData } from '@/api/guest'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-import type {
-  GuestArticle,
-  ChartData,
-  publishedYear,
-  facultyList,
-  GuestParams,
-} from '@/types/guest'
 import { toast } from 'vue-sonner'
+
+import { getDashboardData } from '@/api/guest'
+import type {
+  ChartData,
+  facultyList,
+  GuestArticle,
+  GuestParams,
+  publishedYear,
+} from '@/types/guest'
 
 export const useGuestStore = defineStore('guest', () => {
   const articles = ref<GuestArticle[]>([])
@@ -24,22 +24,31 @@ export const useGuestStore = defineStore('guest', () => {
     isLoading.value = true
     error.value = null
 
-    await getDashboardData(params)
-      .then((response) => {
-        articles.value = response.allArticles
-        prevLogin.value = response.prev_login
-        chartData.value = response.articlesPerYear
-        publishedYear.value = response.publishedList
-        facultyList.value = response.facultyList
+    try {
+      const response = await getDashboardData(params)
 
-        isLoading.value = false
-      })
-      .catch((error) => {
-        isLoading.value = false
-        toast.error(error.response.data.message)
-        console.error('Error fetching articles:', error)
-        error.value = 'Failed to load articles. Please try again.'
-      })
+      articles.value = response.allArticles
+      prevLogin.value = response.prev_login
+      chartData.value = response.articlesPerYear
+      publishedYear.value = response.publishedList
+      facultyList.value = response.facultyList
+    } catch (err: any) {
+      console.error('Error fetching dashboard data:', err)
+      toast.error(err.response?.data?.message || 'Something went wrong.')
+      error.value = 'Failed to load articles. Please try again.'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  function reset() {
+    articles.value = []
+    prevLogin.value = ''
+    chartData.value = []
+    publishedYear.value = []
+    facultyList.value = []
+    error.value = null
+    isLoading.value = false
   }
 
   return {
@@ -52,5 +61,6 @@ export const useGuestStore = defineStore('guest', () => {
     error,
 
     fetchDashboardData,
+    reset,
   }
 })

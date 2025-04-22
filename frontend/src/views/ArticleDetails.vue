@@ -14,14 +14,14 @@ import {
   getArticleDetails,
   updateStatus,
 } from '@/api/articles'
+import { updateReact } from '@/api/articles'
+import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUserStore } from '@/stores/user'
-import { updateReact } from '@/api/articles'
 import type { ArticleResponse } from '@/types/article'
-import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -309,7 +309,10 @@ const downloadArticle = () => {
         </div>
         <div class="flex justify-between items-center py-4 border-b">
           <div class="text-gray-700">
-            <p class="font-semibold">{{ article.articleDetail.creator_name }}</p>
+            <p class="font-semibold">
+              {{ article.articleDetail.creator_name }} -
+              {{ article.articleDetail.article_type_name }}
+            </p>
             <p class="text-sm text-gray-500">
               {{ dayjs(article.articleDetail.created_at).format('MMM D, YYYY') }}
             </p>
@@ -371,26 +374,28 @@ const downloadArticle = () => {
           </div>
         </div>
         <div class="mt-4">
-          <div class="flex gap-3">
+          <div class="flex flex-wrap justify-center gap-4">
             <img
               v-for="(url, name) in articlePhotos"
               :key="name"
               :src="url"
               :alt="`Article Image - ${name}`"
-              class="w-[600px] max-h-[600px]"
+              class="w-full sm:w-[48%] md:w-[45%] lg:w-[40%] max-h-[400px] object-cover rounded shadow"
             />
           </div>
 
-          <p class="mt-4 text-lg text-gray-700 leading-relaxed">
-            <template v-if="articleContent">
-              {{ Object.values(articleContent)[0] }}
-            </template>
-            <template v-else>
-              <div class="flex justify-center w-full py-4">
-                No content available for this article.
-              </div>
-            </template>
-          </p>
+          <div class="mt-6">
+            <p class="text-base sm:text-lg text-gray-700 leading-relaxed">
+              <template v-if="articleContent">
+                {{ Object.values(articleContent)[0] }}
+              </template>
+              <template v-else>
+                <div class="flex justify-center w-full py-4 text-gray-500 italic">
+                  No content available for this article.
+                </div>
+              </template>
+            </p>
+          </div>
         </div>
         <div class="border-t pt-4 mt-6">
           <Tabs v-model="activeTab">

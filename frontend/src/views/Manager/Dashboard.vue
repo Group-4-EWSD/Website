@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ArrowDown, ArrowUp } from 'lucide-vue-next'
+import { onMounted } from 'vue'
 
-import ArticleChart from '@/components/shared/ArticleChart.vue'
 import GuestListTable from '@/components/pagespecific/coordinator-home/GuestListTable.vue'
 import AuroraMembers from '@/components/pagespecific/manager-dashboard/AuroraMembers.vue'
+import ArticleChart from '@/components/shared/ArticleChart.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import { useManagerStore } from '@/stores/manager'
-import { onMounted } from 'vue'
+
 
 const managerStore = useManagerStore()
 

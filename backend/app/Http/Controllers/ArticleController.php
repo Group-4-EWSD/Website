@@ -157,7 +157,7 @@ class ArticleController extends Controller
         }
     }
 
-    public function articleChangeStatus($articleId, Request $request)
+    public function articleChangeStatus($articleId = null, Request $request)
     {
         $userId = Auth::id();
         $result = $this->articleService->changeArticleStatus($userId, $articleId, $request);

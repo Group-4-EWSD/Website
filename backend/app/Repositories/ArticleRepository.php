@@ -284,7 +284,6 @@ class ArticleRepository
             $articles->addSelect(
                 DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = '$primaryKey')) AS current_user_react")
             );
-            $articles->havingRaw("status IN (2, 4)");
         } else if ($state == 1) { // My Articles Student (userId)
             $articles->addSelect(
                 DB::raw("(SELECT fb.message FROM feedbacks fb WHERE fb.article_id = art.article_id ORDER BY fb.created_at DESC LIMIT 1) AS last_feedback"),
@@ -298,17 +297,7 @@ class ArticleRepository
 
         if (!empty($request->status)) {
             $status = $request->status;
-            if ($status == '0') {
-                $articles->havingRaw(" status IN (0, 1, 2, 3) ");
-            } else if ($status == '1') {
-                $articles->havingRaw(" status IN (1, 2, 3) ");
-            } else if ($status == '2') {
-                $articles->havingRaw(" status IN (2, 3) ");
-            } else if ($status == '3') {
-                $articles->havingRaw(" status = 3 ");
-            } else {
-                $articles->havingRaw(" status IN (2, 3) ");
-            }
+            $articles->havingRaw(" status = ". $status);
         }
 
         if ($state == 3 || $state == 4 || $state == 0) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4
@@ -323,7 +312,7 @@ class ArticleRepository
             }
 
             if ($state == 3 || $state == 0) {
-                // 1: Feedback within 14 days, 2: Feedback after 14 days, 3: No feedback
+                //  0: No feedback, 1: Feedback within 14 days, 2: Feedback after 14 days
                 $articles->addSelect(DB::raw("
                     CASE 
                         WHEN EXISTS (
@@ -346,12 +335,37 @@ class ArticleRepository
                         ELSE 0
                     END AS feedback_status
                 "));
+                if (!empty($request->feedbackStatus) || $request->feedbackStatus == '0') {
+                    $articles->whereRaw("
+                        CASE 
+                            WHEN EXISTS (
+                                SELECT 1 
+                                FROM feedbacks fb 
+                                WHERE fb.article_id = art.article_id
+                            ) THEN (
+                                CASE 
+                                    WHEN (
+                                        SELECT fb.created_at 
+                                        FROM feedbacks fb 
+                                        WHERE fb.article_id = art.article_id 
+                                        ORDER BY fb.created_at DESC 
+                                        LIMIT 1
+                                    ) <= DATE_ADD(art.created_at, INTERVAL 14 DAY)
+                                    THEN 1
+                                    ELSE 2
+                                END
+                            )
+                            ELSE 0
+                        END = ?
+                    ", [$request->feedbackStatus]);
+                }
                 if ($state == 3) {
                     $articles->where('sd.faculty_id', '=', $primaryKey);
+                    $articles->havingRaw("status != 0");
                 } 
-                // else if ($state == 0){
-                    // $articles->where('u.id', '=', $primaryKey);
-                // }
+                else if ($state == 0){
+                    $articles->havingRaw("status IN (2, 4)");
+                }
             } else {
                 $articles->addSelect('sd.actual_submission_date AS final_submission_deadline');
                 $articles->havingRaw("status IN (2, 4)");
@@ -462,7 +476,9 @@ class ArticleRepository
     {
         $deadlines = DB::table('system_datas as sd')
             ->select('sd.pre_submission_date', 'sd.actual_submission_date')
-            // ->where('faculty_id', $facultyId)
+            ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->where('ay.academic_year_start', date('Y'))
+            ->where('faculty_id', $facultyId)
             ->first();
         return $deadlines;
     }

@@ -172,12 +172,8 @@ class UserService
 
 
     public function pageVisitInitial($userId, $pageId){
-        if(!$this->userRepository->isUserVisitExist($userId, $pageId)){
-            $this->userRepository->addUserVisit($userId, $pageId);
-            return true;
-        }else{
-            return false;
-        }
+        $this->userRepository->addUserVisit($userId, $pageId);
+        return true;
     }
 
     public function userRegister($data){

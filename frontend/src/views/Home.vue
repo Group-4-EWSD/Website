@@ -19,6 +19,7 @@ interface FeaturedArticle {
   article_description: string
   article_title: string
   article_id: string | number
+  photo_path?: string
 }
 
 const featuredArticles = ref<FeaturedArticle[]>([])
@@ -64,11 +65,8 @@ onMounted(async () => {
 
 // Function to toggle read more/less state
 const toggleReadMore = (articleId: string | number) => {
-  console.log('---', articleId)
   if (articleId) {
     expandedArticles.value[articleId] = !expandedArticles.value[articleId]
-
-    console.log('---expanded ---> ', expandedArticles.value)
   }
 }
 
@@ -157,9 +155,14 @@ const shouldShowReadMore = (description: string): boolean => {
           <div class="md:w-1/3">
             <!-- Placeholder image - would be real image from API in production -->
             <div
-              class="w-full h-44 bg-gray-200 rounded-md flex items-center justify-center text-gray-500"
+              class="w-full h-48 bg-gray-200 rounded-md flex items-center justify-center text-gray-500"
             >
-              <img :src="Logo" class="h-full w-full object-contain"/>
+              <img
+                v-if="article.photo_path"
+                :src="article.photo_path"
+                class="h-full w-full object-cover"
+              />
+              <img v-else :src="Logo" class="h-full w-full object-contain" />
             </div>
           </div>
           <div class="md:w-2/3">

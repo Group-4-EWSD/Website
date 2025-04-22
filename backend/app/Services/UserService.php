@@ -61,7 +61,7 @@ class UserService
             'status' => 200,
             'message' => 'Login successful',
             'token' => $token,
-            'user' => array_merge($user, [
+            'user' => array_merge($user->toArray(), [
                 'prev_login' => $lastLogin,
             ]),
         ];

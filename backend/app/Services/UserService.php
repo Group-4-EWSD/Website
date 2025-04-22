@@ -178,9 +178,9 @@ class UserService
     }
 
 
-    public function pageVisitInitial($userId, $pageId)
-    {
+    public function pageVisitInitial($userId, $pageId){
         $this->userRepository->addUserVisit($userId, $pageId);
+        return true;
     }
 
     public function userRegister($data)

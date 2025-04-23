@@ -14,10 +14,10 @@ const toggleMenu = () => {
 
 <template>
   <nav
-    class="flex justify-between items-center bg-primary text-white h-[65px] px-4 sm:px-6 lg:px-10"
+    class="relative flex justify-between items-center bg-primary text-white h-[65px] px-4 sm:px-6 lg:px-10"
   >
     <!-- Logo and brand name -->
-    <RouterLink class="flex items-center" to="/home">
+    <RouterLink class="flex items-center z-[1]" to="/home">
       <img
         src="@/assets/nav-logo.png"
         alt="University magazine logo"
@@ -54,13 +54,13 @@ const toggleMenu = () => {
     </button>
 
     <!-- Desktop navigation -->
-    <div class="hidden md:flex md:items-center space-x-6 text-sm">
+    <div class="hidden absolute left-0 w-full justify-center md:flex md:items-center space-x-6 text-sm">
       <RouterLink to="/home" class="text-white hover:text-gray-300">Home</RouterLink>
       <RouterLink to="/about" class="text-white hover:text-gray-300">About</RouterLink>
       <RouterLink to="/contact-us" class="text-white hover:text-gray-300">Contact Us</RouterLink>
     </div>
 
-    <div class="hidden md:flex text-sm">
+    <div class="hidden md:flex text-sm z-[1]">
       <RouterLink
         v-if="!userStore.currentUser"
         to="/auth/login"

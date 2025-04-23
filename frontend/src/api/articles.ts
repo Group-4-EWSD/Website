@@ -93,3 +93,9 @@ export const getFilterItems = async (item: number) => {
 export const updateReact = async (articleId: string) => {
   return await api.post(`articles/like`, { articleId })
 }
+
+
+export const getFeaturesArticles = async (): Promise<any> => {
+  const response = await api.get(`topArticles`)
+  return response.data
+}

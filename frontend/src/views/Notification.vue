@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Button from '@/components/ui/button/Button.vue'
@@ -9,7 +9,6 @@ import Layout from '@/components/ui/Layout.vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { getInitials } from '@/lib/utils'
 import { useNotificationsStore } from '@/stores/notification'
-
 
 dayjs.extend(relativeTime)
 
@@ -22,6 +21,25 @@ onMounted(() => {
 const handleNotificationClick = (notification: any) => {
   notificationsStore.changeNotiSeen(notification.notification_id)
   notification.seen = 1
+}
+
+const notificationMessage = (type: number) => {
+  switch (type) {
+    case 1:
+      return 'Liked your article'
+    case 2:
+      return 'Commented on your article'
+    case 3:
+      return 'Wrote a feedback on your article'
+    case 4:
+      return 'Uploaded an article'
+    case 5:
+      return 'Updated the article'
+    case 6:
+      return 'Published the article'
+    default:
+      return 'You have a notification'
+  }
 }
 </script>
 
@@ -88,7 +106,10 @@ const handleNotificationClick = (notification: any) => {
                   From {{ notification.user_name }} ({{ notification.user_type }} -
                   {{ notification.faculty_name }})
                 </div>
-                <p class="text-sm text-gray-600 mt-1">{{ notification.article_title }}</p>
+                <p class="text-sm text-gray-600 mt-1">
+                  {{ notificationMessage(notification.notification_type) }}
+                  - {{ notification.article_title }}
+                </p>
               </div>
 
               <!-- Right side -->

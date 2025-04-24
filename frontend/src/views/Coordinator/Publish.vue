@@ -15,6 +15,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useCoordinatorStore } from '@/stores/coordinator'
+import { publishArticles } from '@/api/coordinator'
+import router from '@/router'
 
 interface Article {
   article_id: string
@@ -82,7 +84,6 @@ const toggleSelectAll = () => {
     selectedIds.value = []
   } else {
     selectedIds.value = articles.value.map((a) => a.article_id)
-    console.log(selectedIds.value, '', articles.value)
   }
 }
 
@@ -94,8 +95,19 @@ const toggleSelectRow = (id: string) => {
   }
 }
 
-const publishSelected = () => {
-  alert(`Publishing: ${selectedIds.value.join(', ')}`)
+const publishSelected = async () => {
+  try {
+    await publishArticles(selectedIds.value)
+
+    alert('Selected articles have been published!')
+
+    await coordinatorStore.fetchApprovedArticles()
+    articles.value = [...coordinatorStore.approvedArticles.articles]
+    selectedIds.value = []
+  } catch (error) {
+    alert('Something went wrong while publishing.')
+    console.error(error)
+  }
 }
 
 watch(articles, (newArticles) => {
@@ -103,6 +115,11 @@ watch(articles, (newArticles) => {
     newArticles.some((article) => article.article_id === id),
   )
 })
+
+const goToArticleDetails = (articleId: string) => {
+  if (!articleId) return
+  router.push({ name: 'getArticleDetails', params: { id: articleId } })
+}
 </script>
 
 <template>
@@ -140,7 +157,24 @@ watch(articles, (newArticles) => {
           </TableHeader>
 
           <TableBody>
+            <template v-if="coordinatorStore.isLoading">
+              <TableRow v-for="n in 5" :key="n">
+                <TableCell colspan="8">
+                  <div class="animate-pulse h-8 bg-gray-200 rounded w-full"></div>
+                </TableCell>
+              </TableRow>
+            </template>
+
+            <template v-else-if="!coordinatorStore.approvedArticles.articles.length">
+              <TableRow>
+                <TableCell colspan="8" class="text-center text-gray-500 py-6">
+                  No articles to display.
+                </TableCell>
+              </TableRow>
+            </template>
+
             <TableRow
+              v-else
               v-for="article in coordinatorStore.approvedArticles.articles"
               :key="article.article_id"
             >
@@ -162,7 +196,13 @@ watch(articles, (newArticles) => {
               <TableCell>{{ article.user_name }}</TableCell>
               <TableCell>
                 <TooltipWrapper text="View the article">
-                  <Button variant="outline" size="sm" @click=""> View </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    @click="goToArticleDetails(article.article_id || '')"
+                  >
+                    View
+                  </Button>
                 </TooltipWrapper>
               </TableCell>
             </TableRow>

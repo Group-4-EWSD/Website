@@ -14,8 +14,6 @@ import {
 } from '@/components/ui/select'
 import { useGuestStore } from '@/stores/guest'
 
-
-
 const guestStore = useGuestStore()
 
 const selectedCategory = ref<string | null>(null)
@@ -24,21 +22,21 @@ const categoryOptions = ref<{ label: string; value: string }[]>([])
 const yearOptions = ref<{ label: string; value: string }[]>([])
 
 onMounted(async () => {
-  const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
+  if (!guestStore.articles.length) {
+    guestStore.fetchDashboardData()
+  }
+
+  const [articleTypes, academicYears] = await Promise.all([getFilterItems(3), getFilterItems(4)])
 
   categoryOptions.value = articleTypes.map((item: any) => ({
-    label: item.article_type_name,
-    value: item.article_type_id,
+    label: item.faculty_name,
+    value: item.faculty_id,
   }))
 
   yearOptions.value = academicYears.map((item: any) => ({
     label: item.academic_year_description,
     value: item.academic_year_id,
   }))
-
-  if (!guestStore.articles.length) {
-    guestStore.fetchDashboardData()
-  }
 })
 
 watch([selectedCategory, selectedYear], ([newCategory, newYear]) => {

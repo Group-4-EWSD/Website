@@ -8,6 +8,8 @@ import type { Article, ArticleParams, CountData } from '@/types/article'
 export const useArticleStore = defineStore('article', () => {
   const countData = ref<CountData | null>(null)
   const articles = ref<Article[]>([])
+  const prevLogin = ref('')
+  const articleCount = ref<number>(0)
   const currentPage = ref<number>(1)
   const displayNumber = 5
   const totalPages = ref(1)
@@ -22,6 +24,7 @@ export const useArticleStore = defineStore('article', () => {
 
   const fetchArticles = async (params: ArticleParams = {}) => {
     isLoading.value = true
+    articles.value = []
     error.value = null
 
     try {
@@ -31,11 +34,14 @@ export const useArticleStore = defineStore('article', () => {
         status: 4,
         sorting: sortOption.value,
         academicYearId: selectedYear.value,
-        faculty: selectedCategory.value,
+        facultyId: selectedCategory.value,
       })
 
       countData.value = response.countData
-      articles.value = response.allArticles
+      articles.value = response.articles
+      prevLogin.value = response.prev_login
+      articleCount.value = response.articlesCount
+
       isFetched.value = true
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Unknown error')
@@ -54,6 +60,8 @@ export const useArticleStore = defineStore('article', () => {
   return {
     countData,
     articles,
+    prevLogin,
+    articleCount,
     isLoading,
     currentPage,
     displayNumber,

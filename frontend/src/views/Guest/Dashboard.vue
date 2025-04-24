@@ -6,7 +6,6 @@ import MagazineArticles from '@/components/shared/MagazineArticles.vue'
 import Layout from '@/components/ui/Layout.vue'
 import { useGuestStore } from '@/stores/guest'
 
-
 const guestStore = useGuestStore()
 const selectedYear = ref<string>('2025')
 
@@ -18,11 +17,12 @@ onMounted(() => {
   if (!guestStore.articles.length) {
     guestStore.fetchDashboardData()
   }
+  console.log(guestStore.articles.length)
 })
 
 const articles = computed(() => {
   return guestStore.articles.filter((article) => {
-    const year = new Date(article.final_submission_deadline).getFullYear().toString()
+    const year = new Date(article.submission_deadline).getFullYear().toString()
     return year === selectedYear.value
   })
 })

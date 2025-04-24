@@ -9,11 +9,7 @@ import type {
   MyArticlesResponse,
   UpdateArcitleData,
 } from '@/types/article'
-
-interface ArticlesResponse {
-  countData: CountData
-  allArticles: Article[]
-}
+import type { DashboardResponse } from '@/types/article'
 
 export enum ArticleStatus {
   DRAFT = 0,
@@ -33,9 +29,12 @@ export interface Comment {
   user_name: string
   message: string
   created_at: string
+  user_photo_path: string
+  gender: number
+  time_diff: string
 }
 
-export const getArticles = async (params: ArticleParams): Promise<ArticlesResponse> => {
+export const getArticles = async (params: ArticleParams): Promise<DashboardResponse> => {
   const response = await api.get(`articles`, { params })
   return response.data
 }
@@ -93,7 +92,6 @@ export const getFilterItems = async (item: number) => {
 export const updateReact = async (articleId: string) => {
   return await api.post(`articles/like`, { articleId })
 }
-
 
 export const getFeaturesArticles = async (): Promise<any> => {
   const response = await api.get(`topArticles`)

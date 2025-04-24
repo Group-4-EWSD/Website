@@ -11,3 +11,11 @@ export const getArticles = async (params: ArticleParams): Promise<CoordinatorArt
   const response = await api.get('/articles/coordinator', { params })
   return response.data
 }
+
+export const publishArticles = async (articleIdList: string[]) => {
+  const response = await api.post('articles/change-status', {
+    articleIdList,
+    status: 3,
+  })
+  return response.data
+}

@@ -58,15 +58,16 @@ const sortBy = (value: string) => {
 }
 
 onMounted(async () => {
+  if (!coordinatorStore.coordinatorArticles.articles.length) {
+    coordinatorStore.fetchCoordinatorArticles()
+  }
+
   const [academicYears] = await Promise.all([getFilterItems(4)])
 
   yearOptions.value = academicYears.map((item: any) => ({
     label: item.academic_year_description,
     value: item.academic_year_id,
   }))
-  if (!coordinatorStore.coordinatorArticles.articles.length) {
-    coordinatorStore.fetchCoordinatorArticles()
-  }
 })
 
 const updateArticles = () => {

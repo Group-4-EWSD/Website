@@ -22,6 +22,10 @@ import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useUserStore } from '@/stores/user'
 import type { ArticleResponse } from '@/types/article'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getInitials } from '@/lib/utils'
+import maleAvatar from '@/assets/male-avatar.png'
+import femaleAvatar from '@/assets/female-avatar.png'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -84,6 +88,9 @@ const addComment = () => {
       user_name: userStore.user?.user_name || 'User',
       message: newComment.value,
       created_at: dayjs().toISOString(),
+      user_photo_path: userStore.currentUser?.user_photo_path ?? '',
+      gender: userStore.currentUser?.gender ?? 1,
+      time_diff: dayjs(dayjs().toISOString()).fromNow(),
     })
 
     try {
@@ -107,6 +114,9 @@ const addFeedback = async () => {
       user_name: userStore.user?.user_name || 'User',
       message: newFeedback.value,
       created_at: dayjs().toISOString(),
+      user_photo_path: userStore.currentUser?.user_photo_path ?? '',
+      gender: userStore.currentUser?.gender ?? 1,
+      time_diff: dayjs(dayjs().toISOString()).fromNow(),
     })
 
     try {
@@ -424,14 +434,17 @@ const downloadArticle = () => {
                     class="flex items-start gap-3 mb-4"
                   >
                     <img
-                      src="@/assets/profile.png"
+                      :src="
+                        comment.user_photo_path ||
+                        (comment.gender === 1 ? maleAvatar : femaleAvatar)
+                      "
                       alt="User Avatar"
                       class="w-10 h-10 rounded-full"
                     />
                     <div class="flex-1">
                       <div class="flex justify-between items-start">
                         <p class="font-semibold">{{ comment.user_name }}</p>
-                        <p class="text-gray-700">{{ dayjs(comment.created_at).fromNow() }}</p>
+                        <p class="text-gray-700">{{ comment.time_diff }}</p>
                       </div>
                       <p class="text-gray-700">{{ comment.message }}</p>
                     </div>
@@ -439,11 +452,12 @@ const downloadArticle = () => {
                 </div>
 
                 <div class="flex items-start gap-3 mb-2 mt-2">
-                  <img
-                    src="@/assets/profile.png"
-                    alt="User Avatar"
-                    class="w-10 h-10 rounded-full"
-                  />
+                  <Avatar>
+                    <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
+                    <AvatarFallback class="text-white">{{
+                      getInitials(userStore.currentUser?.user_name || '')
+                    }}</AvatarFallback>
+                  </Avatar>
                   <div class="flex items-center space-x-2 w-full">
                     <input
                       v-model="newComment"
@@ -475,25 +489,29 @@ const downloadArticle = () => {
                     class="flex items-start gap-3 mb-4"
                   >
                     <img
-                      src="@/assets/profile.png"
+                      :src="
+                        feedback.user_photo_path ||
+                        (feedback.gender === 1 ? maleAvatar : femaleAvatar)
+                      "
                       alt="User Avatar"
                       class="w-10 h-10 rounded-full"
                     />
                     <div class="flex-1">
                       <div class="flex justify-between items-start">
                         <p class="font-semibold">{{ feedback.user_name }}</p>
-                        <p class="text-gray-700">{{ dayjs(feedback.created_at).fromNow() }}</p>
+                        <p class="text-gray-700">{{ feedback.time_diff }}</p>
                       </div>
                       <p class="text-gray-700">{{ feedback.message }}</p>
                     </div>
                   </div>
                 </div>
                 <div class="flex items-start gap-3 mb-2 mt-2">
-                  <img
-                    src="@/assets/profile.png"
-                    alt="User Avatar"
-                    class="w-10 h-10 rounded-full"
-                  />
+                  <Avatar>
+                    <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
+                    <AvatarFallback class="text-white">{{
+                      getInitials(userStore.currentUser?.user_name || '')
+                    }}</AvatarFallback>
+                  </Avatar>
                   <div class="flex items-center space-x-2 w-full">
                     <input
                       v-model="newFeedback"

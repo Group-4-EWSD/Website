@@ -2,15 +2,17 @@ export interface ArticleParams {
   displayNumber?: number
   pageNumber?: number
   academicYearId?: string
-  faculty?: string
+  facultyId?: string
   sorting?: string
   status?: number
   articleTitle?: string
 }
 
-export type ArticleList = {
+export type DashboardResponse = {
   countData: CountData
-  allArticles: Article[]
+  articles: Article[]
+  articlesCount: number
+  prev_login: string
 }
 
 export interface Article {

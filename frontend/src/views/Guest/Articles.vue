@@ -26,11 +26,11 @@ onMounted(async () => {
     guestStore.fetchDashboardData()
   }
 
-  const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
+  const [articleTypes, academicYears] = await Promise.all([getFilterItems(3), getFilterItems(4)])
 
   categoryOptions.value = articleTypes.map((item: any) => ({
-    label: item.article_type_name,
-    value: item.article_type_id,
+    label: item.faculty_name,
+    value: item.faculty_id,
   }))
 
   yearOptions.value = academicYears.map((item: any) => ({

@@ -67,11 +67,11 @@ onMounted(async () => {
   }
   console.log(filtersInitialized.value)
   if (filtersInitialized.value) return
-  const [articleTypes, academicYears] = await Promise.all([getFilterItems(1), getFilterItems(4)])
+  const [articleTypes, academicYears] = await Promise.all([getFilterItems(3), getFilterItems(4)])
 
   categoryOptions.value = articleTypes.map((item: any) => ({
-    label: item.article_type_name,
-    value: item.article_type_id,
+    label: item.faculty_name,
+    value: item.faculty_id,
   }))
 
   yearOptions.value = academicYears.map((item: any) => ({
@@ -202,7 +202,7 @@ const goToPage = (page: number) => {
         </div>
       </div>
       <div class="w-full border rounded-lg shadow-sm bg-white p-4 relative">
-        <div class="max-h-[420px] overflow-y-auto">
+        <div class="max-h-[480px] overflow-y-auto">
           <div v-if="articleStore.error" class="p-4 bg-red-50 text-red-600 rounded-lg">
             {{ articleStore.error }}
             <Button
@@ -277,7 +277,7 @@ const goToPage = (page: number) => {
             <Pagination
               v-slot=""
               :items-per-page="articleStore.displayNumber"
-              :total="24"
+              :total="articleStore.articleCount"
               :sibling-count="1"
               show-edges
               :default-page="articleStore.currentPage"

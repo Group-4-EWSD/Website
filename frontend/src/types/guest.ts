@@ -16,7 +16,7 @@ export interface GuestArticle {
   status: number
   article_type_name: string
   user_name: string
-  final_submission_deadline: string
+  gender: number
 }
 
 export interface ChartData {

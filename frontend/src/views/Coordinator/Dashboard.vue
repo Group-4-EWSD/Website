@@ -9,13 +9,12 @@ import Badge from '@/components/ui/badge/Badge.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import { useCoordinatorStore } from '@/stores/coordinator'
-
-const daysLeft = ref()
+const daysLeft = ref<number>(0)
 const coordinatorStore = useCoordinatorStore()
 
-onMounted(() => {
+onMounted(async () => {
   if (!coordinatorStore.articles.length) {
-    coordinatorStore.fetchAllArticles()
+    await coordinatorStore.fetchAllArticles()
   }
   daysLeft.value = coordinatorStore.publicDate
 })

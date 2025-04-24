@@ -17,7 +17,7 @@ export interface CountData {
   rejected_articles: number
   published_articles: number
   deri_participate_rate: number
-  deriActiveUser: number
+  deri_active_user: number
 }
 
 export interface ChartData {
@@ -34,6 +34,7 @@ export interface AuroraMember {
   date_of_birth: string
   gender: number
   phone_number: string
+  user_photo_path: string
 }
 
 export interface GuestList {

@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Layout from '@/components/ui/Layout.vue'
 import { useManagerStore } from '@/stores/manager'
 
-
 const managerStore = useManagerStore()
 
 onMounted(() => {
@@ -86,14 +85,14 @@ onMounted(() => {
             <div class="flex items-center justify-between">
               <div class="text-accent">Active Rate</div>
               <div class="text-lg">
-                {{ managerStore.countData?.deriActiveUser }}
+                {{ managerStore.countData?.deri_active_user }}
                 <ArrowUp class="inline w-4 h-4 text-green-500" />
               </div>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="text-accent">In Time Rate</div>
-              <div class="text-lg">10% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
+              <div class="text-lg">100% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
             </div>
           </CardContent>
         </Card>

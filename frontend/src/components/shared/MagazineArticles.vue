@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
+import maleAvatar from '@/assets/male-avatar.png'
+import femaleAvatar from '@/assets/female-avatar.png'
 import Card from '@/components/ui/card/Card.vue'
 import type { Article } from '@/types/coordinator'
 
@@ -45,9 +45,15 @@ const props = defineProps<{
               class="text-primary font-semibold cursor-pointer"
             >
               <div class="flex items-center space-x-4">
-                <img src="@/assets/profile.png" alt="Author" class="w-12 h-12 rounded-full" />
+                <img
+                  :src="
+                    article.user_photo_path || (article.gender === 1 ? maleAvatar : femaleAvatar)
+                  "
+                  alt="Author"
+                  class="w-12 h-12 rounded-full object-cover aspect-square"
+                />
                 <div>
-                  {{ article.article_title }} by {{ article.article_title }}
+                  {{ article.article_title }} by {{ article.user_name }}
                   <p class="text-gray-500 text-sm">{{ article.article_description }}</p>
                 </div>
               </div>

@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue'
 
 import type { AuroraMember } from '@/types/manager'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getInitials } from '@/lib/utils'
 
 const props = defineProps<{
   members: AuroraMember[]
@@ -27,11 +29,12 @@ const visibleMembers = computed(() => (showAll.value ? props.members : props.mem
         :key="member.user_name"
         class="flex flex-col items-center text-center p-4 border rounded-xl shadow-sm"
       >
-        <img
-          :src="'https://randomuser.me/api/portraits/men/31.jpg'"
-          alt="Avatar"
-          class="w-16 h-16 rounded-full mb-2 object-cover"
-        />
+        <Avatar>
+          <AvatarImage :src="member.user_photo_path || ''" />
+          <AvatarFallback class="text-white">{{
+            getInitials(member.user_name || '')
+          }}</AvatarFallback>
+        </Avatar>
         <div class="font-medium">{{ member.user_name }}</div>
         <div class="text-sm text-gray-500">{{ member.user_type_name }}</div>
       </div>

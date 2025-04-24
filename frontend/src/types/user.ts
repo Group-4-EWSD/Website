@@ -13,6 +13,7 @@ export interface User {
   phone_number: string | null
   user_photo_path: string
   user_profile_url: string
+  last_login_datetime: string
 }
 
 export interface UserDetailsParams {

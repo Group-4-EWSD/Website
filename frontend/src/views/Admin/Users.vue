@@ -163,6 +163,7 @@ const columns: Column[] = [
   { key: 'user_type_name', label: 'User Type' },
   { key: 'faculty_name', label: 'Faculty' },
   { key: 'date_of_birth', label: 'Date of Birth' },
+  { key: 'last_login_datetime', label: 'Last Login' },
 ]
 
 // Fetch all users
@@ -515,6 +516,9 @@ function formatDate(dateString: string | null): string {
                   <Skeleton class="h-4 w-24" />
                 </TableCell>
                 <TableCell>
+                  <Skeleton class="h-4 w-24" />
+                </TableCell>
+                <TableCell>
                   <div class="flex space-x-2">
                     <Skeleton class="h-8 w-8" />
                     <Skeleton class="h-8 w-8" />
@@ -535,6 +539,7 @@ function formatDate(dateString: string | null): string {
                 <TableCell>{{ user.user_type_name }}</TableCell>
                 <TableCell>{{ user.faculty_name || '-' }}</TableCell>
                 <TableCell>{{ formatDate(user.date_of_birth) }}</TableCell>
+                <TableCell>{{ user.last_login_datetime ? formatDate(user.last_login_datetime) : '-' }}</TableCell>
                 <TableCell>
                   <div class="flex space-x-2">
                     <TooltipWrapper text="Edit User">
@@ -633,6 +638,10 @@ function formatDate(dateString: string | null): string {
                 <div class="col-span-2">
                   <span class="text-muted-foreground">Date of Birth:</span>
                   <p>{{ formatDate(user.date_of_birth) }}</p>
+                </div>
+                <div class="col-span-2">
+                  <span class="text-muted-foreground">Last Login:</span>
+                  <p>{{ user.last_login_datetime ? formatDate(user.last_login_datetime) : '-' }}</p>
                 </div>
               </div>
             </div>

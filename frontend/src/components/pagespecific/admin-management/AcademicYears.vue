@@ -32,8 +32,7 @@ import type {
   AcademicYearParams,
   AcademicYearUpdateParams,
 } from '@/types/academic-years'
-
-
+import type { AxiosError } from 'axios'
 
 // Props and emits
 const props = defineProps<{
@@ -94,8 +93,8 @@ const openModal = (year: AcademicYear | null): void => {
     editing.value = null
 
     setFieldValue('id', null)
-    setFieldValue('academic_year_start', "")
-    setFieldValue('academic_year_end', "")
+    setFieldValue('academic_year_start', '')
+    setFieldValue('academic_year_end', '')
     setFieldValue('updated_at', null)
 
     // resetForm({
@@ -125,7 +124,7 @@ const saveAcademicYear = handleSubmit(async (values) => {
         academic_year_id: values.id,
         academic_year_start: values.academic_year_start,
         academic_year_end: values.academic_year_end,
-        updated_at: values.updated_at || "",
+        updated_at: values.updated_at || '',
       }
       await updateAcademicYear(params)
       emit('refresh')
@@ -148,7 +147,11 @@ const saveAcademicYear = handleSubmit(async (values) => {
       toast.success('Academic year added successfully')
       isModalOpen.value = false
     } catch (error) {
-      toast.error('Failed to add academic year')
+      if ((error as AxiosError)?.response?.status === 422) {
+        toast.error(((error as AxiosError)?.response?.data as { message?: string })?.message || '')
+      } else {
+        toast.error('Failed to add academic year')
+      }
     } finally {
       isSubmitting.value = false
     }

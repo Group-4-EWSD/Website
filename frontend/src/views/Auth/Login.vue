@@ -61,6 +61,13 @@ const onSubmit = handleSubmit(async (values: loginForm) => {
       const user = response.data.user as User
       userStore.setUser(user)
       const userRole = user.user_type_name
+
+      const firstLogin = !user.prev_login;
+
+      if (firstLogin) {
+        router.push('/welcome')
+        return;
+      }
       
       // Role-based redirection
       switch (userRole) {

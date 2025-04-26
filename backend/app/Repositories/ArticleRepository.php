@@ -54,6 +54,16 @@ class ArticleRepository
         ArticleDetail::where('file_name', $file_name)->delete();
     }
 
+    public function checkPreviousActivity($articleId)
+    {
+        $activity = DB::table('activities')
+            ->where('article_id', $articleId)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $activity;
+    }
+
     public function createActivity($articleId, $userId, $request)
     {
         $activity = DB::table('activities')->insert([
@@ -202,9 +212,20 @@ class ArticleRepository
         $totalSubmissions = DB::table('articles as a')
             ->join('system_datas as sd', 'sd.system_id', '=', 'a.system_id')
             ->join('academic_years as ay', 'ay.academic_year_id', '=', 'sd.academic_year_id')
+            ->join(DB::raw('(SELECT avt1.* FROM activities avt1 
+                            INNER JOIN (
+                                SELECT article_id, MAX(created_at) as max_created_at 
+                                FROM activities 
+                                GROUP BY article_id
+                            ) avt2 
+                            ON avt1.article_id = avt2.article_id 
+                            AND avt1.created_at = avt2.max_created_at
+                        ) as avt'), 'avt.article_id', '=', 'a.article_id')
+            ->where('avt.article_status', '!=', 0)
             ->where('ay.academic_year_start', $currentYear)
             ->where('sd.faculty_id', $facultyId)
             ->count();
+
 
         // Function to get count by article status
         $getStatusCount = function ($status) use ($currentYear, $facultyId) {
@@ -286,6 +307,12 @@ class ArticleRepository
         if (!empty($request->articleTitle)) {
             $articles->where('art.article_title', 'LIKE', '%' . $request->articleTitle . '%');
         }
+
+        if (!empty($request->status)) {
+            $status = $request->status;
+            $articles->havingRaw(" status = ". $status);
+        }
+        
         if ($state == 0) { // All Student (userId)
             $articles->addSelect(
                 DB::raw("(SELECT EXISTS (SELECT 1 FROM actions actn WHERE actn.article_id = art.article_id AND actn.react = 1 AND actn.user_id = '$primaryKey')) AS current_user_react")
@@ -299,11 +326,6 @@ class ArticleRepository
         } else if ($state == 2) { // My Draft Articles Student (userId)
             $articles->where('art.user_id', '=', $primaryKey);
             $articles->havingRaw("status = 0");
-        }
-
-        if (!empty($request->status)) {
-            $status = $request->status;
-            $articles->havingRaw(" status = ". $status);
         }
 
         if ($state == 3 || $state == 4 || $state == 0) { // All Articles for Coordinator 3 (facultyId), All articles for all faculties Manager 4

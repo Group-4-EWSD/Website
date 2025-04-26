@@ -56,6 +56,7 @@ import type {
   SubmissionDateParams,
   SubmissionDateUpdateParams,
 } from '@/types/system-data'
+import type { AxiosError } from 'axios'
 
 // Loading states
 const isLoading = ref<boolean>(true)
@@ -77,7 +78,6 @@ const selectedAcademicYearFilter = ref<string>('')
 const isSubmissionModalOpen = ref<boolean>(false)
 const editingSubmission = ref<SubmissionDate | null>(null)
 const isSubmitting = ref<boolean>(false)
-
 
 // Form validation schema
 const validationSchema = yup.object({
@@ -192,12 +192,15 @@ const saveSubmissionDate = handleSubmit(async (formValues) => {
     await fetchSubmissionDates()
     isSubmissionModalOpen.value = false
   } catch (error) {
-    toast.error(
-      editingSubmission.value
-        ? 'Failed to update submission date'
-        : 'Failed to add submission date',
-    )
-    console.error(error)
+    if ((error as AxiosError)?.response?.status === 422) {
+      toast.error(((error as AxiosError)?.response?.data as { message?: string })?.message || "")
+    } else {
+      toast.error(
+        editingSubmission.value
+          ? 'Failed to update submission date'
+          : 'Failed to add submission date',
+      )
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -243,7 +246,6 @@ const refreshFaculties = async (): Promise<void> => {
     console.error(error)
   }
 }
-
 
 onMounted(async () => {
   isLoading.value = true

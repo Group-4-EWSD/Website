@@ -24,7 +24,13 @@ onMounted(() => {
         <!-- Dashboard Title and Previous Login Time Section -->
         <div class="flex flex-col">
           <h2 class="text-xl font-bold uppercase">Manager Dashboard</h2>
-          <p class="text-sm text-gray-500">Previous Login {{ managerStore.prevLogin }}</p>
+          <!-- <p class="text-sm text-gray-500">Previous Login {{ managerStore.prevLogin }}</p> -->
+          <div class="text-sm text-gray-500">
+            <template v-if="managerStore.isLoading">
+              <span class="animate-pulse text-gray-400">Loading...</span>
+            </template>
+            <template v-else> Previous Login {{ managerStore.prevLogin || '-' }} </template>
+          </div>
         </div>
       </div>
 
@@ -37,33 +43,45 @@ onMounted(() => {
             <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="text-accent">Total Articles</div>
-                <div class="text-lg">{{ managerStore.countData?.total_articles }}</div>
+                <div class="text-lg">
+                  {{ managerStore.isLoading ? '-' : managerStore.countData?.total_articles }}
+                </div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Review Articles</div>
-                <div class="text-lg">{{ managerStore.countData?.reviewed_articles }}</div>
+                <div class="text-lg">
+                  {{ managerStore.isLoading ? '-' : managerStore.countData?.reviewed_articles }}
+                </div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Pending Review</div>
-                <div class="text-lg">{{ managerStore.countData?.pending_articles }}</div>
+                <div class="text-lg">
+                  {{ managerStore.isLoading ? '-' : managerStore.countData?.pending_articles }}
+                </div>
               </div>
             </div>
             <div class="flex flex-col gap-3">
               <div class="flex items-center justify-between">
                 <div class="text-accent">Published Articles</div>
-                <div class="text-lg">{{ managerStore.countData?.published_articles }}</div>
+                <div class="text-lg">
+                  {{ managerStore.isLoading ? '-' : managerStore.countData?.published_articles }}
+                </div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Approved</div>
-                <div class="text-lg">{{ managerStore.countData?.approved_articles }}</div>
+                <div class="text-lg">
+                  {{ managerStore.isLoading ? '-' : managerStore.countData?.approved_articles }}
+                </div>
               </div>
 
               <div class="flex items-center justify-between">
                 <div class="text-accent">Rejected</div>
-                <div class="text-lg">{{ managerStore.countData?.rejected_articles }}</div>
+                <div class="text-lg">
+                  {{ managerStore.isLoading ? '-' : managerStore.countData?.rejected_articles }}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -77,22 +95,47 @@ onMounted(() => {
             <div class="flex items-center justify-between">
               <div class="text-accent">Participate</div>
               <div class="text-lg">
-                {{ managerStore.countData?.deri_participate_rate }}
-                <ArrowUp class="inline w-4 h-4 text-green-500" />
+                {{
+                  managerStore.isLoading || managerStore.countData?.deri_participate_rate == null
+                    ? '-'
+                    : Number(managerStore.countData.deri_participate_rate).toFixed(2)
+                }}
+                <component
+                  :is="
+                    Number(managerStore.countData?.deri_participate_rate) > 50 ? ArrowUp : ArrowDown
+                  "
+                  class="inline w-4 h-4"
+                  :class="
+                    Number(managerStore.countData?.deri_participate_rate) > 50
+                      ? 'text-green-500'
+                      : 'text-red-500'
+                  "
+                />
               </div>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="text-accent">Active Rate</div>
               <div class="text-lg">
-                {{ managerStore.countData?.deri_active_user }}
-                <ArrowUp class="inline w-4 h-4 text-green-500" />
+                {{ managerStore.isLoading ? '-' : managerStore.countData?.deri_active_user }}
+                <component
+                  :is="Number(managerStore.countData?.deri_active_user) > 50 ? ArrowUp : ArrowDown"
+                  class="inline w-4 h-4"
+                  :class="
+                    Number(managerStore.countData?.deri_active_user) > 50
+                      ? 'text-green-500'
+                      : 'text-red-500'
+                  "
+                />
               </div>
             </div>
 
             <div class="flex items-center justify-between">
               <div class="text-accent">In Time Rate</div>
-              <div class="text-lg">100% <ArrowDown class="inline w-4 h-4 text-red-500" /></div>
+              <div class="text-lg">
+                {{ managerStore.isLoading ? '-' : '100%' }}
+                <ArrowUp class="inline w-4 h-4 text-green-500" />
+              </div>
             </div>
           </CardContent>
         </Card>

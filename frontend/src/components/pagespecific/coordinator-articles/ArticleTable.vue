@@ -76,7 +76,13 @@ const goToArticleDetails = (articleId: string) => {
                 <TableCell>
                   <div class="flex gap-2">
                     <TooltipWrapper text="View the article">
-                      <Button variant="outline" size="sm" @click.stop> View </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        @click="goToArticleDetails(article.article_id || '')"
+                      >
+                        View
+                      </Button>
                     </TooltipWrapper>
                   </div>
                 </TableCell>

@@ -20,7 +20,7 @@ const props = defineProps<{
     <div class="space-y-2 mt-4">
       <template v-if="isLoading">
         <div
-          v-for="index in 8"
+          v-for="index in 10"
           :key="index"
           class="border-b rounded-md p-2 animate-pulse flex items-center space-x-4"
         >

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {} from 'lucide-vue-next'
-import { PencilIcon } from 'lucide-vue-next'
+import { PencilIcon, LockIcon } from 'lucide-vue-next'
 import { ref } from 'vue'
 
 import ChangeProfileImageDialog from '@/components/pagespecific/settings/ChangeProfileImageDialog.vue'
 import EditInformationDialog from '@/components/pagespecific/settings/EditInformationDialog.vue'
+import PasswordChangeDialog from '@/components/pagespecific/settings/PasswordChangeDialog.vue'
 import SettingsRow from '@/components/pagespecific/settings/SettingsRow.vue'
 import ConfirmationDialog from '@/components/shared/ConfirmDialog.vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -87,6 +88,27 @@ const handleRemovePhoto = () => {
               <SettingsRow label="Date of Birth" :value="userStore.currentUser?.date_of_birth || ''" />
               <SettingsRow label="Gender" :value="GenderOptions[Number(userStore.currentUser?.gender || '3')]" />
               <SettingsRow label="Phone Number" :value="userStore.currentUser?.phone_number || ''" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent class="py-6">
+            <div class="flex items-center justify-between">
+              <h2 class="md:text-lg font-semibold mb-4">Security</h2>
+
+              <PasswordChangeDialog>
+                <template #trigger>
+                  <Button variant="secondary" class="hidden md:flex">
+                    <LockIcon class="w-4 h-4 mr-2" />Change Password</Button
+                  >
+                  <Button variant="ghost" class="p-0 m-0 hover:bg-0 md:hidden">
+                    <LockIcon class="w-4 h-4" />
+                  </Button>
+                </template>
+              </PasswordChangeDialog>
+            </div>
+            <div class="flex flex-col">
+              <SettingsRow label="Password" value="••••••••" />
             </div>
           </CardContent>
         </Card>

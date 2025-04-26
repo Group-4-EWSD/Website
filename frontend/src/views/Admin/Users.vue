@@ -56,7 +56,6 @@ import { calculateAge } from '@/lib/utils'
 import type { Faculty } from '@/types/faculty'
 import type { CreateUserParams, UpdateUserParams, User } from '@/types/user'
 
-
 interface Column {
   key: string
   label: string
@@ -151,8 +150,8 @@ const { handleSubmit, errors, values, resetForm, setValues } = useForm({
     user_type_id: '',
     faculty_id: '',
     gender: 0,
-    date_of_birth: "",
-    phone_number: "",
+    date_of_birth: '',
+    phone_number: '',
   },
 })
 
@@ -539,7 +538,9 @@ function formatDate(dateString: string | null): string {
                 <TableCell>{{ user.user_type_name }}</TableCell>
                 <TableCell>{{ user.faculty_name || '-' }}</TableCell>
                 <TableCell>{{ formatDate(user.date_of_birth) }}</TableCell>
-                <TableCell>{{ user.last_login_datetime ? formatDate(user.last_login_datetime) : '-' }}</TableCell>
+                <TableCell>{{
+                  user.last_login_datetime ? formatDate(user.last_login_datetime) : '-'
+                }}</TableCell>
                 <TableCell>
                   <div class="flex space-x-2">
                     <TooltipWrapper text="Edit User">

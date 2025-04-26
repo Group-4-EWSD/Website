@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PasswordResetMail;
-use App\Mail\AccountCreateMail;
+use App\Mail\GuestAccountCreateMail;
+use App\Mail\UserCreatedMail;
 use App\Repositories\ArticleRepository;
 
 class UserService
@@ -188,13 +189,16 @@ class UserService
         $data['user_id'] = $this->userRepository->generateUserId();
         $data['user_password'] = Str::random(12);
 
-        $coordinatorEmail = DB::table('users')
-            ->where('faculty_id', Auth::user()->faculty_id)
-            ->where('user_type_id', 2)
-            ->value('user_email');
-
-        Mail::to($coordinatorEmail)->send(new AccountCreateMail($data));
-
+        if ($data['user_type_id']==0)
+        {
+            $coordinatorMail = DB::table('users')
+                ->where('faculty_id', $data['faculty_id'])
+                ->where('user_type_id', 2)
+                ->value('user_email');
+                
+            Mail::to($coordinatorMail)->send(new GuestAccountCreateMail($data));
+        }
+        Mail::to($data['user_email'])->send(new UserCreatedMail($data));
         return $this->userRepository->userRegister($data);
     }
 

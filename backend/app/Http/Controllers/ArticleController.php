@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\UserCreatedMail;
+use App\Mail\ArticleCreatedMail;
 use App\Services\ArticleService;
 use App\Services\FileService;
 use App\Services\NotificationService;
@@ -135,7 +135,7 @@ class ArticleController extends Controller
                     ->where('user_type_id', 2)
                     ->value('user_email');
 
-                $mailSent = Mail::to($coordinatorEmail)->send(new UserCreatedMail(
+                $mailSent = Mail::to($coordinatorEmail)->send(new ArticleCreatedMail(
                     Auth::user(),
                     $request->article_id ?: Str::uuid(), 
                     $request->article_title,

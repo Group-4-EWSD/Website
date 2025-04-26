@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 
 const searchQuery = ref('')
 const hasNotification = true
@@ -56,12 +57,14 @@ const userStore = useUserStore()
         </p>
       </div>
 
-      <Avatar>
-        <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
-        <AvatarFallback class="text-white">{{
-          getInitials(userStore.currentUser?.user_name || '')
-        }}</AvatarFallback>
-      </Avatar>
+      <RouterLink to="/settings">
+        <Avatar>
+          <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
+          <AvatarFallback class="text-white">{{
+            getInitials(userStore.currentUser?.user_name || '')
+          }}</AvatarFallback>
+        </Avatar>
+      </RouterLink>
     </div>
   </nav>
 </template>

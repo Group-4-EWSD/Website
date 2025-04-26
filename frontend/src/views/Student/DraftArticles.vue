@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { PencilIcon, TrashIcon } from 'lucide-vue-next'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { toast } from 'vue-sonner'
 
 import { getDraftArticles } from '@/api/articles'
@@ -53,6 +53,15 @@ const handleDeleteClick = (article: DraftArticle) => {
   console.log('Delete article', article)
 }
 
+watch(
+  () => showDialog.value,
+  (value) => {
+    if (!value) {
+      selectedArticleId.value = "";
+    }
+  },
+)
+
 </script>
 
 <template>
@@ -97,11 +106,6 @@ const handleDeleteClick = (article: DraftArticle) => {
                 <TooltipWrapper text="Edit">
                   <Button variant="ghost" size="icon" @click="handleEditClick(article.article_id)">
                     <PencilIcon class="h-4 w-4 cursor-pointer" />
-                  </Button>
-                </TooltipWrapper>
-                <TooltipWrapper text="Delete">
-                  <Button variant="ghost" size="icon" @click="handleDeleteClick(article)">
-                    <TrashIcon class="h-4 w-4 text-destructive cursor-pointer" />
                   </Button>
                 </TooltipWrapper>
               </div>

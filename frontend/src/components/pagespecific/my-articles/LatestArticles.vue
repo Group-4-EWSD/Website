@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { PencilIcon } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import { ArticleStatus } from '@/api/articles'
 import StatusIndicator from '@/components/shared/StatusIndicator.vue'
@@ -30,9 +30,6 @@ const selectedArticleId = ref<string>('')
 
 // Function to handle edit button click
 const handleEditClick = (id: string) => {
-
-  console.log('---heree?')
-
   selectedArticleId.value = id
   showDialog.value = true
 }
@@ -42,6 +39,15 @@ const isOverActualUploadDeadline = (): boolean => {
   const currentDate = new Date()
   return currentDate > actualUploadDeadline
 }
+
+watch(
+  () => showDialog.value,
+  (value) => {
+    if (!value) {
+      selectedArticleId.value = "";
+    }
+  },
+)
 
 </script>
 

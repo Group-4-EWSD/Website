@@ -9,6 +9,7 @@ import {
   getArticleDetails,
   getCategories,
   updateArticle,
+  updateArticleStatus,
   uploadArticle,
 } from '@/api/articles'
 import DropZone from '@/components/shared/DropZone.vue'
@@ -161,6 +162,7 @@ const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
         article_remaining_files: [...existingFiles.value],
       } as UpdateArcitleData
       await updateArticle(data)
+      await updateArticleStatus(articleData.article_id, ArticleStatus.PENDING)
     } else {
       await uploadArticle(articleData)
     }

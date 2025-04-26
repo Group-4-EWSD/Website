@@ -2,14 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Account Created</title>
+    <title>Gurest Account Created</title>
 </head>
 <body>
-    <p>Welcome, {{ $user_name }}!</p>
-    <p>Your account has been successfully created with the following details:</p>
+    <h1>Dear Marketing Coordinator</h1>
+    <p>A guest account to your faculty is created.</p>
+    <p>Created guest user's detail:</p>
+    <p><strong>Name:</strong> {{ $user_name }}</p>
     <p><strong>Email:</strong> {{ $user_email }}</p>
-    <p><strong>Temporary Password:</strong> {{ $new_password }}</p>
-    <p>For security reasons, we strongly recommend changing your password after logging in.</p>
-    <p>If you did not request this account, please contact support immediately.</p>
 </body>
 </html>

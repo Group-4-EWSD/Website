@@ -299,12 +299,12 @@ class UserController extends Controller
                 'user_email'      => 'required|email|max:255|unique:users,user_email',
                 'user_type_id'    => 'required|exists:user_types,user_type_id',
                 'faculty_id'      => 'required|uuid|exists:faculties,faculty_id',
-                'gender'          => 'required|in:1,2', 
+                'gender'          => 'sometimes|in:1,2', 
                 'date_of_birth'   => 'sometimes|date|before:today',
                 'phone_number'    => 'sometimes|string|max:20'
             ]);
 
-            return response()->json(['new user id' => $this->userService->userRegister($validated)]);
+            return response()->json($this->userService->userRegister($validated));
 
         }catch (\Exception $e) {
             return response()->json([

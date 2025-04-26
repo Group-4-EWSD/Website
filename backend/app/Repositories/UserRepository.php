@@ -294,7 +294,6 @@ class UserRepository
             'id' => $data['user_id'],
             'user_name' => $data['user_name'],
             'nickname' => $data['nickname'] ?? null,
-            'nickname' => $data['nickname'] ?? null,
             'user_email' => $data['user_email'],
             'user_password' => Hash::make($data['user_password']),
             'user_type_id' => $data['user_type_id'],

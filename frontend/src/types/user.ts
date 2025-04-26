@@ -14,6 +14,7 @@ export interface User {
   user_photo_path: string
   user_profile_url: string
   last_login_datetime: string
+  prev_login: string
 }
 
 export interface UserDetailsParams {

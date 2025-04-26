@@ -162,7 +162,7 @@ const onSubmit = handleSubmit(async (formValues: UploadArticleSchema) => {
         article_remaining_files: [...existingFiles.value],
       } as UpdateArcitleData
       await updateArticle(data)
-      await updateArticleStatus(articleData.article_id, ArticleStatus.PENDING)
+      // await updateArticleStatus(articleData.article_id, ArticleStatus.PENDING)
     } else {
       await uploadArticle(articleData)
     }

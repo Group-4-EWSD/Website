@@ -47,10 +47,10 @@ const filteredArticles = computed(() => {
 })
 
 const sortOptions = [
-  { label: 'Recently Submitted', value: 'created_at DESC' },
-  { label: 'Oldest Submission', value: 'created_at ASC' },
-  { label: 'Title A-Z', value: 'title ASC' },
-  { label: 'Title Z-A', value: 'title DESC' },
+  { label: 'Recently Submitted', value: '2' },
+  { label: 'Oldest Submission', value: '1' },
+  { label: 'Title A-Z', value: '3' },
+  { label: 'Title Z-A', value: '4' },
 ]
 
 const sortBy = (value: string) => {
@@ -79,16 +79,16 @@ const updateArticles = () => {
     params.feedback = Number(selectedFeedbackFilter.value)
   }
 
+  if (selectedYear.value !== 'all') {
+    params.academicYearId = selectedYear.value
+  }
+
   coordinatorStore.fetchCoordinatorArticles(params)
 }
 
-watch(selectedFeedbackFilter, updateArticles)
+watch([selectedFeedbackFilter, selectedYear], updateArticles, { immediate: true })
+
 watch(currentSort, updateArticles)
-watch(selectedYear, (newYear) => {
-  return coordinatorStore.fetchCoordinatorArticles({
-    ...(newYear !== 'all' ? { academicYearId: newYear } : {}),
-  })
-})
 
 const goToPublishPage = () => {
   router.push({ name: 'Coordinator Publish' })
@@ -192,7 +192,7 @@ const goToPublishPage = () => {
               <SelectItem value="all">All Feedback</SelectItem>
               <SelectItem value="1">Given Within 14 days</SelectItem>
               <SelectItem value="2">Given After 14 days</SelectItem>
-              <SelectItem value="3">Not Given</SelectItem>
+              <SelectItem value="0">Not Given</SelectItem>
             </SelectContent>
           </Select>
 

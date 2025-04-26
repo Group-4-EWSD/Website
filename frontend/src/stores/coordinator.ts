@@ -47,7 +47,7 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
       const response = await getAllArticles()
 
       countData.value = response.countData
-      articles.value = response.articles
+      articles.value = response.allArticles
       guestList.value = response.guestList
       prevLogin.value = response.prev_login
       publicDate.value = response.remaining_final_publish
@@ -89,8 +89,8 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
     isLoading.value = true
     error.value = null
 
-    // await getArticles({ status: 2, academicYearId: 'da7944da-c209-4fd2-859d-1d1721fd0a04' })
-    await getArticles({ status: 2, academicYearId: '11da1254-7774-4de7-bfce-9b338d4aab0b' })
+    // await getArticles({ status: 2, academicYearId: '11da1254-7774-4de7-bfce-9b338d4aab0b' }) // 2022
+    await getArticles({ status: 2, academicYearId: 'da7944da-c209-4fd2-859d-1d1721fd0a04' }) // 2025
       .then((response) => {
         approvedArticles.value = {
           totalSubmissions: response.totalSubmissions,

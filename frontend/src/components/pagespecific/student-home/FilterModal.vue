@@ -37,28 +37,24 @@ const applyFilter = () => {
   isDialogOpen.value = false
 }
 
-// const categoryOptions = [
-//   { label: 'All', value: 'all' },
-//   { label: 'Science', value: 'science' },
-//   { label: 'Mathematics', value: 'mathematics' },
-//   { label: 'Engineering', value: 'engineering' },
-//   { label: 'Art', value: 'art' },
-//   { label: 'IT', value: 'it' },
-//   { label: 'Business', value: 'business' },
-// ]
-
-// const yearOptions = [
-//   { label: 'All', value: 'all' },
-//   { label: '2025', value: '2025' },
-//   { label: '2024', value: '2024' },
-//   { label: '2023', value: '2023' },
-//   { label: '2022', value: '2022' },
-// ]
-
 const resetFilters = () => {
   localCategory.value = 'all'
   localYear.value = 'all'
 }
+
+watch(
+  () => props.selectedCategory,
+  (newVal) => {
+    localCategory.value = newVal || 'all'
+  },
+)
+
+watch(
+  () => props.selectedYear,
+  (newVal) => {
+    localYear.value = newVal || 'all'
+  },
+)
 </script>
 
 <template>

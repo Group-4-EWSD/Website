@@ -372,7 +372,7 @@ const onSubmit = handleSubmit(async (formValues) => {
       }
     } else {
       // Add new user
-      const createParams: CreateUserParams = formValues
+      const createParams: CreateUserParams = {...formValues}
       await createUser(createParams)
 
       toast.success('User created successfully')

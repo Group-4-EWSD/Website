@@ -2,7 +2,7 @@ export interface ArticleResponse {
   countData: CountData | null
   articlesPerYear: ChartData[]
   guestList: GuestList[]
-  articles: Article[]
+  allArticles: Article[]
   prev_login: string
   remaining_final_publish: number
 }

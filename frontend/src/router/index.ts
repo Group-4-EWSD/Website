@@ -180,7 +180,7 @@ const commomRoutes = [
     name: 'getArticleDetails',
     component: ArticleDetails,
     meta: {
-      roles: ['Student', 'Marketing Coordinator'],
+      roles: ['Student', 'Marketing Coordinator', 'Marketing Manager', 'Guest'],
     },
   },
   {

@@ -23,8 +23,8 @@ export const useArticleStore = defineStore('article', () => {
   const error = ref<string | null>(null)
 
   const fetchArticles = async (params: ArticleParams = {}) => {
-    isLoading.value = true
     articles.value = []
+    isLoading.value = true
     error.value = null
 
     try {

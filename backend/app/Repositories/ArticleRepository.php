@@ -363,7 +363,7 @@ class ArticleRepository
                         ELSE 0
                     END AS feedback_status
                 "));
-                if (!empty($request->feedbackStatus) || $request->feedbackStatus == '0') {
+                if (!empty($request->feedback) || $request->feedback == '0') {
                     $articles->whereRaw("
                         CASE 
                             WHEN EXISTS (
@@ -385,7 +385,7 @@ class ArticleRepository
                             )
                             ELSE 0
                         END = ?
-                    ", [$request->feedbackStatus]);
+                    ", [$request->feedback]);
                 }
                 if ($state == 3) {
                     $articles->where('sd.faculty_id', '=', $primaryKey);

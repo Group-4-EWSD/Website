@@ -47,7 +47,7 @@ export const useCoordinatorStore = defineStore('coordinator-article', () => {
       const response = await getAllArticles()
 
       countData.value = response.countData
-      articles.value = response.articles
+      articles.value = response.allArticles
       guestList.value = response.guestList
       prevLogin.value = response.prev_login
       publicDate.value = response.remaining_final_publish

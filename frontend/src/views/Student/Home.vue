@@ -45,10 +45,10 @@ const selectedYear = ref('all')
 const sortedValue = ref('created asc')
 
 const sortOptions = ref([
-  { value: 'created_at ASC', label: 'Newest First' },
-  { value: 'created_at DESC', label: 'Oldest First' },
-  { value: 'title ASC', label: 'Name (A → Z)' },
-  { value: 'title DESC', label: 'Name (Z → A)' },
+  { value: '2', label: 'Newest First' },
+  { value: '1', label: 'Oldest First' },
+  { value: '3', label: 'Name (A → Z)' },
+  { value: '4', label: 'Name (Z → A)' },
 ])
 
 const goToArticleDetails = (articleId: string) => {
@@ -239,6 +239,7 @@ const goToPage = (page: number) => {
                   <Skeleton class="h-12" animate-pulse />
                 </TableCell>
               </TableRow>
+
               <TableRow
                 v-else
                 v-for="article in articleStore.articles.slice(0, 5)"

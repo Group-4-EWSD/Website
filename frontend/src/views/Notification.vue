@@ -47,42 +47,45 @@ const notificationMessage = (type: number) => {
   <Layout>
     <h1 class="text-2xl font-semibold mb-4">Notifications</h1>
 
-    <!-- Notification Cards -->
     <div class="space-y-4">
       <template v-if="notificationsStore.isLoading">
-        <div v-for="n in 5" :key="n" class="flex items-start p-4 border rounded-lg bg-white">
-          <Skeleton class="w-12 h-12 rounded-full" />
-
-          <div class="flex-1 flex justify-between ml-4">
-            <div class="space-y-2">
-              <Skeleton class="h-5 w-48 rounded" />
-
-              <Skeleton class="h-4 w-64 rounded" />
+        <div
+          v-for="n in 5"
+          :key="n"
+          class="flex items-start p-4 border rounded-lg bg-white flex-col sm:flex-row sm:items-center"
+        >
+          <Skeleton class="w-12 h-12 rounded-full mb-2 sm:mb-0" />
+          <div
+            class="flex-1 flex flex-col sm:flex-row sm:justify-between sm:items-start sm:ml-4 w-full"
+          >
+            <div class="space-y-2 w-full sm:w-auto">
+              <Skeleton class="h-5 w-full sm:w-48 rounded" />
+              <Skeleton class="h-4 w-full sm:w-64 rounded" />
             </div>
-
-            <div class="flex flex-col items-end ml-4 flex-shrink-0">
+            <div class="flex justify-end sm:ml-4 mt-2 sm:mt-0">
               <Skeleton class="h-3 w-16 rounded" />
             </div>
           </div>
         </div>
       </template>
+
       <template v-else>
         <div
           v-if="!notificationsStore.notifications.length"
-          class="flex flex-col items-center justify-center"
+          class="flex flex-col items-center justify-center text-center"
         >
           <p>Oops, there is no notification.</p>
           <Button
             variant="outline"
             size="sm"
-            class="ml-2"
+            class="mt-2"
             @click="notificationsStore.fetchNotification()"
           >
             Try Again
           </Button>
         </div>
+
         <RouterLink
-          v-else
           v-for="notification in notificationsStore.notifications"
           :key="notification.notification_id"
           :to="`/articles/${notification.article_id}`"
@@ -92,34 +95,34 @@ const notificationMessage = (type: number) => {
           <div
             class="flex items-start p-4 border rounded-lg bg-white hover:bg-gray-50 transition-all cursor-pointer"
           >
-            <Avatar size="base" class="h-12 w-12 mr-4">
+            <Avatar size="base" class="h-12 w-12 mr-4 flex-shrink-0">
               <AvatarImage :src="notification.user_photo_path || ''" />
-              <AvatarFallback class="text-white">{{
-                getInitials(notification.user_name)
-              }}</AvatarFallback>
+              <AvatarFallback class="text-white">
+                {{ getInitials(notification.user_name) }}
+              </AvatarFallback>
             </Avatar>
 
-            <div class="flex-1 flex justify-between">
-              <!-- Left side -->
-              <div>
-                <div class="text-lg font-semibold text-gray-800">
-                  From {{ notification.user_name }} ({{ notification.user_type }} -
-                  {{ notification.faculty_name }})
+            <div class="flex-1 flex justify-between min-w-0">
+              <div class="min-w-0">
+                <div
+                  class="text-base font-semibold text-gray-800 truncate overflow-hidden whitespace-nowrap"
+                >
+                  From {{ notification.user_name }}
+                  <span class="hidden md:inline">
+                    ({{ notification.user_type }} - {{ notification.faculty_name }})
+                  </span>
                 </div>
-                <p class="text-sm text-gray-600 mt-1">
+                <p class="text-sm text-gray-600 mt-1 truncate overflow-hidden whitespace-nowrap">
                   {{ notificationMessage(notification.notification_type) }}
                   - {{ notification.article_title }}
                 </p>
               </div>
 
-              <!-- Right side -->
-              <div class="flex flex-col items-end ml-4 flex-shrink-0 relative">
-                <div v-if="!notification.seen">
-                  <span class="absolute top-[-8px] right-0 w-3 h-3 bg-red-500 rounded-full"></span>
-                  <div class="flex-grow"></div>
+              <div class="flex flex-col items-end ml-4 flex-shrink-0">
+                <div v-if="!notification.seen" class="relative">
+                  <span class="absolute top-[-6px] right-0 w-3 h-3 bg-red-500 rounded-full"></span>
                 </div>
-
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-gray-500 whitespace-nowrap">
                   {{ dayjs(notification.created_at).fromNow() }}
                 </span>
               </div>

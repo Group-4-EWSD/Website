@@ -23,15 +23,18 @@ onMounted(async () => {
 <template>
   <Layout>
     <div class="space-y-4">
-      <div class="flex items-center justify-between mb-4">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-4 sm:space-y-0"
+      >
         <!-- Dashboard Title and Previous Login Time Section -->
         <div class="flex flex-col">
           <h2 class="text-xl font-bold uppercase">Coordinator Dashboard</h2>
           <p class="text-sm text-gray-500">Previous Login {{ coordinatorStore.prevLogin }}</p>
         </div>
+
         <!-- Top Badges -->
-        <div class="flex justify-between">
-          <Badge variant="secondary" class="px-4 py-2 mr-2 cursor-pointer">IN PROGRESS</Badge>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0">
+          <Badge variant="secondary" class="px-4 py-2 cursor-pointer">IN PROGRESS</Badge>
           <Badge
             variant="outline"
             :class="{
@@ -39,8 +42,9 @@ onMounted(async () => {
               'bg-transparent text-gray-700': daysLeft >= 10,
             }"
             class="px-4 py-2"
-            >TOTAL DAYS LEFT UNTIL PUBLICATIONS: {{ daysLeft }} Days</Badge
           >
+            TOTAL DAYS LEFT UNTIL PUBLICATIONS: {{ daysLeft }} Days
+          </Badge>
         </div>
       </div>
 

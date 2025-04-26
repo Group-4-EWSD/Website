@@ -2,6 +2,7 @@ import type {
   CreateUserParams,
   ProfilePhotoParams,
   ProfilePhotoResponse,
+  UpdatePasswordParams,
   UpdateUserParams,
   User,
   UserDetailsParams,
@@ -18,6 +19,11 @@ export const updateProfilePhoto = async (
   params: ProfilePhotoParams,
 ): Promise<ProfilePhotoResponse> => {
   const response = await api.post(`user/update-photo`, params)
+  return response.data
+}
+
+export const updateUserPassword = async (params: UpdatePasswordParams) => {
+  const response = await api.post(`user/update-password`, params)
   return response.data
 }
 

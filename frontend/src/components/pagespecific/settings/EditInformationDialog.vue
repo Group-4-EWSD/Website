@@ -237,6 +237,7 @@ const closeModal = () => {
             <Select
               name="gender"
               id="gender"
+              disabled
               :errors="errors"
               :options="genderOptions"
               :modelValue="values.gender"

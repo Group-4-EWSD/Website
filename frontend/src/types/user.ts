@@ -14,6 +14,7 @@ export interface User {
   user_photo_path: string
   user_profile_url: string
   last_login_datetime: string
+  prev_login: string
 }
 
 export interface UserDetailsParams {
@@ -25,6 +26,11 @@ export interface UserDetailsParams {
 
 export interface ProfilePhotoParams {
   user_photo: File
+}
+
+export interface UpdatePasswordParams {
+  user_password: string;
+  user_password_confirmation: string;
 }
 
 export interface ProfilePhotoResponse {

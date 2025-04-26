@@ -1,39 +1,31 @@
 <?php 
+
 namespace App\Mail;
 
 use Illuminate\Mail\Mailable;
 
 class UserCreatedMail extends Mailable
 {
-    public $user;
-    public $articleId;      
-    public $articleTitle;   
-    public $userName;
-    public $userNickname;  
-    public $userEmail;     
-
-    public function __construct($user, $articleId, $articleTitle, $userName, $userNickname, $userEmail)
+    public $user_name;
+    public $user_email;
+    public $password;
+    
+    public function __construct($data)
     {
-        $this->user = $user;
-        $this->articleId = $articleId;
-        $this->articleTitle = $articleTitle;
-        $this->userName = $userName;
-        $this->userNickname = $userNickname;
-        $this->userEmail = $userEmail;
+        $this->user_name = $data['user_name'];
+        $this->user_email = $data['user_email'];
+        $this->password = $data['user_password'];
     }
 
     public function build()
     {
         return $this->from(config('mail.from.address'))
-            ->subject('New Article Has been Created')
-            ->view('emails.article_create_mail')
+            ->subject('Your Account Has Been Create')
+            ->view('emails.user_created_mail')
             ->with([
-                'user' => $this->user,
-                'article_id' => $this->articleId,
-                'article_title' => $this->articleTitle,
-                'user_name' => $this->userName,
-                'user_nickname' => $this->userNickname,
-                'user_email' => $this->userEmail
+                'user_name' => $this->user_name,
+                'user_email' => $this->user_email,
+                'password' => $this->password
             ]);
     }
 }

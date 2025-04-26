@@ -142,7 +142,7 @@ class ArticleService
 
     public function createUpdateArticle($userId, $request)
     {
-        
+        $sendEmail = true;
         $systemId = $this->articleRepository->getSystemId($userId);
         DB::beginTransaction();
 
@@ -195,17 +195,27 @@ class ArticleService
             }
             if (empty($request->article_id)) {
                 $this->articleRepository->createActivity($articleId, $userId, $request);
-                $this->notificationRepository->setNotification('4', $articleId);
+                if($request->status == 1){
+                    $this->notificationRepository->setNotification('4', $articleId);
+                }else{
+                    $sendEmail = false;
+                }
             }else{
+                $previousStatus = $this->articleRepository->checkPreviousActivity($articleId)->article_status;
+                if($request->status == 1 && $previousStatus == 0){
+                    $this->articleRepository->createActivity($articleId, $userId, $request);
+                }else{
+                    $sendEmail = false;
+                }
                 $this->notificationRepository->setNotification('5', $request->articleId);
             }
 
             DB::commit();
-            return ['success' => true];
+            return ['success' => true, 'sendEmail' => $sendEmail];
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => $e->getMessage()];
+            return ['success' => false, 'message' => $e->getMessage() ];
         }
     }
 
@@ -224,10 +234,7 @@ class ArticleService
 
     public function draftArticleList($userId){
         $articles = $this->articleRepository->getAllArticles(2, $userId);
-        return [
-            'draftArticles' => $articles->get(),
-            'draftArticlesCount' => $articles->get()->count()
-        ];
+        return $articles->get();
     }
 
     public function getFileList($articleId, $request){

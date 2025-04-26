@@ -106,6 +106,7 @@ class UserRepository
             ->select([
                 'u.user_name',
                 'u.nickname',
+                DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                 'u.user_email',
                 'f.faculty_name',
                 'ut.user_type_name',
@@ -292,14 +293,14 @@ class UserRepository
         DB::table('users')->insert([
             'id' => $data['user_id'],
             'user_name' => $data['user_name'],
-            'nickname' => $data['nickname'],
+            'nickname' => $data['nickname'] ?? null,
             'user_email' => $data['user_email'],
             'user_password' => Hash::make($data['user_password']),
             'user_type_id' => $data['user_type_id'],
             'faculty_id' => $data['faculty_id'],
             'gender' => $data['gender'],
-            'date_of_birth' => $data['date_of_birth'],
-            'phone_number' => $data['phone_number'],
+            'date_of_birth' => $data['date_of_birth'] ?? null,
+            'phone_number' => $data['phone_number'] ?? null,
             'created_at' => now(),
             'updated_at' => now()
         ]);

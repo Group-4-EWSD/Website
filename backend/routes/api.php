@@ -49,7 +49,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/create', [ArticleController::class, 'articleCreateUpdate']); // create an article
         Route::post('/update', [ArticleController::class, 'articleCreateUpdate']); // create an article
         Route::get('/{articleId}', [ActionController::class, 'articlePageInitial']);
-        Route::post('/change-status/{articleId}', [ArticleController::class, 'articleChangeStatus']); // update article status
+        Route::post('/change-status/{articleId?}', [ArticleController::class, 'articleChangeStatus']);
     });
 
     // Category routes

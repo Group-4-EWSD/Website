@@ -42,8 +42,10 @@ class NotificationRepository
                 'notifications.notification_type',
                 'notifications.status as seen',
                 'articles.article_title',
-                'notifications.created_at'
-            ]);
+                'notifications.created_at',
+                DB::raw('TIMESTAMPDIFF(SECOND, notifications.created_at, NOW()) as time_diff'),
+            ])
+            ->where('notify_users.id', '!=', $user->id);
 
         if ($user->user_type_id == 1) {
             $notificationList->where('articles.user_id', $user->id)
@@ -54,6 +56,7 @@ class NotificationRepository
         } elseif ($user->user_type_id == 3) {
             $notificationList->where('notifications.notification_type', 6);
         }
+        $notificationList->orderBy('notifications.created_at', 'desc');
         return $notificationList->get();
     }
 

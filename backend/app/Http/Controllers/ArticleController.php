@@ -129,7 +129,7 @@ class ArticleController extends Controller
         $result = $this->articleService->createUpdateArticle($userId, $request);
 
         if ($result['success']) {
-            if (empty($request->article_id)) {
+            if ($result['sendEmail'] == true) {
                 $coordinatorEmail = DB::table('users')
                     ->where('faculty_id', Auth::user()->faculty_id)
                     ->where('user_type_id', 2)
@@ -157,10 +157,11 @@ class ArticleController extends Controller
         }
     }
 
-    public function articleChangeStatus($articleId = null, Request $request)
+    public function articleChangeStatus(Request $request, $articleId = null)
     {
         $userId = Auth::id();
         $result = $this->articleService->changeArticleStatus($userId, $articleId, $request);
+
         if ($result) {
             return response()->json(['message' => 'Article status changed successfully'], 201);
         } else {

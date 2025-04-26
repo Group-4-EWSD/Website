@@ -27,6 +27,11 @@ export interface ProfilePhotoParams {
   user_photo: File
 }
 
+export interface UpdatePasswordParams {
+  user_password: string;
+  user_password_confirmation: string;
+}
+
 export interface ProfilePhotoResponse {
   photo_path: string
 }

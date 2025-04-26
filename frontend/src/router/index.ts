@@ -26,6 +26,7 @@ const GuestArticles = () => import('@/views/Guest/Articles.vue')
 
 const Notification = () => import('@/views/Notification.vue')
 const Settings = () => import('@/views/Settings.vue')
+const Welcome = () => import('@/views/Welcome.vue')
 
 const AdminManagement = () => import('@/views/Admin/Management.vue')
 const AdminReports = () => import('@/views/Admin/Reports.vue')
@@ -179,7 +180,7 @@ const commomRoutes = [
     name: 'getArticleDetails',
     component: ArticleDetails,
     meta: {
-      roles: ['Student', 'Marketing Coordinator'],
+      roles: ['Student', 'Marketing Coordinator', 'Marketing Manager', 'Guest'],
     },
   },
   {
@@ -195,6 +196,14 @@ const commomRoutes = [
     path: '/settings',
     name: 'Settings',
     component: Settings,
+    meta: {
+      roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
+    },
+  },
+  {
+    path: '/welcome',
+    name: 'Welcome',
+    component: Welcome,
     meta: {
       roles: ['Student', 'Marketing Coordinator', 'Admin', 'Marketing Manager', 'Guest'],
     },

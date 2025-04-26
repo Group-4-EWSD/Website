@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { Eye, SlidersHorizontal, ThumbsUp } from 'lucide-vue-next'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { getFilterItems } from '@/api/articles'
@@ -40,15 +40,23 @@ const articleStore = useArticleStore()
 const categoryOptions = ref<{ label: string; value: string }[]>([])
 const yearOptions = ref<{ label: string; value: string }[]>([])
 const filtersInitialized = ref(false)
-const selectedCategory = ref('all')
-const selectedYear = ref('all')
 const sortedValue = ref('created asc')
 
+const selectedCategory = computed({
+  get: () => articleStore.selectedCategory,
+  set: (val) => (articleStore.selectedCategory = val),
+})
+
+const selectedYear = computed({
+  get: () => articleStore.selectedYear,
+  set: (val) => (articleStore.selectedYear = val),
+})
+
 const sortOptions = ref([
-  { value: 'created_at ASC', label: 'Newest First' },
-  { value: 'created_at DESC', label: 'Oldest First' },
-  { value: 'title ASC', label: 'Name (A → Z)' },
-  { value: 'title DESC', label: 'Name (Z → A)' },
+  { value: '2', label: 'Newest First' },
+  { value: '1', label: 'Oldest First' },
+  { value: '3', label: 'Name (A → Z)' },
+  { value: '4', label: 'Name (Z → A)' },
 ])
 
 const goToArticleDetails = (articleId: string) => {
@@ -121,7 +129,16 @@ const goToPage = (page: number) => {
 
 <template>
   <Layout>
-    <h2 class="text-xl font-bold mb-4 uppercase">Dashboard</h2>
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-xl font-bold uppercase">Dashboard</h2>
+
+      <div class="text-sm text-gray-500">
+        <template v-if="articleStore.isLoading">
+          <span class="animate-pulse text-gray-400">Loading...</span>
+        </template>
+        <template v-else> Previous Login {{ articleStore.prevLogin || '-' }} </template>
+      </div>
+    </div>
 
     <div class="flex flex-col gap-3">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -146,7 +163,7 @@ const goToPage = (page: number) => {
             <p class="text-4xl font-bold py-2">
               {{ articleStore.countData?.currentYearArticleCount || '0' }}
             </p>
-            <p class="text-sm text-muted-foreground">Articles for this year</p>
+            <p class="text-sm text-muted-foreground">All-time article uploads</p>
           </div>
         </Card>
         <Card class="p-4">
@@ -239,6 +256,7 @@ const goToPage = (page: number) => {
                   <Skeleton class="h-12" animate-pulse />
                 </TableCell>
               </TableRow>
+
               <TableRow
                 v-else
                 v-for="article in articleStore.articles.slice(0, 5)"

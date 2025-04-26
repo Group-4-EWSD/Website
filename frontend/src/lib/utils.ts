@@ -24,13 +24,13 @@ export function valueUpdater<T extends Updater<unknown>>(updaterOrValue: T, ref:
 export async function forceSignOut(clearToken: boolean = true) {
   console.log('forceSignOut')
   setActivePinia(pinia)
-  resetAllStores()
 
   if (clearToken) {
     await logout()
     // Remove token from cookies
     removeCookie('token')
     removeCookie('user')
+    resetAllStores()
     // Redirect to login
     router.push('/auth/login')
   } else {

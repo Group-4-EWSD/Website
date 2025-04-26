@@ -22,7 +22,6 @@ class PasswordResetMail extends Mailable
             ->view('emails.password_reset')
             ->with([
                 'user_name' => $this->user->user_name,
-                'user_email' => $this->user->user_email,
                 'new_password' => $this->newPassword
             ]);
     }

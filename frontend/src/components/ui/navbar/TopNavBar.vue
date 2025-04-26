@@ -5,13 +5,9 @@ import { ref } from 'vue'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
+import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 
-const searchQuery = ref('')
 const hasNotification = true
-const isSearchActive = ref(false)
-const toggleSearch = () => {
-  isSearchActive.value = !isSearchActive.value
-}
 const userStore = useUserStore()
 </script>
 
@@ -29,7 +25,13 @@ const userStore = useUserStore()
 
     <div class="flex items-center space-x-4 pr-2 sm:pr-6">
       <div class="relative hidden sm:block">
-        <RouterLink :to="`/notifications`">
+        <RouterLink
+          :to="
+            userStore.currentUser?.user_type_name === 'Admin'
+              ? '/admin/contact-us'
+              : '/notifications'
+          "
+        >
           <button class="relative p-1 text-white h-[3rem]">
             <BellDot class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
           </button>
@@ -56,12 +58,14 @@ const userStore = useUserStore()
         </p>
       </div>
 
-      <Avatar>
-        <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
-        <AvatarFallback class="text-white">{{
-          getInitials(userStore.currentUser?.user_name || '')
-        }}</AvatarFallback>
-      </Avatar>
+      <RouterLink to="/settings">
+        <Avatar>
+          <AvatarImage :src="userStore.currentUser?.user_photo_path || ''" />
+          <AvatarFallback class="text-white">{{
+            getInitials(userStore.currentUser?.user_name || '')
+          }}</AvatarFallback>
+        </Avatar>
+      </RouterLink>
     </div>
   </nav>
 </template>

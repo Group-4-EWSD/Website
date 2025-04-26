@@ -304,7 +304,7 @@ class UserController extends Controller
                 'phone_number'    => 'sometimes|string|max:20'
             ]);
 
-            return response()->json(['new user id' => $this->userService->userRegister($validated)]);
+            return response()->json($this->userService->userRegister($validated));
 
         }catch (\Exception $e) {
             return response()->json([

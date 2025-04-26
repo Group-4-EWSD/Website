@@ -18,7 +18,8 @@ interface Props {
   placeholder?: string
   options: { label: string; value: string | number }[]
   errors?: Record<string, string | string[] | null | undefined>
-  modelValue?: AcceptableValue
+  modelValue?: AcceptableValue,
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -47,6 +48,7 @@ watchEffect(() => {
         :options="props.options"
         :model-value="value"
         @update:model-value="setValue"
+        :disabled="disabled || false"
       >
         <SelectTrigger
           :class="

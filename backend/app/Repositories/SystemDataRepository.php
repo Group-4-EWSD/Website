@@ -20,8 +20,9 @@ class SystemDataRepository
                 'sd.actual_submission_date',
                 'sd.updated_at'
             ])
-            ->join('faculties as f', 'f.faculty_id', '=', 'sd.faculty_id')
-            ->join('academic_years as ay', 'ay.academic_year_id', 'sd.academic_year_id')
+            ->leftJoin('faculties as f', 'f.faculty_id', '=', 'sd.faculty_id')
+            ->leftJoin('academic_years as ay', 'ay.academic_year_id', 'sd.academic_year_id')
+            ->orderBy('sd.created_at', 'asc')
             ->get(); 
     }
 
@@ -42,6 +43,7 @@ class SystemDataRepository
             ->join('faculties as f', 'f.faculty_id', '=', 'sd.faculty_id')
             ->join('academic_years as ay', 'ay.academic_year_id', 'sd.academic_year_id')
             ->where('sd.system_id','=', $SysId)
+            ->orderBy('sd.created_at', 'asc')
             ->get(); 
     }
 

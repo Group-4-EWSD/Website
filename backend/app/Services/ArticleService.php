@@ -201,14 +201,18 @@ class ArticleService
                     $sendEmail = false;
                 }
             }else{
-                $previousStatus = $this->articleRepository->checkPreviousActivity($articleId)->article_status;
-                if($request->status == 1 && $previousStatus == 0){
+                $currentStatus = $this->articleRepository->checkCurrentActivity($articleId)->article_status;
+                if($request->status == 1 && $currentStatus == 0){
                     $this->articleRepository->createActivity($articleId, $userId, $request);
+                    $this->notificationRepository->setNotification('4', $articleId);
+                // dd($currentStatus, $articleId);
                 }else{
                     $sendEmail = false;
+                    if($currentStatus == 1){
+                        $this->notificationRepository->setNotification('5', $articleId);
+                    }
                 }
-                $this->notificationRepository->setNotification('5', $request->articleId);
-            }
+            }$sendEmail = false;
 
             DB::commit();
             return ['success' => true, 'sendEmail' => $sendEmail];
@@ -221,11 +225,15 @@ class ArticleService
 
     public function changeArticleStatus($userId, $articleId, $request){
         if($articleId != null){
-            $this->notificationRepository->setNotification('6', $articleId);
+            if($request->status == 4){
+                $this->notificationRepository->setNotification('6', $articleId);
+            }
             $this->articleRepository->createActivity( $articleId, $userId,$request);
         }else{
             foreach ($request->articleIdList as $eachArticleId) {
-                $this->notificationRepository->setNotification('6', $eachArticleId);
+                if($request->status == 4){
+                    $this->notificationRepository->setNotification('6', $eachArticleId);
+                }
                 $this->articleRepository->createActivity($eachArticleId, $userId,$request);
             }
         }

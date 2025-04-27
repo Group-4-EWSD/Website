@@ -76,7 +76,7 @@ class NotificationRepository
 
     public function viewNotification($notificationId)
     {
-        $this->model()::where('user_id', Auth::id())
+        $notiSeen = DB::table('notifications')
             ->where('notification_id', '=', $notificationId)
             ->update([
                 'status' => 1

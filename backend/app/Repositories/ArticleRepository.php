@@ -54,7 +54,7 @@ class ArticleRepository
         ArticleDetail::where('file_name', $file_name)->delete();
     }
 
-    public function checkPreviousActivity($articleId)
+    public function checkCurrentActivity($articleId)
     {
         $activity = DB::table('activities')
             ->where('article_id', $articleId)
@@ -80,12 +80,23 @@ class ArticleRepository
     public function getSystemId($userId)
     {
         $systemId = DB::select("
-                    SELECT sd.*
-                    FROM system_datas AS sd
-                    JOIN academic_years AS ay ON ay.academic_year_start = YEAR(CURDATE())
-                    JOIN users AS u ON u.faculty_id = sd.faculty_id
-                    WHERE u.id = ?
-                    LIMIT 1
+                    SELECT 
+                        sd_new.* 
+                    FROM 
+                        system_datas sd_new
+                    JOIN 
+                        users u ON u.faculty_id = sd_new.faculty_id
+                    JOIN 
+                        academic_years ay_new ON ay_new.academic_year_id = sd_new.academic_year_id
+                    JOIN 
+                        academic_years ay_old ON ay_old.academic_year_start = ay_new.academic_year_start - 1
+                    JOIN 
+                        system_datas sd_old ON sd_old.academic_year_id = ay_old.academic_year_id
+                    WHERE 
+                        CURRENT_DATE() < sd_new.actual_submission_date
+                        AND CURRENT_DATE() > sd_old.actual_submission_date
+                        AND u.id = ?
+                    LIMIT 1;
                 ", [$userId])[0]->system_id; // Use parameter binding to prevent SQL injection
         return $systemId;
     }

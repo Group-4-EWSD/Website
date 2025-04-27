@@ -15,7 +15,8 @@ class ContactUsRepository
             'description' => $data['description'],
             'created_at' => now(),
             'updated_at' => now()
-        ]);
+        ])
+        ->orderBy('created_at', 'desc');
 
         return $data['contact_us_id'];
     }

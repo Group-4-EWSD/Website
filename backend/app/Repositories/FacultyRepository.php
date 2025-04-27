@@ -25,6 +25,7 @@ class FacultyRepository
             'f.faculty_name',
             'f.updated_at'
         ])
+        ->orderBy('created_at', 'asc')
         ->get();
     }     
 

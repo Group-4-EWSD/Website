@@ -15,6 +15,7 @@ class AcademicYearRepository
             'academic_year_description',
             'updated_at'
         ])
+        ->orderBy('created_at', 'asc')
         ->get();
     }
 

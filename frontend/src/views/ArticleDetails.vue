@@ -279,7 +279,6 @@ const isPublished = computed(() => articleStatus.value === 4)
 const handleDownload = () => {
   if (isCoordinator && isPending) {
     handleDownloadArticle(articleId.value)
-    alert(`This is an download feature.`)
   } else {
     alert(`This is an upcoming feature.`)
   }

@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { BellDot, Search, X } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { BellRing } from 'lucide-vue-next'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
 import { useUserStore } from '@/stores/user'
-import TooltipWrapper from '@/components/shared/TooltipWrapper.vue'
 
-const hasNotification = true
 const userStore = useUserStore()
 </script>
 
@@ -33,17 +30,10 @@ const userStore = useUserStore()
           "
         >
           <button class="relative p-1 text-white h-[3rem]">
-            <BellDot class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
+            <BellRing class="w-[3.2rem] h-8 sm:w-6 sm:h-6" />
           </button>
-
-          <span
-            v-if="hasNotification"
-            class="absolute top-[0.8rem] right-[1rem] sm:top-[1rem] sm:right-[0.37rem] w-[0.7rem] h-[0.7rem] sm:w-2 sm:h-2 bg-red-500 rounded-full"
-          ></span>
         </RouterLink>
       </div>
-
-      <!-- <div class="hidden sm:flex text-white font-medium">Welcome, Username</div> -->
 
       <div class="hidden sm:flex flex-col text-white font-medium">
         <p>Welcome, {{ userStore.currentUser?.user_name }}</p>
@@ -71,18 +61,8 @@ const userStore = useUserStore()
 </template>
 
 <style scoped>
-.search-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
 input {
   width: 100%;
-}
-
-.my-icon {
-  width: 24px;
-  height: 24px;
 }
 
 .name-color {

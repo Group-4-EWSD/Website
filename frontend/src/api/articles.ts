@@ -83,9 +83,7 @@ export const updateStatus = async (status: number, articleId: string) => {
 }
 
 export const downloadArticle = async (articleId: string) => {
-  return await api.get('articles/download', {
-    params: { articleId },
-  })
+  return await api.get(`articles/download/${articleId}`)
 }
 
 export const downloadArticles = async (articleIdList: string[]) => {

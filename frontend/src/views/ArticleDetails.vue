@@ -277,7 +277,7 @@ const isRejected = computed(() => articleStatus.value === 3)
 const isPublished = computed(() => articleStatus.value === 4)
 
 const handleDownload = () => {
-  if (isCoordinator && isPending) {
+  if (isCoordinator) {
     handleDownloadArticle(articleId.value)
   } else {
     alert(`This is an upcoming feature.`)
@@ -405,7 +405,9 @@ const handleDownload = () => {
               @click="handleDownload"
             >
               <Download class="w-4 h-4 text-gray-700" v-if="!downloadingArticle" />
-              <span class="hidden sm:inline text-sm">Download Doc</span>
+              <span class="hidden sm:inline text-sm">{{
+                downloadingArticle ? 'Downloading ...' : 'Download Doc'
+              }}</span>
             </Button>
           </div>
         </div>

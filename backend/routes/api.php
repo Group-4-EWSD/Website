@@ -29,6 +29,8 @@ Route::middleware([RedirectIfAuthenticated::class])->group(function () {
 });
 
 Route::get('/topArticles', [ArticleController::class, 'topArticles']);
+
+Route::post('/contact-us/create', [ContactUsController::class, 'createContactUs']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/visit/{pageId}', [UserController::class, 'pageVisitInitial']);
     // Articles routes
@@ -83,7 +85,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/all-user-list', [UserController::class, 'getUserList']);
     Route::get('/get-user-bytype/{user_type}', [UserController::class, 'getUserListByType']);
     Route::post('/password-reset', [UserController::class, 'resetPassword']);
-    Route::post('/edit-user', [UserController::class, 'editUser']);
+    Route::post('/user-update', [UserController::class, 'editUser']);
     Route::get('/get-user-by-id/{userId}', [UserController::class, 'getUserById']);
 
     Route::prefix('/academic-years')->group(function(){
@@ -105,7 +107,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('/contact-us')->group(function(){
         Route::get('/get-all-list', [ContactUsController::class, 'getContactUsList']);
-        Route::post('/create', [ContactUsController::class, 'createContactUs']);
     });
 });
 // Unnecessory, Just for testing

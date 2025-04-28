@@ -23,6 +23,7 @@ class FacultyRepository
         ->select([
             'f.faculty_id',
             'f.faculty_name',
+            'f.remark',
             'f.updated_at'
         ])
         ->orderBy('created_at', 'asc')

@@ -212,7 +212,7 @@ class ArticleService
                         $this->notificationRepository->setNotification('5', $articleId);
                     }
                 }
-            }$sendEmail = false;
+            }
 
             DB::commit();
             return ['success' => true, 'sendEmail' => $sendEmail];

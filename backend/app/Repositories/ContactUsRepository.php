@@ -15,13 +15,12 @@ class ContactUsRepository
             'description' => $data['description'],
             'created_at' => now(),
             'updated_at' => now()
-        ])
-        ->orderBy('created_at', 'desc');
+        ]);
 
         return $data['contact_us_id'];
     }
 
     public function getContactUsList(){
-        return DB::table('contact_us')->get();
+        return DB::table('contact_us')->orderBy('created_at', 'desc')->get();
     }
 }

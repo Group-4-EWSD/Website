@@ -119,7 +119,8 @@ class ArticleController extends Controller
     
     public function guestArticles(Request $request)
     {
-        $articles = $this->articleService->getGuestArticles($request);
+        $facultyId = Auth::user()->faculty_id;
+        $articles = $this->articleService->getGuestArticles($request, $facultyId);
         return response()->json($articles);
     }
 

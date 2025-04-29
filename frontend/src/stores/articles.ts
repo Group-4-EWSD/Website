@@ -14,6 +14,8 @@ export const useArticleStore = defineStore('article', () => {
   const displayNumber = 5
   const totalPages = ref(1)
   const sortOption = ref<string>('')
+  const categoryOptions = ref<{ label: string; value: string }[]>([])
+  const yearOptions = ref<{ label: string; value: string }[]>([])
   const selectedCategory = ref('')
   const selectedYear = ref('')
 
@@ -52,6 +54,14 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  const setCategoryOptions = (options: { label: string; value: string }[]) => {
+    categoryOptions.value = options
+  }
+
+  const setYearOptions = (options: { label: string; value: string }[]) => {
+    yearOptions.value = options
+  }
+
   const reset = () => {
     articles.value = []
     countData.value = null
@@ -71,9 +81,13 @@ export const useArticleStore = defineStore('article', () => {
     sortOption,
     selectedYear,
     selectedCategory,
+    categoryOptions,
+    yearOptions,
     error,
 
     fetchArticles,
+    setCategoryOptions,
+    setYearOptions,
     reset,
   }
 })

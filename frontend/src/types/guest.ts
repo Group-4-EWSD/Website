@@ -6,6 +6,11 @@ export interface DashboardResponse {
   publishedList: []
 }
 
+export interface ArticleResponse {
+  articles: []
+  articlesCount: Number
+}
+
 export interface GuestArticle {
   article_id: string
   article_title: string

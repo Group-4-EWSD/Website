@@ -16,39 +16,35 @@ import { useGuestStore } from '@/stores/guest'
 
 const guestStore = useGuestStore()
 
-const selectedCategory = ref<string | null>(null)
-const selectedYear = ref<string | null>(null)
-const categoryOptions = ref<{ label: string; value: string }[]>([])
+const selectedYear = ref(guestStore.selectedYear || '')
 const yearOptions = ref<{ label: string; value: string }[]>([])
 
 onMounted(async () => {
-  if (!guestStore.articles.length) {
-    guestStore.fetchDashboardData()
+  if (!guestStore.guestArticles.length) {
+    guestStore.fetchArticles()
   }
 
-  const [articleTypes, academicYears] = await Promise.all([getFilterItems(3), getFilterItems(4)])
+  if (!guestStore.yearOptions.length) {
+    const [academicYears] = await Promise.all([getFilterItems(4)])
 
-  categoryOptions.value = articleTypes.map((item: any) => ({
-    label: item.faculty_name,
-    value: item.faculty_id,
-  }))
+    yearOptions.value = academicYears.map((item: any) => ({
+      label: item.academic_year_description,
+      value: item.academic_year_id,
+    }))
 
-  yearOptions.value = academicYears.map((item: any) => ({
-    label: item.academic_year_description,
-    value: item.academic_year_id,
-  }))
+    guestStore.setYearOptions(yearOptions.value)
+  }
 })
 
-watch([selectedCategory, selectedYear], ([newCategory, newYear]) => {
-  console.log(newCategory, newYear)
-  guestStore.fetchDashboardData({
-    ...(newCategory && { facultyId: newCategory }),
+watch([selectedYear], ([newYear]) => {
+  guestStore.setSelectedYear(newYear)
+
+  guestStore.fetchArticles({
     ...(newYear && { academicYearId: newYear }),
   })
 })
 
 const resetFilters = () => {
-  selectedCategory.value = ''
   selectedYear.value = ''
 }
 </script>
@@ -60,28 +56,16 @@ const resetFilters = () => {
         <h2 class="text-xl font-bold uppercase">Articles</h2>
 
         <div class="flex items-center gap-4">
-          <!-- Feedback Filter -->
-          <Select v-model="selectedCategory">
-            <SelectTrigger class="w-[180px]">
-              <SelectValue placeholder="Filter by Faculty" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem
-                v-for="option in categoryOptions"
-                :key="option.value"
-                :value="option.value"
-              >
-                {{ option.label }}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
           <Select v-model="selectedYear">
             <SelectTrigger class="w-[180px]">
               <SelectValue placeholder="Filter by Year" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem v-for="option in yearOptions" :key="option.value" :value="option.value">
+              <SelectItem
+                v-for="option in guestStore.yearOptions"
+                :key="option.value"
+                :value="option.value"
+              >
                 {{ option.label }}
               </SelectItem>
             </SelectContent>
@@ -91,7 +75,7 @@ const resetFilters = () => {
         </div>
       </div>
 
-      <ArticleTable :articles="guestStore.articles" :isLoading="guestStore.isLoading" />
+      <ArticleTable :articles="guestStore.guestArticles" :isLoading="guestStore.isLoading" />
     </div>
   </Layout>
 </template>

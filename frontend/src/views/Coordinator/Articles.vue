@@ -47,8 +47,8 @@ const filteredArticles = computed(() => {
 })
 
 const sortOptions = [
-  { label: 'Recently Submitted', value: '2' },
-  { label: 'Oldest Submission', value: '1' },
+  { label: 'Recently Submitted', value: '1' },
+  { label: 'Oldest Submission', value: '2' },
   { label: 'Title A-Z', value: '3' },
   { label: 'Title Z-A', value: '4' },
 ]

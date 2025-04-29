@@ -33,7 +33,7 @@ class ArticleService
     }
 
     public function getGuestHomePageData($userId, $facultyId, $request){
-        $articles = $this->articleRepository->getAllArticles(5, null, $request);
+        $articles = $this->articleRepository->getAllArticles(5, $facultyId, $request);
         $articleList = $this->articleRepository->limitArticleList($request,$articles)->orderBy('art.created_at', 'desc')->get();
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),

@@ -411,7 +411,7 @@ class ArticleRepository
             }
         }
         else if ($state == 5){
-            $articles->havingRaw("status = 4 ");
+            $articles->havingRaw("status = 4 ")->where('f.faculty_id', '=', $primaryKey);
         }
         // Ensure GROUP BY is valid by including `art.article_id`
         $articles->groupBy([

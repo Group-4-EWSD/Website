@@ -70,7 +70,7 @@ export const updateArticle = async (article: UpdateArcitleData) => {
 }
 
 export const updateArticleStatus = async (articleId: string, status: ArticleStatus) => {
-  return await api.post(`articles/change-status/${articleId}`, {status})
+  return await api.post(`articles/change-status/${articleId}`, { status })
 }
 
 export const getCategories = async (): Promise<Category[]> => {
@@ -80,6 +80,10 @@ export const getCategories = async (): Promise<Category[]> => {
 
 export const updateStatus = async (status: number, articleId: string) => {
   return await api.post(`articles/change-status/${articleId}`, { status })
+}
+
+export const downloadArticle = async (articleId: string) => {
+  return await api.get(`articles/download/${articleId}`)
 }
 
 export const downloadArticles = async (articleIdList: string[]) => {

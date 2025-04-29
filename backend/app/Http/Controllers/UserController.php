@@ -201,7 +201,6 @@ class UserController extends Controller
                 'date_of_birth' => 'sometimes|date',  
                 'phone_number' => 'sometimes|string|max:20', 
             ]);
-
             $updatedUser = $this->userService->editUser($data);
 
             return response()->json([
@@ -295,13 +294,13 @@ class UserController extends Controller
         try {
             $validated = $request->validate([
                 'user_name'       => 'required|string|max:255',
-                'nickname'        => 'sometimes|string|max:100',
+                'nickname'        => 'nullable|string|max:100',
                 'user_email'      => 'required|email|max:255|unique:users,user_email',
                 'user_type_id'    => 'required|exists:user_types,user_type_id',
                 'faculty_id'      => 'required|uuid|exists:faculties,faculty_id',
-                'gender'          => 'sometimes|in:1,2', 
-                'date_of_birth'   => 'sometimes|date|before:today',
-                'phone_number'    => 'sometimes|string|max:20'
+                'gender'          => 'required|in:0,1,2', 
+                'date_of_birth'   => 'nullable|date|before:today',
+                'phone_number'    => 'nullable|string|max:20'
             ]);
 
             return response()->json($this->userService->userRegister($validated));

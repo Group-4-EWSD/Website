@@ -14,7 +14,7 @@ import {
   getArticleDetails,
   updateStatus,
 } from '@/api/articles'
-import { updateReact } from '@/api/articles'
+import { updateReact, downloadArticle } from '@/api/articles'
 import FeedbackModal from '@/components/shared/FeedbackModal.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Layout from '@/components/ui/Layout.vue'
@@ -48,6 +48,7 @@ const feedbacks = ref<Comment[]>([])
 const isLoading = ref(false)
 const approveLoading = ref(false)
 const rejectLoading = ref(false)
+const downloadingArticle = ref(false)
 
 const articleContent: any = ref([])
 const articlePhotos = ref<Record<string, string>>({
@@ -144,6 +145,30 @@ const updateLike = async () => {
     isLiked.value = !isLiked.value
     likeCount.value += isLiked.value ? 1 : -1
   }
+}
+
+const handleDownloadArticle = (articleId: string) => {
+  downloadingArticle.value = true
+  downloadArticle(articleId)
+    .then((res) => {
+      // download from link
+      const url = res.data.download_url
+      const link = document.createElement('a')
+      link.href = url
+      link.download = res.data.filename || 'article.zip'
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast.success('Download started. Check your downloads folder.')
+    })
+    .catch((error) => {
+      toast.error('Error downloading articles: ' + error.message)
+    })
+    .finally(() => {
+      downloadingArticle.value = false
+    })
 }
 
 onMounted(() => {
@@ -246,12 +271,17 @@ const isOwnArticle = computed(() => {
 const articleStatus = computed(() => article.value.articleDetail?.article_status)
 
 const isDraft = computed(() => articleStatus.value === 0)
+const isPending = computed(() => articleStatus.value === 1)
 const isApproved = computed(() => articleStatus.value === 2)
 const isRejected = computed(() => articleStatus.value === 3)
 const isPublished = computed(() => articleStatus.value === 4)
 
-const downloadArticle = () => {
-  alert(`This is an upcoming feature.`)
+const handleDownload = () => {
+  if (isCoordinator) {
+    handleDownloadArticle(articleId.value)
+  } else {
+    alert(`This is an upcoming feature.`)
+  }
 }
 </script>
 
@@ -259,8 +289,6 @@ const downloadArticle = () => {
   <Layout>
     <template v-if="isLoading">
       <div class="space-y-6">
-        <!-- skeleton elements -->
-        <!-- top title & like count & view count -->
         <div class="flex items-center justify-between">
           <Skeleton class="w-32 h-6" />
           <div class="flex space-x-4">
@@ -270,7 +298,6 @@ const downloadArticle = () => {
             <Skeleton class="w-16 h-6" />
           </div>
         </div>
-        <!-- author, date & download -->
         <div class="flex justify-between items-center">
           <div class="space-y-2">
             <Skeleton class="w-24 h-4" />
@@ -279,16 +306,13 @@ const downloadArticle = () => {
 
           <Skeleton class="w-28 h-10 rounded-lg" />
         </div>
-        <!-- content -->
         <div class="h-40 flex items-center justify-center border rounded-lg">
           <Skeleton class="w-48 h-10" />
         </div>
-        <!-- comment & feedback tabs -->
         <div class="flex space-x-4">
           <Skeleton class="w-20 h-8 rounded-lg" />
           <Skeleton class="w-20 h-8 rounded-lg" />
         </div>
-        <!-- comment -->
         <div class="flex items-center space-x-4">
           <Skeleton class="w-10 h-10 rounded-full" />
           <Skeleton class="flex-1 h-10 rounded-lg" />
@@ -365,6 +389,7 @@ const downloadArticle = () => {
               Published
             </Button>
 
+            <!-- Draft -->
             <Button
               v-if="isCoordinator && isDraft"
               :disabled="false"
@@ -376,10 +401,13 @@ const downloadArticle = () => {
             <!-- Download -->
             <Button
               class="flex items-center gap-2 px-3 py-2 border rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100"
-              @click="downloadArticle"
+              :processing="downloadingArticle"
+              @click="handleDownload"
             >
-              <Download class="w-4 h-4 text-gray-700" />
-              <span class="hidden sm:inline text-sm">Download Doc</span>
+              <Download class="w-4 h-4 text-gray-700" v-if="!downloadingArticle" />
+              <span class="hidden sm:inline text-sm">{{
+                downloadingArticle ? 'Downloading ...' : 'Download Doc'
+              }}</span>
             </Button>
           </div>
         </div>
@@ -534,9 +562,9 @@ const downloadArticle = () => {
         </div>
       </div>
       <div v-else>
-        <div class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center justify-center min-h-[50vh] space-y-2">
           <p>Something went wrong, please</p>
-          <Button variant="outline" size="sm" class="ml-2" @click="fetchArticleDetails(articleId)">
+          <Button variant="outline" size="sm" @click="fetchArticleDetails(articleId)">
             Try Again
           </Button>
         </div>

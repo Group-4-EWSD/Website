@@ -106,6 +106,7 @@ class UserRepository
             ->select([
                 'u.user_name',
                 'u.nickname',
+                DB::raw("CONCAT('https://ewsdcloud.s3.ap-southeast-1.amazonaws.com/', u.user_photo_path) AS user_photo_path"),
                 'u.user_email',
                 'f.faculty_name',
                 'ut.user_type_name',
@@ -232,6 +233,7 @@ class UserRepository
             ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id') 
             ->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id') 
             ->leftJoin(DB::raw('(SELECT user_id, MAX(login_datetime) as last_login_datetime FROM login_histories GROUP BY user_id) as lh'), 'lh.user_id', '=', 'u.id')
+            ->orderBy('u.created_at', 'asc')
             ->get();
     }
 
@@ -258,6 +260,7 @@ class UserRepository
             ->leftJoin('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
             ->leftJoin(DB::raw('(SELECT user_id, MAX(login_datetime) as last_login_datetime FROM login_histories GROUP BY user_id) as lh'), 'lh.user_id', '=', 'u.id')
             ->where('u.user_type_id', '=', $userType)
+            ->orderBy('u.created_at', 'asc')
             ->get();
     }
 
@@ -297,7 +300,7 @@ class UserRepository
             'user_password' => Hash::make($data['user_password']),
             'user_type_id' => $data['user_type_id'],
             'faculty_id' => $data['faculty_id'],
-            'gender' => $data['gender'] ?? null,
+            'gender' => $data['gender'],
             'date_of_birth' => $data['date_of_birth'] ?? null,
             'phone_number' => $data['phone_number'] ?? null,
             'created_at' => now(),

@@ -98,7 +98,7 @@ const genderOptions = [
 
 const validationSchema = yup.object({
   user_name: yup.string().required('Name is required'),
-  nickname: yup.string().optional(),
+  nickname: yup.string().nullable(),
   user_email: yup.string().email('Must be a valid email').required('Email is required'),
   user_type_id: yup.string().required('User type is required'),
   faculty_id: yup.string().when('user_type_id', {
@@ -199,9 +199,9 @@ function applyFiltersAndSort() {
     const query = searchQuery.value.toLowerCase()
     filteredData = filteredData.filter(
       (user) =>
-        user.user_name.toLowerCase().includes(query) ||
-        user.user_email.toLowerCase().includes(query) ||
-        user.nickname.toLowerCase().includes(query),
+        user.user_name?.toLowerCase().includes(query) ||
+        user.user_email?.toLowerCase().includes(query) ||
+        user.nickname?.toLowerCase().includes(query),
     )
   }
 
@@ -740,6 +740,7 @@ function formatDate(dateString: string | null): string {
                   :errors="errors"
                   :options="userTypes"
                   :modelValue="values.user_type_id"
+                  :disabled="!!userToEdit"
                 />
               </template>
             </FormElement>
@@ -755,6 +756,7 @@ function formatDate(dateString: string | null): string {
                   :errors="errors"
                   :options="faculties.map((f) => ({ label: f.faculty_name, value: f.faculty_id }))"
                   :modelValue="values.faculty_id"
+                  :disabled="!!userToEdit"
                 />
               </template>
             </FormElement>
@@ -771,6 +773,7 @@ function formatDate(dateString: string | null): string {
                     :errors="errors"
                     :options="genderOptions"
                     :modelValue="values.gender"
+                    :disabled="!!userToEdit"
                   ></CustomSelect>
                 </template>
               </FormElement>

@@ -21,6 +21,6 @@ class ContactUsRepository
     }
 
     public function getContactUsList(){
-        return DB::table('contact_us')->get();
+        return DB::table('contact_us')->orderBy('created_at', 'desc')->get();
     }
 }

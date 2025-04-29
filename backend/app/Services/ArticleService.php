@@ -142,7 +142,7 @@ class ArticleService
 
     public function createUpdateArticle($userId, $request)
     {
-        
+        $sendEmail = true;
         $systemId = $this->articleRepository->getSystemId($userId);
         DB::beginTransaction();
 
@@ -195,27 +195,45 @@ class ArticleService
             }
             if (empty($request->article_id)) {
                 $this->articleRepository->createActivity($articleId, $userId, $request);
-                $this->notificationRepository->setNotification('4', $articleId);
+                if($request->status == 1){
+                    $this->notificationRepository->setNotification('4', $articleId);
+                }else{
+                    $sendEmail = false;
+                }
             }else{
-                $this->notificationRepository->setNotification('5', $request->articleId);
+                $currentStatus = $this->articleRepository->checkCurrentActivity($articleId)->article_status;
+                if($request->status == 1 && $currentStatus == 0){
+                    $this->articleRepository->createActivity($articleId, $userId, $request);
+                    $this->notificationRepository->setNotification('4', $articleId);
+                // dd($currentStatus, $articleId);
+                }else{
+                    $sendEmail = false;
+                    if($currentStatus == 1){
+                        $this->notificationRepository->setNotification('5', $articleId);
+                    }
+                }
             }
 
             DB::commit();
-            return ['success' => true];
+            return ['success' => true, 'sendEmail' => $sendEmail];
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => $e->getMessage()];
+            return ['success' => false, 'message' => $e->getMessage() ];
         }
     }
 
     public function changeArticleStatus($userId, $articleId, $request){
         if($articleId != null){
-            $this->notificationRepository->setNotification('6', $articleId);
+            if($request->status == 4){
+                $this->notificationRepository->setNotification('6', $articleId);
+            }
             $this->articleRepository->createActivity( $articleId, $userId,$request);
         }else{
             foreach ($request->articleIdList as $eachArticleId) {
-                $this->notificationRepository->setNotification('6', $eachArticleId);
+                if($request->status == 4){
+                    $this->notificationRepository->setNotification('6', $eachArticleId);
+                }
                 $this->articleRepository->createActivity($eachArticleId, $userId,$request);
             }
         }
@@ -224,10 +242,7 @@ class ArticleService
 
     public function draftArticleList($userId){
         $articles = $this->articleRepository->getAllArticles(2, $userId);
-        return [
-            'draftArticles' => $articles->get(),
-            'draftArticlesCount' => $articles->get()->count()
-        ];
+        return $articles->get();
     }
 
     public function getFileList($articleId, $request){

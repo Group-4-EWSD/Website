@@ -21,11 +21,13 @@ configure({
   validateOnBlur: false,
 })
 
+const recaptchaKey = import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY
+
 const app = createApp(App)
 const pinia = createPinia()
 app.use(pinia)
 app.use(VueReCaptcha, {
-  siteKey: '6LewtB4rAAAAANYyuYZ-c-0hROFl6u0xB8H0xBgu',
+  siteKey: recaptchaKey,
   loaderOptions: {
     useRecaptchaNet: true,
     autoHideBadge: false,

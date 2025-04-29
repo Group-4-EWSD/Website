@@ -551,19 +551,19 @@ class ArticleRepository
     public function getItemList($item)
     {
         $tables = [
-            '1' => ['article_types', ['article_type_id', 'article_type_name']],
-            '2' => ['user_types', ['user_type_id', 'user_type_name']],
-            '3' => ['faculties', ['faculty_id', 'faculty_name']],
-            '4' => ['academic_years', ['academic_year_id', 'academic_year_description', 'academic_year_start', 'academic_year_end']]
+            '1' => ['article_types', 'created_at', ['article_type_id', 'article_type_name']],
+            '2' => ['user_types', 'user_type_id', ['user_type_id', 'user_type_name']],
+            '3' => ['faculties', 'created_at', ['faculty_id', 'faculty_name']],
+            '4' => ['academic_years', 'academic_year_start', ['academic_year_id', 'academic_year_description', 'academic_year_start', 'academic_year_end']]
         ];
 
         if (!isset($tables[$item])) {
             return []; // Return empty array if item is invalid
         }
 
-        [$table, $selectColumns] = $tables[$item];
+        [$table, $orderColumn, $selectColumns] = $tables[$item];
 
-        return DB::table($table)->select($selectColumns)->get();
+        return DB::table($table)->select($selectColumns)->orderBy($orderColumn, 'asc')->get();
     }
 
     public function getPreviousLogin($userId)

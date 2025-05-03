@@ -16,8 +16,10 @@ import { TooltipProvider } from '@/components/ui/tooltip'
           class="sm:hidden absolute top-[1.3rem] left-[1.25rem] z-50 p-2 bg-primary rounded-md text-white w-8 h-8"
         />
         <TooltipProvider v-bind:delay-duration="100">
-          <main class="flex-1 p-6 overflow-y-auto mx-auto lg:max-w-[1500px]">
-            <slot />
+          <main class="flex-1 p-6 overflow-y-auto w-full">
+            <div class="mx-auto lg:max-w-[1500px]">
+              <slot />
+            </div>
           </main>
         </TooltipProvider>
       </div>

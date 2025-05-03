@@ -116,7 +116,7 @@ class UserRepository
             ])
             ->join('faculties as f', 'f.faculty_id', '=', 'u.faculty_id')
             ->join('user_types as ut', 'ut.user_type_id', '=', 'u.user_type_id')
-            ->where('u.user_type_id', '!=', 0)
+            ->where('u.user_type_id', '=', 2)
             ->get();
     }
 
@@ -207,6 +207,7 @@ class UserRepository
             ->join('app_pages as p', 'vp.page_id', '=', 'p.app_page_id')
             ->select('vp.page_id', 'p.app_page_name', DB::raw('COUNT(vp.page_id) as view_count'))
             ->groupBy('vp.page_id')
+            ->orderBy('view_count', 'desc')
             ->get();
         return $mostViewedPages;
     }

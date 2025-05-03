@@ -32,13 +32,14 @@ export async function forceSignOut(clearToken: boolean = true) {
     removeCookie('user')
     resetAllStores()
     // Redirect to login
-    router.push('/auth/login')
+    pushAndReload('/auth/login')
   } else {
     // Remove token from cookies
     removeCookie('token')
     removeCookie('user')
+    resetAllStores()
     // Redirect to login
-    router.push('/auth/login')
+    pushAndReload('/auth/login')
   }
 }
 
@@ -94,4 +95,23 @@ export const getInitials = (name?: string): string => {
     .split(' ')
     .map((part) => part[0])
     .join('')
+}
+
+export function pushAndReload(path: string) {
+  return new Promise((resolve) => {
+    // Use router.push's promise to wait for navigation to complete
+    router
+      .push(path)
+      .then(() => {
+        // After navigation completes, reload the page
+        window.location.reload()
+        resolve(true)
+      })
+      .catch((err) => {
+        console.error('Navigation error:', err)
+        // Reload anyway in case of navigation errors
+        window.location.reload()
+        resolve(false)
+      })
+  })
 }

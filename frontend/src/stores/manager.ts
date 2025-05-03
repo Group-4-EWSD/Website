@@ -25,7 +25,7 @@ export const useManagerStore = defineStore('manager', () => {
       guestList.value = response.guestList
       prevLogin.value = response.prev_login
       chartData.value = response.articlesPerYear
-      members.value = response.memberList
+      members.value = response.memberList.filter((member) => member.user_type_name !== 'Student')
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'An unexpected error occurred.')
       console.error('Error fetching dashboard data:', error)

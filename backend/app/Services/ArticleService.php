@@ -71,6 +71,7 @@ class ArticleService
             'guestList' => $this->userRepository->getGuestList()
         ];
     }
+    
     public function getManagerHomePageData($userId){
         return [
             'prev_login' => $this->articleRepository->getPreviousLogin($userId),

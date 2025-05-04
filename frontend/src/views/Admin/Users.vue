@@ -740,7 +740,6 @@ function formatDate(dateString: string | null): string {
                   :errors="errors"
                   :options="userTypes"
                   :modelValue="values.user_type_id"
-                  :disabled="!!userToEdit"
                 />
               </template>
             </FormElement>
@@ -756,7 +755,6 @@ function formatDate(dateString: string | null): string {
                   :errors="errors"
                   :options="faculties.map((f) => ({ label: f.faculty_name, value: f.faculty_id }))"
                   :modelValue="values.faculty_id"
-                  :disabled="!!userToEdit"
                 />
               </template>
             </FormElement>
@@ -773,7 +771,6 @@ function formatDate(dateString: string | null): string {
                     :errors="errors"
                     :options="genderOptions"
                     :modelValue="values.gender"
-                    :disabled="!!userToEdit"
                   ></CustomSelect>
                 </template>
               </FormElement>

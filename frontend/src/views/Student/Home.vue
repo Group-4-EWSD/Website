@@ -39,7 +39,6 @@ const articleStore = useArticleStore()
 
 const categoryOptions = ref<{ label: string; value: string }[]>([])
 const yearOptions = ref<{ label: string; value: string }[]>([])
-const filtersInitialized = ref(false)
 const sortedValue = ref('created asc')
 
 const selectedCategory = computed({
@@ -53,8 +52,8 @@ const selectedYear = computed({
 })
 
 const sortOptions = ref([
-  { value: '2', label: 'Newest First' },
-  { value: '1', label: 'Oldest First' },
+  { value: '1', label: 'Newest First' },
+  { value: '2', label: 'Oldest First' },
   { value: '3', label: 'Name (A → Z)' },
   { value: '4', label: 'Name (Z → A)' },
 ])
@@ -73,21 +72,22 @@ onMounted(async () => {
   if (!articleStore.articles.length) {
     articleStore.fetchArticles({ pageNumber: 1 })
   }
-  console.log(filtersInitialized.value)
-  if (filtersInitialized.value) return
-  const [articleTypes, academicYears] = await Promise.all([getFilterItems(3), getFilterItems(4)])
+  if (!articleStore.categoryOptions.length || !articleStore.yearOptions.length) {
+    const [articleTypes, academicYears] = await Promise.all([getFilterItems(3), getFilterItems(4)])
 
-  categoryOptions.value = articleTypes.map((item: any) => ({
-    label: item.faculty_name,
-    value: item.faculty_id,
-  }))
+    categoryOptions.value = articleTypes.map((item: any) => ({
+      label: item.faculty_name,
+      value: item.faculty_id,
+    }))
 
-  yearOptions.value = academicYears.map((item: any) => ({
-    label: item.academic_year_description,
-    value: item.academic_year_id,
-  }))
+    yearOptions.value = academicYears.map((item: any) => ({
+      label: item.academic_year_description,
+      value: item.academic_year_id,
+    }))
 
-  filtersInitialized.value = true
+    articleStore.setCategoryOptions(categoryOptions.value)
+    articleStore.setYearOptions(yearOptions.value)
+  }
 })
 
 watch(
@@ -185,10 +185,10 @@ const goToPage = (page: number) => {
         <div class="flex gap-3 text-gray-600 pr-[10px] relative">
           <!-- Filter -->
           <FilterModal
-            :category-options="categoryOptions"
-            :year-options="yearOptions"
-            :selected-category="selectedCategory"
-            :selected-year="selectedYear"
+            :category-options="articleStore.categoryOptions"
+            :year-options="articleStore.yearOptions"
+            :selected-category="articleStore.selectedCategory"
+            :selected-year="articleStore.selectedYear"
             @update:selectedCategory="updateCategory"
             @update:selectedYear="updateYear"
           />
